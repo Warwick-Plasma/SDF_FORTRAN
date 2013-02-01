@@ -11,7 +11,7 @@ OBJDIR = obj
 LIBDIR = lib
 INCDIR = include
 
-CPU = px
+CPU = p7
 
 ifeq (linux-ix86_64,$(ARCH))
    M64_FLAG = -m64
