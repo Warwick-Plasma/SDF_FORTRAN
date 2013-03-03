@@ -54,7 +54,7 @@ ifeq (intel,$(findstring intel,$(FLAVOUR)))
 endif
 
 ifeq (pgi,$(findstring pgi,$(FLAVOUR)))
-   MY_FFLAGS += -Mnodefaultunit -Ktrap=fp -Mdclchk -tp $(CPU)
+   MY_FFLAGS += -Mnodefaultunit -Ktrap=fp -Mdclchk -tp $(CPU) -mcmodel=medium
    MY_FFLAGS_OPT = $(MY_FFLAGS) -O2 -Mvect -Munroll
    MY_FFLAGS_DBG = $(MY_FFLAGS) -O0 -g -Ktrap=denorm -Mbounds -Mchkfpstk \
        -Mdepchk -Mstandard -C
