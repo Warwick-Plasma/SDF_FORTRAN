@@ -464,6 +464,7 @@ CONTAINS
     IF (ASSOCIATED(var%dim_labels)) DEALLOCATE(var%dim_labels)
     IF (ASSOCIATED(var%dim_units)) DEALLOCATE(var%dim_units)
     IF (ASSOCIATED(var%material_names)) DEALLOCATE(var%material_names)
+    IF (ASSOCIATED(var%run)) DEALLOCATE(var%run)
 
     CALL initialise_block_type(var)
 
