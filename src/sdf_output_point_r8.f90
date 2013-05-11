@@ -348,13 +348,51 @@ CONTAINS
     REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
 
     INTERFACE
-      FUNCTION iterator(array, npoint_it, start, direction)
+      FUNCTION iterator(array, npoint_it, start, direction, param)
         USE sdf_common
         REAL(r8) :: iterator
-        REAL(r8), DIMENSION(:), INTENT(OUT) :: array
+        REAL(r8), DIMENSION(:), INTENT(INOUT) :: array
         INTEGER, INTENT(INOUT) :: npoint_it
         LOGICAL, INTENT(IN) :: start
         INTEGER, INTENT(IN) :: direction
+        INTEGER, INTENT(IN), OPTIONAL :: param
+      END FUNCTION iterator
+    END INTERFACE
+
+    CALL write_point_mesh_gen_r8(h, id, name, species_id, npoint_global, &
+        ndims, iterator, 0, offset, convert_in, dim_labels, dim_units, &
+        dim_mults)
+
+  END SUBROUTINE write_point_mesh_r8
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a nD point mesh in parallel using an iterator with parameter
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_point_mesh_gen_r8(h, id, name, species_id, npoint_global, &
+      ndims, iterator, param, offset, convert_in, dim_labels, dim_units, &
+      dim_mults)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, species_id
+    INTEGER(i8), INTENT(IN) :: npoint_global
+    INTEGER(i4), INTENT(IN) :: ndims, param
+    INTEGER(i8), INTENT(IN) :: offset
+    LOGICAL, INTENT(IN), OPTIONAL :: convert_in
+    CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
+    REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
+
+    INTERFACE
+      FUNCTION iterator(array, npoint_it, start, direction, param)
+        USE sdf_common
+        REAL(r8) :: iterator
+        REAL(r8), DIMENSION(:), INTENT(INOUT) :: array
+        INTEGER, INTENT(INOUT) :: npoint_it
+        LOGICAL, INTENT(IN) :: start
+        INTEGER, INTENT(IN) :: direction
+        INTEGER, INTENT(IN), OPTIONAL :: param
       END FUNCTION iterator
     END INTERFACE
 
@@ -410,7 +448,7 @@ CONTAINS
       file_offset = h%current_location + offset * b%type_size
 
       DO
-        ret = iterator(array, npoint_this_cycle, start, idim)
+        ret = iterator(array, npoint_this_cycle, start, idim, param)
         nmax = npoint_this_cycle
         CALL MPI_ALLREDUCE(npoint_this_cycle, nmax, 1, MPI_INTEGER, &
             MPI_MAX, h%comm, errcode)
@@ -468,7 +506,7 @@ CONTAINS
     h%current_location = b%data_location + b%data_length
     b%done_data = .TRUE.
 
-  END SUBROUTINE write_point_mesh_r8
+  END SUBROUTINE write_point_mesh_gen_r8
 
 
 
@@ -566,12 +604,47 @@ CONTAINS
     REAL(r8), INTENT(IN), OPTIONAL :: mult
 
     INTERFACE
-      FUNCTION iterator(array, npoint_it, start)
+      FUNCTION iterator(array, npoint_it, start, param)
         USE sdf_common
         REAL(r8) :: iterator
-        REAL(r8), DIMENSION(:), INTENT(OUT) :: array
+        REAL(r8), DIMENSION(:), INTENT(INOUT) :: array
         INTEGER, INTENT(INOUT) :: npoint_it
         LOGICAL, INTENT(IN) :: start
+        INTEGER, INTENT(IN), OPTIONAL :: param
+      END FUNCTION iterator
+    END INTERFACE
+
+    CALL write_point_variable_gen_r8(h, id, name, species_id, units, &
+        npoint_global, mesh_id, iterator, 0, offset, convert_in, mult)
+
+  END SUBROUTINE write_point_variable_r8
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a point variable in parallel using an iterator and parameter
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_point_variable_gen_r8(h, id, name, species_id, units, &
+      npoint_global, mesh_id, iterator, param, offset, convert_in, mult)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, species_id, units
+    INTEGER(i8), INTENT(IN) :: npoint_global
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER, INTENT(IN) :: param
+    INTEGER(i8), INTENT(IN) :: offset
+    LOGICAL, INTENT(IN), OPTIONAL :: convert_in
+    REAL(r8), INTENT(IN), OPTIONAL :: mult
+
+    INTERFACE
+      FUNCTION iterator(array, npoint_it, start, param)
+        USE sdf_common
+        REAL(r8) :: iterator
+        REAL(r8), DIMENSION(:), INTENT(INOUT) :: array
+        INTEGER, INTENT(INOUT) :: npoint_it
+        LOGICAL, INTENT(IN) :: start
+        INTEGER, INTENT(IN), OPTIONAL :: param
       END FUNCTION iterator
     END INTERFACE
 
@@ -622,7 +695,7 @@ CONTAINS
     file_offset = h%current_location + offset * b%type_size
 
     DO
-      ret = iterator(array, npoint_this_cycle, start)
+      ret = iterator(array, npoint_this_cycle, start, param)
       nmax = npoint_this_cycle
       CALL MPI_ALLREDUCE(npoint_this_cycle, nmax, 1, MPI_INTEGER, &
           MPI_MAX, h%comm, errcode)
@@ -653,6 +726,6 @@ CONTAINS
     h%current_location = b%data_location + b%data_length
     b%done_data = .TRUE.
 
-  END SUBROUTINE write_point_variable_r8
+  END SUBROUTINE write_point_variable_gen_r8
 
 END MODULE sdf_output_point_r8
