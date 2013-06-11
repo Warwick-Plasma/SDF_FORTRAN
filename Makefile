@@ -46,10 +46,10 @@ ifeq (gfortran,$(findstring gfortran,$(FLAVOUR)))
 endif
 
 ifeq (intel,$(findstring intel,$(FLAVOUR)))
-   MY_FFLAGS += -fpe0
-   MY_FFLAGS_OPT = $(MY_FFLAGS) -O3 -ip -vec-report0 #-ipo 
+   MY_FFLAGS += -fpe0 -mcmodel=medium -heap-arrays 64
+   MY_FFLAGS_OPT = $(MY_FFLAGS) -O3 -ip -vec-report0
    MY_FFLAGS_DBG = $(MY_FFLAGS) -O0 -g -u -ftrapuv -traceback -nothreads \
-       -fltconsistency -C -warn -save-temps -fpic -Wl,-no_pie
+       -fltconsistency -C -warn -save-temps -fpic
    MY_FFLAGS_PROF = $(MY_FFLAGS_OPT) -p
 endif
 
