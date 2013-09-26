@@ -6,7 +6,10 @@ set(INHERIT_FLAGS OFF CACHE BOOL "Inherit compiler flags")
 
 if(NOT INHERIT_FLAGS)
    if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "PGI")
-      set(CPU nehalem-64 CACHE STRING "Which CPU? (see pgf90 man page for options)")
+      set(CPU "" CACHE STRING "Which CPU? (see pgf90 man page for options)")
+      if(CPU)
+         set(CPU "-tp ${CPU}")
+      endif()
 
       set(CMAKE_Fortran_FLAGS
          "-Mnodefaultunit -Ktrap=fp -mcmodel=medium -Mdclchk -tp ${CPU} ${MPI_Fortran_COMPILE_FLAGS}"
