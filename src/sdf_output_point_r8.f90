@@ -66,7 +66,7 @@ CONTAINS
       ! big enough for npoint_global which is an INTEGER*8
 
       npoint_max = HUGE(npoint_max)
-      npoint_rem = INT(MOD(npoint_global, INT(npoint_max,i8)),r4)
+      npoint_rem = INT(MOD(npoint_global, INT(npoint_max,i8)),i4)
 
       ! X-coordinates
       idx = 1
@@ -145,7 +145,7 @@ CONTAINS
       ! big enough for npoint_global which is an INTEGER*8
 
       npoint_max = HUGE(npoint_max)
-      npoint_rem = INT(MOD(npoint_global, INT(npoint_max,i8)),r4)
+      npoint_rem = INT(MOD(npoint_global, INT(npoint_max,i8)),i4)
 
       ! X-coordinates
       idx = 1
@@ -237,7 +237,7 @@ CONTAINS
       ! big enough for npoint_global which is an INTEGER*8
 
       npoint_max = HUGE(npoint_max)
-      npoint_rem = INT(MOD(npoint_global, INT(npoint_max,i8)),r4)
+      npoint_rem = INT(MOD(npoint_global, INT(npoint_max,i8)),i4)
 
       ! X-coordinates
       idx = 1
@@ -359,8 +359,7 @@ CONTAINS
     END INTERFACE
 
     INTEGER(MPI_OFFSET_KIND) :: file_offset, offset_for_min_max
-    INTEGER(i8) :: nmax
-    INTEGER :: errcode, idim, npoint_this_cycle
+    INTEGER :: errcode, idim, npoint_this_cycle, nmax
     LOGICAL :: start, convert
     REAL(r8), DIMENSION(c_maxdims) :: gmn, gmx
     REAL(r8), ALLOCATABLE, DIMENSION(:) :: array
@@ -413,7 +412,7 @@ CONTAINS
       DO
         ret = iterator(array, npoint_this_cycle, start, idim)
         nmax = npoint_this_cycle
-        CALL MPI_ALLREDUCE(npoint_this_cycle, nmax, 1, h%mpitype_integer, &
+        CALL MPI_ALLREDUCE(npoint_this_cycle, nmax, 1, MPI_INTEGER, &
             MPI_MAX, h%comm, errcode)
         IF (nmax .LE. 0) EXIT
 
@@ -514,7 +513,7 @@ CONTAINS
       ! big enough for npoint_global which is an INTEGER*8
 
       npoint_max = HUGE(npoint_max)
-      npoint_rem = INT(MOD(npoint_global, INT(npoint_max,i8)),r4)
+      npoint_rem = INT(MOD(npoint_global, INT(npoint_max,i8)),i4)
 
       idx = 1
       DO i = 1, npoint_global / npoint_max
@@ -577,8 +576,7 @@ CONTAINS
     END INTERFACE
 
     INTEGER(MPI_OFFSET_KIND) :: file_offset
-    INTEGER(i8) :: nmax
-    INTEGER :: errcode, npoint_this_cycle
+    INTEGER :: errcode, npoint_this_cycle, nmax
     LOGICAL :: start, convert
     REAL(r8), ALLOCATABLE, DIMENSION(:) :: array
     REAL(r4), ALLOCATABLE, DIMENSION(:) :: r4array
@@ -626,7 +624,7 @@ CONTAINS
     DO
       ret = iterator(array, npoint_this_cycle, start)
       nmax = npoint_this_cycle
-      CALL MPI_ALLREDUCE(npoint_this_cycle, nmax, 1, h%mpitype_integer, &
+      CALL MPI_ALLREDUCE(npoint_this_cycle, nmax, 1, MPI_INTEGER, &
           MPI_MAX, h%comm, errcode)
       IF (nmax .LE. 0) EXIT
 

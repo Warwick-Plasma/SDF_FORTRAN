@@ -219,6 +219,9 @@ CONTAINS
       h%current_location = h%current_location + b%npoints * b%type_size
     ENDDO
 
+    CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
+        MPI_INFO_NULL, errcode)
+
     DEALLOCATE(array)
 
     h%current_location = b%next_block_location
@@ -297,6 +300,9 @@ CONTAINS
       ret = iterator(array, npoint_this_it, start)
       start = .FALSE.
     ENDDO
+
+    CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
+        MPI_INFO_NULL, errcode)
 
     DEALLOCATE(array)
 

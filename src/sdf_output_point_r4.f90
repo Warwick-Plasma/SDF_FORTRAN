@@ -359,8 +359,7 @@ CONTAINS
     END INTERFACE
 
     INTEGER(MPI_OFFSET_KIND) :: file_offset, offset_for_min_max
-    INTEGER(i8) :: nmax
-    INTEGER :: errcode, idim, npoint_this_cycle
+    INTEGER :: errcode, idim, npoint_this_cycle, nmax
     LOGICAL :: start, convert
     REAL(r8), DIMENSION(c_maxdims) :: gmn, gmx
     REAL(r4), ALLOCATABLE, DIMENSION(:) :: array
@@ -413,7 +412,7 @@ CONTAINS
       DO
         ret = iterator(array, npoint_this_cycle, start, idim)
         nmax = npoint_this_cycle
-        CALL MPI_ALLREDUCE(npoint_this_cycle, nmax, 1, h%mpitype_integer, &
+        CALL MPI_ALLREDUCE(npoint_this_cycle, nmax, 1, MPI_INTEGER, &
             MPI_MAX, h%comm, errcode)
         IF (nmax .LE. 0) EXIT
 
@@ -577,8 +576,7 @@ CONTAINS
     END INTERFACE
 
     INTEGER(MPI_OFFSET_KIND) :: file_offset
-    INTEGER(i8) :: nmax
-    INTEGER :: errcode, npoint_this_cycle
+    INTEGER :: errcode, npoint_this_cycle, nmax
     LOGICAL :: start, convert
     REAL(r4), ALLOCATABLE, DIMENSION(:) :: array
     REAL(r4), ALLOCATABLE, DIMENSION(:) :: r4array
@@ -626,7 +624,7 @@ CONTAINS
     DO
       ret = iterator(array, npoint_this_cycle, start)
       nmax = npoint_this_cycle
-      CALL MPI_ALLREDUCE(npoint_this_cycle, nmax, 1, h%mpitype_integer, &
+      CALL MPI_ALLREDUCE(npoint_this_cycle, nmax, 1, MPI_INTEGER, &
           MPI_MAX, h%comm, errcode)
       IF (nmax .LE. 0) EXIT
 
