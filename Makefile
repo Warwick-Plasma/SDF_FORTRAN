@@ -10,6 +10,7 @@ SRCDIR = src
 OBJDIR = obj
 LIBDIR = lib
 INCDIR = include
+GEN_SRC = $(SRCDIR)/pack.sh
 
 CPU = p7
 
@@ -43,6 +44,7 @@ ifeq (gfortran,$(findstring gfortran,$(FLAVOUR)))
        -fbacktrace -Wextra -ffpe-trap=invalid,zero,overflow -pedantic 
    MY_FFLAGS_PROF = $(MY_FFLAGS_OPT) -p
    MODULEFLAG = -I/usr/include -I$(INCDIR) -J$(INCDIR)
+   INFO_FLAGS = -Wno-conversion -fno-range-check
 endif
 
 ifeq (intel,$(findstring intel,$(FLAVOUR)))
@@ -93,6 +95,8 @@ ifeq (opt,$(findstring opt,$(mode)))
    FFLAGS  += $(MY_FFLAGS_OPT)
 endif
 
+FC_INFO := $(shell ${FC} --version | grep '[a-zA-Z]' | head -n 1)
+
 # objectlist file
 include Makefile-objs
 
@@ -112,6 +116,11 @@ all: $(LIB)
 # implicit rules
 %.o: %.f90
 	$(FC) -c $(FFLAGS) $(MODULEFLAG) -o $(OBJDIR)/$@ $<
+
+$(SRCDIR)/sdf_source_info.f90: $(SOURCE_ALL)
+	$(GEN_SRC) $@ "$(FC_INFO)" "$(FFLAGS)" $^
+sdf_source_info.o: sdf_source_info.f90 $(SOURCE_ALL)
+	$(FC) -c $(FFLAGS) $(INFO_FLAGS) $(MODULEFLAG) -o $(OBJDIR)/$@ $<
 
 $(LIB): $(OBJS)
 	$(RM) -f $@

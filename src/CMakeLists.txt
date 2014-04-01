@@ -1,12 +1,12 @@
 set(SOURCES
+   sdf.f90
    sdf_common.f90
    sdf_control.f90
-   sdf.f90
+   sdf_input.f90
    sdf_input_cartesian.f90
    sdf_input_cartesian_r4.f90
    sdf_input_cartesian_r8.f90
    sdf_input_cartesian_ru.f90
-   sdf_input.f90
    sdf_input_point.f90
    sdf_input_point_r4.f90
    sdf_input_point_r8.f90
@@ -20,11 +20,11 @@ set(SOURCES
    sdf_input_station_ru.f90
    sdf_input_util.f90
    sdf_job_info.f90
+   sdf_output.f90
    sdf_output_cartesian.f90
    sdf_output_cartesian_r4.f90
    sdf_output_cartesian_r8.f90
    sdf_output_cartesian_ru.f90
-   sdf_output.f90
    sdf_output_point.f90
    sdf_output_point_r4.f90
    sdf_output_point_r8.f90
@@ -32,11 +32,48 @@ set(SOURCES
    sdf_output_r4.f90
    sdf_output_r8.f90
    sdf_output_ru.f90
+   sdf_output_source.f90
    sdf_output_station.f90
    sdf_output_station_r4.f90
    sdf_output_station_r8.f90
    sdf_output_station_ru.f90
    sdf_output_util.f90
    )
+
+find_program(PACK_SDF pack.sh
+   PATHS .
+   DOC "pack source info into a Fortran byte array")
+
+execute_process(COMMAND ${CMAKE_Fortran_COMPILER} --version
+  COMMAND grep [a-zA-Z] COMMAND head -n 1
+  OUTPUT_VARIABLE FC_INFO OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+   set(FFLAGS ${CMAKE_Fortran_FLAGS_DEBUG})
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+   set(FFLAGS ${CMAKE_Fortran_FLAGS_RELEASE})
+else()
+   set(FFLAGS ${CMAKE_Fortran_FLAGS})
+endif()
+
+set(INFO_FILE sdf_source_info.f90)
+file(GLOB SOURCE_ALL RELATIVE "${TOPLEVEL}" ${SOURCE_ALL} ${SOURCES}
+   CMakeLists.txt pack.py pack.sh)
+
+add_custom_command(
+   OUTPUT ${INFO_FILE}
+   COMMAND ${CMAKE_COMMAND} -E remove -f ${FORT}
+   COMMAND ${PACK_SDF} ${CMAKE_CURRENT_BINARY_DIR}/${INFO_FILE} ${FC_INFO}
+      ${FFLAGS} ${SOURCE_ALL}
+   WORKING_DIRECTORY ${TOPLEVEL}
+   DEPENDS ${PACK_SDF} VERBATIM)
+
+list(APPEND SOURCES ${INFO_FILE})
+
+if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
+   set(INFO_FLAGS "-Wno-conversion -fno-range-check")
+   set_source_files_properties(${INFO_FILE} PROPERTIES COMPILE_FLAGS
+      ${INFO_FLAGS})
+endif()
 
 add_library(sdf ${SOURCES})

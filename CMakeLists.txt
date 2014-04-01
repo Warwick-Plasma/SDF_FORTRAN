@@ -41,6 +41,9 @@ if(NOT INHERIT_FLAGS)
    endif()
 endif()
 
+set(TOPLEVEL "${CMAKE_CURRENT_SOURCE_DIR}")
+file(GLOB SOURCE_ALL CMakeLists.txt Makefile*)
+
 include_directories(
    include
    ${MPI_Fortran_INCLUDE_PATH})
