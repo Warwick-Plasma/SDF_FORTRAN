@@ -8,8 +8,8 @@ SRCFILES := sdf.f90 sdf_common.f90 sdf_control.f90 sdf_input.f90 \
    sdf_output_cartesian_r4.f90 sdf_output_cartesian_r8.f90 \
    sdf_output_cartesian_ru.f90 sdf_output_point.f90 sdf_output_point_r4.f90 \
    sdf_output_point_r8.f90 sdf_output_point_ru.f90 sdf_output_r4.f90 \
-   sdf_output_r8.f90 sdf_output_ru.f90 sdf_output_station.f90 \
-   sdf_output_station_r4.f90 sdf_output_station_r8.f90 \
+   sdf_output_r8.f90 sdf_output_ru.f90 sdf_output_source.f90 \
+   sdf_output_station.f90 sdf_output_station_r4.f90 sdf_output_station_r8.f90 \
    sdf_output_station_ru.f90 sdf_output_util.f90
 OBJS := $(SRCFILES:.f90=.o) sdf_source_info.o
 SOURCE_ALL := CMakeLists.txt Makefile Makefile-objs Makefile-deps $(SRCFILES) \
