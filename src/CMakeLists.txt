@@ -76,4 +76,6 @@ if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
       ${INFO_FLAGS})
 endif()
 
-add_library(sdf ${SOURCES})
+if(NOT TARGET sdf)
+   add_library(sdf ${SOURCES})
+endif()
