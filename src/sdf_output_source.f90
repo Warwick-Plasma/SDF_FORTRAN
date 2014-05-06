@@ -14,7 +14,9 @@ CONTAINS
     CHARACTER(LEN=c_id_length) :: stitched_ids(3)
     CHARACTER(LEN=c_id_length) :: time_string
     CHARACTER(LEN=512) :: string_array(6)
-    INTEGER :: n = 0
+    INTEGER :: n
+
+    n = 0
 
     IF (SIZE(sdf_bytes) .GT. 1 .OR. &
           TRIM(sdf_bytes_checksum_type) .NE. '') THEN
