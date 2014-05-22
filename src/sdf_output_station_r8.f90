@@ -47,9 +47,9 @@ CONTAINS
 
       real8 = REAL(time,r8)
       CALL MPI_FILE_WRITE(h%filehandle, real8, 1, mpitype_real, &
-            MPI_STATUS_IGNORE, errcode)
+          MPI_STATUS_IGNORE, errcode)
       CALL MPI_FILE_WRITE(h%filehandle, array, b%nvariables-1, mpitype_real, &
-            MPI_STATUS_IGNORE, errcode)
+          MPI_STATUS_IGNORE, errcode)
     ENDIF
     b%nelements = b%nelements + 1
     b%data_length = b%data_length + b%type_size
