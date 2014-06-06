@@ -93,6 +93,7 @@ CONTAINS
 
       CALL MPI_FILE_WRITE(h%filehandle, time, 1, &
           MPI_REAL8, MPI_STATUS_IGNORE, errcode)
+      h%time = time
       h%time_wrote = h%time
 
       CALL MPI_FILE_WRITE(h%filehandle, h%jobid%start_seconds, 1, &
@@ -499,8 +500,8 @@ CONTAINS
     INTEGER, INTENT(IN), OPTIONAL :: rank_write
 
     CALL write_run_info_minor(h, version, revision, 0, commit_id, &
-      sha1sum, compile_machine, compile_flags, defines, compile_date, &
-      run_date, rank_write)
+        sha1sum, compile_machine, compile_flags, defines, compile_date, &
+        run_date, rank_write)
 
   END SUBROUTINE write_run_info_old
 
@@ -1741,7 +1742,7 @@ CONTAINS
 
 
   SUBROUTINE write_cpu_split_1d_spec(h, id, name, ndim1, nmax1, ndim2, nmax2, &
-          ndim3, nmax3, rank_write)
+      ndim3, nmax3, rank_write)
 
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name

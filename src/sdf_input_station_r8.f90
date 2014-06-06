@@ -38,9 +38,9 @@ CONTAINS
 
     IF (h%rank .EQ. h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, time, 1, mpitype_real, &
-            MPI_STATUS_IGNORE, errcode)
+          MPI_STATUS_IGNORE, errcode)
       CALL MPI_FILE_READ(h%filehandle, array, b%nvariables-1, mpitype_real, &
-            MPI_STATUS_IGNORE, errcode)
+          MPI_STATUS_IGNORE, errcode)
       h%current_location = h%current_location + b%type_size
     ENDIF
 
