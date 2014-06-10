@@ -149,6 +149,7 @@ CONTAINS
       use_mult_char = ACHAR(use_mult)
       CALL MPI_FILE_WRITE(h%filehandle, use_mult_char, 1, MPI_CHARACTER, &
           MPI_STATUS_IGNORE, errcode)
+      padding = REPEAT(ACHAR(0),LEN(padding))
       CALL MPI_FILE_WRITE(h%filehandle, padding, 3, MPI_CHARACTER, &
           MPI_STATUS_IGNORE, errcode)
       DO i = 1,b%nstations
