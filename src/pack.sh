@@ -1,18 +1,24 @@
 #! /bin/sh
 
+export GIT_WORK_TREE=$1
+export GIT_DIR=$1/.git
+shift
+
+prefix=$1
+pack_source_code=$2
+pack_git_diff=$3
+pack_git_diff_from_origin=$4
+generate_checksum=$5
+f77_output=$6
+
 # Use python script by default and then fall back to shell script if that
 # fails
 BASEDIR=$(dirname $0)
-$BASEDIR/pack.py "$@"
+python2.7 $BASEDIR/pack.py "$@"
 if [ $? -eq 0 ]; then
   exit
 fi
-
-prefix="sdf"
-pack_source_code=1
-pack_git_diff=1
-pack_git_diff_from_origin=1
-generate_checksum=1
+shift 6
 
 archive="source_info_archive.tgz"
 hexdump="source_info_hexdump.txt"

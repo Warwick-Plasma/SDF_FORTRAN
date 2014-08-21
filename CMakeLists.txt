@@ -44,6 +44,13 @@ endif()
 set(TOPLEVEL "${CMAKE_CURRENT_SOURCE_DIR}")
 file(GLOB SOURCE_ALL CMakeLists.txt Makefile*)
 
+set(PACK_SOURCE_CODE 1 CACHE STRING "Pack source code")
+set(PACK_GIT_DIFF 1 CACHE STRING "Pack git diff")
+set(PACK_GIT_DIFF_FROM_ORIGIN 1 CACHE STRING "Pack git diff from origin")
+set(GENERATE_CHECKSUM 1 CACHE 1 "Generate checksum")
+set(F77_OUTPUT 0)
+set(GIT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
 include_directories(
    include
    ${MPI_Fortran_INCLUDE_PATH})
