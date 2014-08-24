@@ -3,19 +3,43 @@
 import binascii
 import struct
 import os
-import sys
 import time
 import subprocess as sp
 import tarfile
 import hashlib
 import platform
 import gzip
+import argparse
 
-prefix="sdf"
-pack_source_code = True
-pack_git_diff = True
-pack_git_diff_from_origin = True
-generate_checksum = True
+def str2bool(x):
+   if x.lower() not in {'true', 'yes', '1', 'false', 'no', '0'}:
+      raise TypeError
+   return x.lower() in {'true', 'yes', '1'}
+
+argp = argparse.ArgumentParser(
+      description="Pack source code for writing to SDF output")
+argp.add_argument("prefix", type=str, help="Package name")
+argp.add_argument("pack_source_code", type=str2bool,
+      help="Pack source code")
+argp.add_argument("pack_git_diff", type=str2bool,
+      help="Pack git diff")
+argp.add_argument("pack_git_diff_from_origin", type=str2bool,
+      help="Pack git diff from origin")
+argp.add_argument("generate_checksum", type=str2bool,
+      help="Generate checksum")
+argp.add_argument("f77_output", type=str2bool,
+      help="Fortran 77 output")
+argp.add_argument("outfile", type=str, help="Output file")
+argp.add_argument("compiler_info", type=str, help="Compiler info")
+argp.add_argument("compiler_flags", type=str, help="Compiler flags")
+argp.add_argument("filelist", type=str, nargs='*', help="Source files")
+args = argp.parse_args()
+
+prefix = args.prefix
+pack_source_code  = args.pack_source_code 
+pack_git_diff  = args.pack_git_diff 
+pack_git_diff_from_origin  = args.pack_git_diff_from_origin 
+generate_checksum  = args.generate_checksum 
 
 archive="source_info_archive.tgz"
 hexdump="source_info_hexdump.txt"
@@ -23,10 +47,10 @@ gitdiff="source_info_gitdiff.txt"
 varname="%s_bytes" % prefix
 diffname="%s_diff_bytes" % prefix
 module_name="%s_source_info" % prefix
-outfile=sys.argv[1]
+outfile=args.outfile
 incfile=outfile.split('.')[0] + '_include.inc'
 
-f77_output = False
+f77_output = args.f77_output
 nbytes = 8
 nelements = 0
 padding = 0
@@ -220,7 +244,7 @@ fnull=open(os.devnull,'w')
 try:
   git_version = sp.check_output("git describe --always --long --dirty",
                   shell=True,stderr=fnull).rstrip()
-except:
+except (OSError, CalledProcessError):
   git_version = ''
   pack_git_diff = False
 
@@ -228,13 +252,13 @@ tsec = time.time()
 compile_date = int(round(tsec))
 compile_date_string = time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime(tsec))
 compile_machine_info = ' '.join((platform.node(),platform.platform()))
-compiler_info=sys.argv[2]
-compiler_flags=sys.argv[3]
+compiler_info=args.compiler_info
+compiler_flags=args.compiler_flags
 
 #filelist = sp.check_output("git ls-files --cached --no-empty-directory "
 #                + "--full-name", shell=True, stderr=fnull).rstrip()
 
-filelist = sys.argv[4:]
+filelist = args.filelist
 if filelist == []:
   pack_source_code = False
 

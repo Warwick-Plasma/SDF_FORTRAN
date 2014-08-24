@@ -1,18 +1,24 @@
 #! /bin/sh
 
+export GIT_WORK_TREE=$1
+export GIT_DIR=$1/.git
+shift
+
+prefix=$1
+pack_source_code=$2
+pack_git_diff=$3
+pack_git_diff_from_origin=$4
+generate_checksum=$5
+f77_output=$6
+
 # Use python script by default and then fall back to shell script if that
 # fails
 BASEDIR=$(dirname $0)
-$BASEDIR/pack.py "$@"
+python2.7 $BASEDIR/pack.py "$@"
 if [ $? -eq 0 ]; then
   exit
 fi
-
-prefix="sdf"
-pack_source_code=1
-pack_git_diff=1
-pack_git_diff_from_origin=1
-generate_checksum=1
+shift 6
 
 archive="source_info_archive.tgz"
 hexdump="source_info_hexdump.txt"
@@ -24,6 +30,7 @@ outfile="$1"
 
 git_version=$(git describe --always --long --dirty 2>/dev/null)
 if [ $? -ne 0 ]; then
+  git_version=' '
   pack_git_diff=0
 fi
 
@@ -32,6 +39,12 @@ compile_date_string=$(date "+%Y-%m-%d-%H:%M:%S")
 compile_machine_info="$(uname -n) $(uname -s) $(uname -r) $(uname -m) $(uname -p)"
 compiler_info="$2"
 compiler_flags="$3"
+if [ "$compiler_info"x = x ]; then
+  compiler_info=' '
+fi
+if [ "$compiler_flags"x = x ]; then
+  compiler_flags=' '
+fi
 
 ncont=39 # Maximum continuation lines allowed in F95
 continuation_lines=39
@@ -136,8 +149,8 @@ fi
 
 
 get_bytes_checksum () {
-  checksum_type=''
-  checksum=''
+  checksum_type=' '
+  checksum=' '
   if [ $generate_checksum -ne 0 ]; then
     files="$*"
     checksum_type='sha256'
@@ -148,10 +161,13 @@ get_bytes_checksum () {
       if [ "$checksum"x = x ]; then
         #echo openssl failed. Trying sha256sum.
         checksum=$(cat $files | sha256sum 2>/dev/null | cut -f1 -d' ')
+        if [ "$checksum"x = x ]; then
+          checksum=' '
+        fi
       fi
     fi
     if [ "$checksum"x = x ]; then
-      checksum_type=''
+      checksum_type=' '
       echo WARNING: unable to create valid SHA-256 checksum
     fi
   fi
@@ -184,8 +200,8 @@ fi
 
 
 vname=$varname
-checksum_type=''
-checksum=''
+checksum_type=' '
+checksum=' '
 if [ "$filelist"x != x ]; then
   get_bytes_checksum $filelist
 fi
@@ -194,7 +210,7 @@ cat >> $outfile <<EOF
   CHARACTER(LEN=*), PARAMETER :: ${vname}_checksum = '$checksum'
 EOF
 if [ $pack_source_code -eq 0 ]; then
-  mimetype=''
+  mimetype=' '
 cat >> $outfile <<EOF
   CHARACTER(LEN=*), PARAMETER :: ${vname}_mimetype = '$mimetype'
   INTEGER($nbytes) :: $vname(0)
@@ -209,12 +225,12 @@ fi
 
 
 vname=$diffname
-checksum_type=''
-checksum=''
+checksum_type=' '
+checksum=' '
 cat >> $outfile <<EOF
 EOF
 if [ $pack_git_diff -eq 0 ]; then
-  mimetype=''
+  mimetype=' '
 cat >> $outfile <<EOF
   CHARACTER(LEN=*), PARAMETER :: ${vname}_checksum_type = '$checksum_type'
   CHARACTER(LEN=*), PARAMETER :: ${vname}_checksum = '$checksum'
