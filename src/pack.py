@@ -244,7 +244,7 @@ fnull=open(os.devnull,'w')
 try:
   git_version = sp.check_output("git describe --always --long --dirty",
                   shell=True,stderr=fnull).rstrip()
-except (OSError, CalledProcessError):
+except (OSError, sp.CalledProcessError):
   git_version = ''
   pack_git_diff = False
 

@@ -1,7 +1,11 @@
 #! /bin/sh
 
-export GIT_WORK_TREE=$1
-export GIT_DIR=$1/.git
+GIT_WORK_TREE=$1
+GIT_DIR=$1/.git
+if [ ! -d $GIT_DIR ] ; then
+   GIT_DIR=$(awk '/^gitdir:/ { print $2 }' $GIT_DIR)
+fi
+export GIT_WORK_TREE GIT_DIR
 shift
 
 prefix=$1
