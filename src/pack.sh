@@ -18,11 +18,13 @@ f77_output=$6
 # Use python script by default and then fall back to shell script if that
 # fails
 BASEDIR=$(dirname $0)
-python2.7 $BASEDIR/pack.py "$@"
+python $BASEDIR/pack.py "$@"
 if [ $? -eq 0 ]; then
   exit
 fi
 shift 6
+
+echo WARNING: pack.py script failed. Falling back to shell script.
 
 archive="source_info_archive.tgz"
 hexdump="source_info_hexdump.txt"

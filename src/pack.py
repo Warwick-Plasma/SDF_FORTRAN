@@ -10,6 +10,7 @@ import hashlib
 import platform
 import gzip
 import argparse
+import codecs
 
 def str2bool(x):
    if x.lower() not in {'true', 'yes', '1', 'false', 'no', '0'}:
@@ -75,14 +76,14 @@ def byteswap4(s):
   s = binascii.unhexlify(s)
   a, = struct.unpack('>L',s)
   s = struct.pack('<L',a)
-  return binascii.hexlify(s)
+  return binascii.hexlify(s).decode('utf-8')
 
 
 def byteswap8(s):
   s = binascii.unhexlify(s)
   a, = struct.unpack('>Q',s)
   s = struct.pack('<Q',a)
-  return binascii.hexlify(s)
+  return binascii.hexlify(s).decode('utf-8')
 
 
 def wrapped(string):
@@ -150,7 +151,7 @@ def get_bytes_checksum(files):
       data = f.read(cksum.block_size)
       if not data:
         break
-      cksum.update(data)
+      cksum.update(data.encode('utf-8'))
   checksum_type = 'sha256'
   return cksum.hexdigest()
 
@@ -159,13 +160,13 @@ def write_data_bytes(filename, varname):
   global mimetype, of
   global linestart, linecont, suffix, ncolumns, ncontinuation
 
-  f=open(filename)
+  f=open(filename, 'rb')
   d=f.read()
-  dhex=d.encode('hex')
+  dhex=codecs.encode(d, 'hex_codec').decode('utf-8')
   f.close()
   os.remove(filename)
 
-  nelements = (len(d)+nbytes-1) / nbytes
+  nelements = (len(d)+nbytes-1) // nbytes
   padding = nelements * nbytes - len(d)
   dhex += '00' * padding
 
@@ -176,9 +177,9 @@ def write_data_bytes(filename, varname):
   print_integer_array(nelements)
 
   nwidth = len("z'',") + 2 * nbytes
-  nper_line_body = (ncolumns - 1) / nwidth
+  nper_line_body = (ncolumns - 1) // nwidth
   sdata = linestart + "DATA(%s(i),i=%i,%i)/" % (varname,nelements,nelements)
-  nper_line_first = (ncolumns - len(sdata) - 1) / nwidth
+  nper_line_first = (ncolumns - len(sdata) - 1) // nwidth
   nper_segment = nper_line_first + nper_line_body * ncontinuation
 
   i0 = 0
@@ -240,13 +241,25 @@ def print_integer_array(value):
     wrapped("INTEGER(%i) :: %s(%i)" % (nbytes,vname,value))
 
 
-fnull=open(os.devnull,'w')
 try:
-  git_version = sp.check_output("git describe --always --long --dirty",
-                  shell=True,stderr=fnull).rstrip()
-except (OSError, sp.CalledProcessError):
-  git_version = ''
-  pack_git_diff = False
+  cmd = sp.Popen("git describe --always --long --dirty",shell=True,
+                 stderr=sp.PIPE,stdout=sp.PIPE)
+  output = cmd.communicate()
+  if cmd.returncode == 127:
+    print('WARNING: Git command not found')
+    git_version = ''
+    pack_git_diff = False
+  elif cmd.returncode != 0 and str(output[1]).find('ot a git repo') != -1:
+    print('WARNING: Not a git repository')
+    git_version = ''
+    pack_git_diff = False
+  elif cmd.returncode != 0:
+    raise Exception('ERROR: unable to generate git diff')
+  else:
+    git_version = output[0].decode('utf-8').rstrip()
+    pack_git_diff = True
+except:
+  raise Exception('ERROR: unable to generate git diff')
 
 tsec = time.time()
 compile_date = int(round(tsec))
@@ -255,6 +268,7 @@ compile_machine_info = ' '.join((platform.node(),platform.platform()))
 compiler_info=args.compiler_info
 compiler_flags=args.compiler_flags
 
+#fnull=open(os.devnull,'w')
 #filelist = sp.check_output("git ls-files --cached --no-empty-directory "
 #                + "--full-name", shell=True, stderr=fnull).rstrip()
 
