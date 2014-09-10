@@ -41,7 +41,7 @@ ifeq (gfortran,$(findstring gfortran,$(FLAVOUR)))
    MY_FFLAGS += -Wall -frecord-marker=4
    MY_FFLAGS_OPT = $(MY_FFLAGS) -O3
    MY_FFLAGS_DBG = $(MY_FFLAGS) -O0 -g -fimplicit-none -fbounds-check \
-       -fbacktrace -Wextra -ffpe-trap=invalid,zero,overflow -pedantic 
+       -fbacktrace -Wextra -ffpe-trap=invalid,zero,overflow -pedantic
    MY_FFLAGS_PROF = $(MY_FFLAGS_OPT) -p
    MODULEFLAG = -I/usr/include -I$(INCDIR) -J$(INCDIR)
    INFO_FLAGS = -Wno-conversion -fno-range-check

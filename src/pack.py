@@ -37,10 +37,10 @@ argp.add_argument("filelist", type=str, nargs='*', help="Source files")
 args = argp.parse_args()
 
 prefix = args.prefix
-pack_source_code  = args.pack_source_code 
-pack_git_diff  = args.pack_git_diff 
-pack_git_diff_from_origin  = args.pack_git_diff_from_origin 
-generate_checksum  = args.generate_checksum 
+pack_source_code  = args.pack_source_code
+pack_git_diff  = args.pack_git_diff
+pack_git_diff_from_origin  = args.pack_git_diff_from_origin
+generate_checksum  = args.generate_checksum
 
 archive="source_info_archive.tgz"
 hexdump="source_info_hexdump.txt"
