@@ -30,7 +30,7 @@ if(NOT INHERIT_FLAGS)
          CACHE STRING "Fortran flags for debug build" FORCE)
 
    elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
-      set(CMAKE_Fortran_FLAGS "-Wall -frecord-marker=4"
+      set(CMAKE_Fortran_FLAGS "-Wall -frecord-marker=4 -mcmodel=medium"
          CACHE STRING "Fortran flags" FORCE)
       set(CMAKE_Fortran_FLAGS_RELEASE "-O3"
          CACHE STRING "Fortran flags for release build" FORCE)
