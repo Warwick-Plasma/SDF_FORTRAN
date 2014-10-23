@@ -51,7 +51,5 @@ set(GENERATE_CHECKSUM 1 CACHE 1 "Generate checksum")
 set(F77_OUTPUT 0)
 set(GIT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-include_directories(
-   include
-   ${MPI_Fortran_INCLUDE_PATH})
+include_directories(${MPI_Fortran_INCLUDE_PATH})
 add_subdirectory(src lib)
