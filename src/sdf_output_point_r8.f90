@@ -398,6 +398,7 @@ CONTAINS
 
     INTEGER(MPI_OFFSET_KIND) :: file_offset, offset_for_min_max
     INTEGER :: errcode, idim, npoint_this_cycle, nmax
+    INTEGER :: stat1, stat2
     LOGICAL :: start, convert
     REAL(r8), DIMENSION(c_maxdims) :: gmn, gmx
     REAL(r8), ALLOCATABLE, DIMENSION(:) :: array
@@ -406,6 +407,40 @@ CONTAINS
     REAL(r8) :: ret
 
     IF (npoint_global .LE. 0) RETURN
+
+    ! Allocate buffer arrays
+
+    start = .FALSE.
+    DO
+      stat1 = 0
+      stat2 = 0
+      ALLOCATE(array(npoint_per_iteration), STAT=stat1)
+      IF (convert) ALLOCATE(r4array(npoint_per_iteration), STAT=stat2)
+
+      IF (stat1 + stat2 .EQ. 0) EXIT
+
+      DEALLOCATE(array, STAT=stat1)
+      IF (convert) DEALLOCATE(r4array, STAT=stat2)
+
+      start = .TRUE.
+      npoint_per_iteration = npoint_per_iteration / 4
+
+      IF (npoint_per_iteration .LT. 2) THEN
+        IF (h%print_errors .AND. h%rank .EQ. h%rank_master) THEN
+          PRINT*, '*** ERROR ***'
+          PRINT*, 'SDF library was unable to allocate memory for output buffer'
+        ENDIF
+        h%error_code = c_err_sdf
+        RETURN
+      ENDIF
+    ENDDO
+
+    IF (start) THEN
+      IF (h%print_warnings .AND. h%rank .EQ. h%rank_master) THEN
+        PRINT*, '*** WARNING ***'
+        PRINT*, 'SDF npoint_per_iteration reduced to ', npoint_per_iteration
+      ENDIF
+    ENDIF
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -438,9 +473,6 @@ CONTAINS
         dim_units, dim_mults)
 
     ! Write the real data
-
-    ALLOCATE(array(1:npoint_per_iteration))
-    IF (convert) ALLOCATE(r4array(1:npoint_per_iteration))
 
     DO idim = 1, ndims
       npoint_this_cycle = INT(npoint_per_iteration)
@@ -650,6 +682,7 @@ CONTAINS
 
     INTEGER(MPI_OFFSET_KIND) :: file_offset
     INTEGER :: errcode, npoint_this_cycle, nmax
+    INTEGER :: stat1, stat2
     LOGICAL :: start, convert
     REAL(r8), ALLOCATABLE, DIMENSION(:) :: array
     REAL(r4), ALLOCATABLE, DIMENSION(:) :: r4array
@@ -657,6 +690,40 @@ CONTAINS
     REAL(r8) :: ret
 
     IF (npoint_global .LE. 0) RETURN
+
+    ! Allocate buffer arrays
+
+    start = .FALSE.
+    DO
+      stat1 = 0
+      stat2 = 0
+      ALLOCATE(array(npoint_per_iteration), STAT=stat1)
+      IF (convert) ALLOCATE(r4array(npoint_per_iteration), STAT=stat2)
+
+      IF (stat1 + stat2 .EQ. 0) EXIT
+
+      DEALLOCATE(array, STAT=stat1)
+      IF (convert) DEALLOCATE(r4array, STAT=stat2)
+
+      start = .TRUE.
+      npoint_per_iteration = npoint_per_iteration / 4
+
+      IF (npoint_per_iteration .LT. 2) THEN
+        IF (h%print_errors .AND. h%rank .EQ. h%rank_master) THEN
+          PRINT*, '*** ERROR ***'
+          PRINT*, 'SDF library was unable to allocate memory for output buffer'
+        ENDIF
+        h%error_code = c_err_sdf
+        RETURN
+      ENDIF
+    ENDDO
+
+    IF (start) THEN
+      IF (h%print_warnings .AND. h%rank .EQ. h%rank_master) THEN
+        PRINT*, '*** WARNING ***'
+        PRINT*, 'SDF npoint_per_iteration reduced to ', npoint_per_iteration
+      ENDIF
+    ENDIF
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -686,9 +753,6 @@ CONTAINS
         mesh_id, mult)
 
     ! Write the real data
-
-    ALLOCATE(array(1:npoint_per_iteration))
-    IF (convert) ALLOCATE(r4array(1:npoint_per_iteration))
 
     npoint_this_cycle = INT(npoint_per_iteration)
     start = .TRUE.
