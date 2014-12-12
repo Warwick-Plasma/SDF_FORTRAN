@@ -89,6 +89,7 @@ CONTAINS
       int4 = INT(step,i4)
       CALL MPI_FILE_WRITE(h%filehandle, int4, 1, &
           MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
+      h%step = step
       h%step_wrote = h%step
 
       CALL MPI_FILE_WRITE(h%filehandle, time, 1, &

@@ -467,6 +467,9 @@ CONTAINS
     gmn =  HUGE(1.d0)
     gmx = -HUGE(1.d0)
 
+    b%extents(1:ndims) = gmn(1:ndims)
+    b%extents(ndims+1:2*ndims) = gmx(1:ndims)
+
     ! Write header
 
     CALL write_point_mesh_meta_r8(h, id, name, species_id, dim_labels, &

@@ -17,8 +17,8 @@ CONTAINS
     CALL sdf_set_default_rank(h, 0)
 
     h%filename = TRIM(filename)
-    h%comm = sdf_comm_in
-    CALL MPI_COMM_RANK(sdf_comm_in, h%rank, errcode)
+    CALL MPI_COMM_DUP(sdf_comm_in, h%comm, errcode)
+    CALL MPI_COMM_RANK(h%comm, h%rank, errcode)
 
     ierr = KIND(errcode)
     IF (ierr .EQ. i4) THEN

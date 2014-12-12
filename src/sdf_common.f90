@@ -679,6 +679,7 @@ CONTAINS
     var%nblocks = 0
     var%error_code = 0
     var%errhandler = 0
+    var%comm = 0
 
   END SUBROUTINE initialise_file_handle
 
@@ -695,6 +696,8 @@ CONTAINS
     IF (var%errhandler .NE. 0) THEN
       CALL MPI_ERRHANDLER_FREE(var%errhandler, errcode)
     ENDIF
+
+    IF (var%comm .NE. 0) CALL MPI_COMM_FREE(var%comm, errcode)
 
     DO i = 1, max_handles
       IF (sdf_handles(i)%filehandle .EQ. var%filehandle) THEN
