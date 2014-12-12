@@ -13,6 +13,7 @@ CONTAINS
     INTEGER :: i, errcode
     TYPE(sdf_block_type), POINTER :: b
 
+    IF (h%rank .NE. h%rank_master) RETURN
     IF (.NOT.ASSOCIATED(h%current_block)) RETURN
 
     b => h%current_block
