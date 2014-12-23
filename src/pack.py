@@ -42,6 +42,8 @@ pack_git_diff  = args.pack_git_diff
 pack_git_diff_from_origin  = args.pack_git_diff_from_origin
 generate_checksum  = args.generate_checksum
 
+commitfile = os.path.join(os.environ['GIT_WORK_TREE'],'src','COMMIT')
+
 archive="source_info_archive.tgz"
 hexdump="source_info_hexdump.txt"
 gitdiff="source_info_gitdiff.txt"
@@ -249,10 +251,20 @@ try:
     print('WARNING: Git command not found')
     git_version = ''
     pack_git_diff = False
+    try:
+      execfile(commitfile)
+      git_version = COMMIT
+    except:
+      pass
   elif cmd.returncode != 0 and str(output[1]).find('ot a git repo') != -1:
     print('WARNING: Not a git repository')
     git_version = ''
     pack_git_diff = False
+    try:
+      execfile(commitfile)
+      git_version = COMMIT
+    except:
+      pass
   elif cmd.returncode != 0:
     raise Exception('ERROR: unable to generate git diff')
   else:

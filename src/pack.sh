@@ -34,9 +34,15 @@ diffname="${prefix}_diff_bytes"
 module_name="${prefix}_source_info"
 outfile="$1"
 
+commitfile="$GIT_WORK_TREE/src/COMMIT"
+
 git_version=$(git describe --always --long --dirty 2>/dev/null)
 if [ $? -ne 0 ]; then
   git_version=' '
+  if [ -f $commitfile ]; then
+    . $commitfile
+    git_version=$COMMIT
+  fi
   pack_git_diff=0
 fi
 

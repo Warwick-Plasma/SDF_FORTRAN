@@ -13,4 +13,5 @@ SRCFILES := sdf.f90 sdf_common.f90 sdf_control.f90 sdf_input.f90 \
    sdf_output_station_ru.f90 sdf_output_util.f90
 OBJS := $(SRCFILES:.f90=.o) sdf_source_info.o
 SOURCE_ALL := CMakeLists.txt Makefile Makefile-objs Makefile-deps $(SRCFILES) \
-   $(SRCDIR)/CMakeLists.txt pack.py pack.sh
+   $(SRCDIR)/CMakeLists.txt pack.py pack.sh $(SRCDIR)/COMMIT \
+   sdf_source_info_dummy.f90 gen_commit_string

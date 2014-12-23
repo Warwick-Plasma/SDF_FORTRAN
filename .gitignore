@@ -3,3 +3,4 @@ lib
 include
 .*.swp
 src/sdf_source_info.f90
+src/COMMIT
