@@ -42,7 +42,7 @@ sdf_output_r4.o: sdf_output_r4.f90 sdf_output_ru.o
 sdf_output_r8.o: sdf_output_r8.f90 sdf_output_ru.o
 sdf_output_ru.o: sdf_output_ru.f90 sdf_common.o
 sdf_output_source.o: sdf_output_source.f90 sdf_common.o sdf_output.o \
-  sdf_source_info.o
+  $(ENCODED_SOURCE)
 sdf_output_station.o: sdf_output_station.f90 sdf_output_station_r4.o \
   sdf_output_station_r8.o
 sdf_output_station_r4.o: sdf_output_station_r4.f90 sdf_output_station_ru.o

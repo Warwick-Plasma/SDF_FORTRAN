@@ -1,6 +1,6 @@
-# Choose compiler (intel, pgi, g95 or gfortran) using FLAVOUR= when
+# Choose compiler (intel, pgi, g95 or gfortran) using COMPILER= when
 # invoking make or get the default of pgi
-FLAVOUR ?= pgi
+COMPILER ?= pgi
 
 # Architecture... (default 64 bit, use ARCH=linux-ix86 on command line
 # for 32 bit)
@@ -10,7 +10,17 @@ SRCDIR = src
 OBJDIR = obj
 LIBDIR = lib
 INCDIR = include
-GEN_SRC = $(SRCDIR)/pack.sh
+PACK_SDF = $(SRCDIR)/pack.sh
+
+GIT_WORK_TREE = "."
+PACK_PREFIX = sdf
+PACK_SOURCE_CODE = 1
+PACK_GIT_DIFF = 1
+PACK_GIT_DIFF_FROM_ORIGIN = 1
+GENERATE_CHECKSUM = 1
+F77_OUTPUT = 0
+PACK_OPTS = $(GIT_WORK_TREE) sdf $(PACK_SOURCE_CODE) $(PACK_GIT_DIFF) \
+    $(PACK_GIT_DIFF_FROM_ORIGIN) $(GENERATE_CHECKSUM) $(F77_OUTPUT)
 
 CPU = p7
 
@@ -20,50 +30,151 @@ else
    M64_FLAG =
 endif
 
-# Compiler definitions (assumes MPI compiler on search path)
-MY_FC = mpif90
-MY_CC = mpicc
-MODULEFLAG = -module $(INCDIR)
-MY_FFLAGS = -I$(INCDIR)
-
 # Support for multiple compiler flags
 
-ifeq (g95,$(findstring g95,$(FLAVOUR)))
-   MY_FFLAGS += -Wall -Wimplicit-none -fPIC -Wno=155 $(M64_FLAG)
-   MY_FFLAGS_OPT = $(MY_FFLAGS) -O3
-   MY_FFLAGS_DBG = $(MY_FFLAGS) -O0 -g -ftrace=full -fbounds-check -fzero \
-       -fimplicit-none -fbounds-check
-   MY_FFLAGS_PROF = $(MY_FFLAGS_OPT) -p
-   MODULEFLAG = -fmod=$(OBJDIR)
+MPIF90 ?= mpif90
+D = -D
+
+# PGI
+# ===
+ifeq ($(strip $(COMPILER)),pgi)
+  FFLAGS = -O2 -Mvect -Munroll
+  ifeq ($(strip $(MODE)),debug)
+    FFLAGS = -O0 -g -C -Ktrap=denorm -Mbounds -Mchkfpstk -Mdepchk -Mstandard
+  endif
+  ifeq (prof,$(findstring prof,$(MODE)))
+    FFLAGS += -Mprof=func,lines
+  endif
+  FFLAGS += -Mnodefaultunit -Ktrap=fp -Mdclchk -tp $(CPU) -mcmodel=medium
+  MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
+  PUBMODULE  := $(MODFLAG) -module $(INCDIR)
+  MODULEFLAG := $(MODFLAG) -module $(OBJDIR)
 endif
 
-ifeq (gfortran,$(findstring gfortran,$(FLAVOUR)))
-   MY_FFLAGS += -Wall -frecord-marker=4
-   MY_FFLAGS_OPT = $(MY_FFLAGS) -O3
-   MY_FFLAGS_DBG = $(MY_FFLAGS) -O0 -g -fimplicit-none -fbounds-check \
-       -fbacktrace -Wextra -ffpe-trap=invalid,zero,overflow -pedantic
-   MY_FFLAGS_PROF = $(MY_FFLAGS_OPT) -p
-   MODULEFLAG = -I/usr/include -I$(INCDIR) -J$(INCDIR)
-   INFO_FLAGS = -Wno-conversion -fno-range-check
+# Intel
+# =====
+ifeq ($(strip $(COMPILER)),intel)
+  FFLAGS = -O3 -ipo
+  #FFLAGS = -O3 -ipo -xHost # Optimised (B)
+  #FFLAGS = -O3 -ipo -xAVX  # Optimised (W)
+  ifeq (debug,$(findstring debug,$(MODE)))
+    FFLAGS = -O0 -g -u -C -warn -nothreads -traceback -fltconsistency -ftrapuv \
+        -fpic
+    ifeq ($(strip $(SYSTEM)),Darwin)
+      FFLAGS += -Wl,-no_pie
+    endif
+  endif
+  ifeq (prof,$(findstring prof,$(MODE)))
+    FFLAGS += -p
+  endif
+  FFLAGS += -fpe0 -mcmodel=medium -heap-arrays 64
+  MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
+  PUBMODULE  := $(MODFLAG) -module $(INCDIR)
+  MODULEFLAG := $(MODFLAG) -module $(OBJDIR)
 endif
 
-ifeq (intel,$(findstring intel,$(FLAVOUR)))
-   MY_FFLAGS += -fpe0 -mcmodel=medium -heap-arrays 64
-   MY_FFLAGS_OPT = $(MY_FFLAGS) -O3 -ip -vec-report0
-   MY_FFLAGS_DBG = $(MY_FFLAGS) -O0 -g -u -ftrapuv -traceback -nothreads \
-       -fltconsistency -C -warn -save-temps -fpic
-   MY_FFLAGS_PROF = $(MY_FFLAGS_OPT) -p
+# gfortran
+# ========
+ifeq ($(strip $(COMPILER)),gfortran)
+  FFLAGS = -O3
+  ifeq (debug,$(findstring debug,$(MODE)))
+    FFLAGS = -O0 -g -Wall -Wextra -pedantic -fbounds-check \
+             -ffpe-trap=invalid,zero,overflow -Wno-unused-parameter \
+             -ffpe-trap=underflow,denormal -fimplicit-none
+
+    GNUVER := $(shell gfortran -dumpversion | head -1 \
+        | sed 's/[^0-9\.]*\([0-9\.]\+\).*/\1/')
+    GNUMAJOR := $(shell echo $(GNUVER) | cut -f1 -d\.)
+    GNUMINOR := $(shell echo $(GNUVER) | cut -f2 -d\.)
+
+    # gfortran-4.3
+    GNUGE43 := $(shell expr $(GNUMAJOR) \>= 4 \& $(GNUMINOR) \>= 3)
+    ifeq "$(GNUGE43)" "1"
+      FFLAGS += -fbacktrace -fdump-core
+
+      # gfortran-4.6
+      GNUGE46 := $(shell expr $(GNUMINOR) \>= 6)
+      ifeq "$(GNUGE46)" "1"
+        FFLAGS += -Wno-unused-dummy-argument
+
+        # gfortran-4.8
+        GNUGE48 := $(shell expr $(GNUMINOR) \>= 8)
+        ifeq "$(GNUGE48)" "1"
+          FFLAGS += -Wno-target-lifetime
+        endif
+      endif
+    endif
+  endif
+  ifeq (prof,$(findstring prof,$(MODE)))
+    FFLAGS += -p
+  endif
+  FFLAGS += -frecord-marker=4
+  MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
+  PUBMODULE  := $(MODFLAG) -J$(INCDIR)
+  MODULEFLAG := $(MODFLAG) -J$(OBJDIR)
+  INFO_FLAGS = -Wno-conversion -fno-range-check
 endif
 
-ifeq (pgi,$(findstring pgi,$(FLAVOUR)))
-   MY_FFLAGS += -Mnodefaultunit -Ktrap=fp -Mdclchk -tp $(CPU) -mcmodel=medium
-   MY_FFLAGS_OPT = $(MY_FFLAGS) -O2 -Mvect -Munroll
-   MY_FFLAGS_DBG = $(MY_FFLAGS) -O0 -g -Ktrap=denorm -Mbounds -Mchkfpstk \
-       -Mdepchk -Mstandard -C
-   MY_FFLAGS_PROF = $(MY_FFLAGS_OPT) -Mprof=func,lines
+# g95
+# ========
+ifeq ($(strip $(COMPILER)),g95)
+  FFLAGS = -O3
+  ifeq (debug,$(findstring debug,$(MODE)))
+    FFLAGS = -O0 -g -Wall -Wimplicit-none -ftrace=full -fbounds-check -fzero
+  endif
+  ifeq (prof,$(findstring prof,$(MODE)))
+    FFLAGS += -p
+  endif
+  FFLAGS += -fPIC -Wno=155 $(M64_FLAG)
+  MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
+  PUBMODULE  := $(MODFLAG) -fmod=$(INCDIR)
+  MODULEFLAG := $(MODFLAG) -fmod=$(OBJDIR)
 endif
 
+# IBM Bluegene
+# ============
+ifeq ($(strip $(COMPILER)),ibm)
+  FFLAGS = -O5 -qhot -qipa # Optimised
+  ifeq ($(strip $(MODE)),debug)
+    FFLAGS = -O0 -C -g -qfullpath -qinfo #-qkeepparm -qflttrap \
+          -qnosmp -qxflag=dvz -Q! -qnounwind -qnounroll # Debug
+    #FFLAGS = -O0 -qarch=qp -qtune=qp
+    #FFLAGS = -qthreaded -qsmp=noauto -qsmp=omp # Hybrid stuff
+  endif
+  MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
+  PUBMODULE  := $(MODFLAG) -qmoddir=$(INCDIR)
+  MODULEFLAG := $(MODFLAG) -qmoddir=$(OBJDIR)
+  MPIF90 = mpixlf90_r
 
+  # IBM compiler needs a -WF to recognise preprocessor directives
+  D = -WF,-D
+endif
+
+# HECToR
+# ========
+ifeq ($(strip $(COMPILER)),hector)
+  FFLAGS = -O3
+  ifeq ($(strip $(MODE)),debug)
+    FFLAGS = -O0 -g -ea -ec -eC -eD -eI -en -hfp_trap -Ktrap=fp -m0 -M1438,7413
+  endif
+  MODFLAG := -em -I/usr/include -I$(INCDIR) -I$(OBJDIR)
+  PUBMODULE  := $(MODFLAG) -J=$(INCDIR)
+  MODULEFLAG := $(MODFLAG) -J=$(OBJDIR)
+  MPIF90 = ftn
+endif
+
+# Don't compile encoded source if MODE=debug or ENC=no
+# Do compile encoded source if MODE=debug and ENC=yes
+ifeq ($(strip $(ENC)),no)
+  ENCODED_SOURCE = sdf_source_info_dummy.o
+else
+  ENCODED_SOURCE = sdf_source_info.o
+  ifneq ($(strip $(ENC)),yes)
+    ifeq ($(strip $(MODE)),debug)
+      ENCODED_SOURCE = sdf_source_info_dummy.o
+    endif
+  endif
+endif
 
 # utils
 ECHO    = echo
@@ -71,29 +182,9 @@ RM      = rm
 MKDIR   = mkdir
 
 # compiler & archiver
-FC  = $(MY_FC)
+FC  = $(MPIF90)
 AR  = ar
 RANLIB = ranlib
-
-# default mode (max. optimization)
-mode = opt
-
-FFLAGS =
-
-# add flags for debugging if requested
-ifeq (dbg,$(findstring dbg,$(mode)))
-   FFLAGS  += $(MY_FFLAGS_DBG)
-endif
-
-# add flags for profiling if requested
-ifeq (pro,$(findstring pro,$(mode)))
-   FFLAGS  += $(MY_FFLAGS_PROF)
-endif
-
-# add flags for optimization if requested
-ifeq (opt,$(findstring opt,$(mode)))
-   FFLAGS  += $(MY_FFLAGS_OPT)
-endif
 
 FC_INFO := $(shell ${FC} --version | grep '[a-zA-Z]' | head -n 1)
 
@@ -120,8 +211,11 @@ $(SRCDIR)/COMMIT: FORCE
 %.o: %.f90
 	$(FC) -c $(FFLAGS) $(MODULEFLAG) -o $(OBJDIR)/$@ $<
 
+sdf.o sdf_job_info.o:
+	$(FC) -c $(FFLAGS) $(PUBMODULE) -o $(OBJDIR)/$@ $<
+
 $(SRCDIR)/sdf_source_info.f90: $(SOURCE_ALL)
-	$(GEN_SRC) $@ "$(FC_INFO)" "$(FFLAGS)" $^
+	$(PACK_SDF) $(PACK_OPTS) $@ "$(FC_INFO)" "$(FFLAGS)" $^
 sdf_source_info.o: sdf_source_info.f90 $(SOURCE_ALL)
 	$(FC) -c $(FFLAGS) $(INFO_FLAGS) $(MODULEFLAG) -o $(OBJDIR)/$@ $<
 
@@ -156,11 +250,11 @@ help:
 	@$(ECHO) "  all    : build targets (default)"
 	@$(ECHO) "  clean  : cleanup"
 	@$(ECHO) "Defined modes:"
-	@$(ECHO) "  opt: enable flags for optimization (default)"
-	@$(ECHO) "  dbg: enable flags for debugging"
-	@$(ECHO) "  pro: enable flags for profiling"
+	@$(ECHO) "  opt:   enable flags for optimization (default)"
+	@$(ECHO) "  debug: enable flags for debugging"
+	@$(ECHO) "  prof:  enable flags for profiling"
 	@$(ECHO) "Example:"
-	@$(ECHO) "  type \`make mode=dbg+pro' to enable dbg and pro flags"
+	@$(ECHO) "  type \`make MODE=debug+prof' to enable debug and prof flags"
 
 # dependencies file
 include Makefile-deps
