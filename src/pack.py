@@ -252,8 +252,10 @@ try:
     git_version = ''
     pack_git_diff = False
     try:
-      execfile(commitfile)
-      git_version = COMMIT
+      f = open(commitfile,"r")
+      string = f.readline().rstrip('\n')
+      f.close()
+      git_version = string.split('=')[1]
     except:
       pass
   elif cmd.returncode != 0 and str(output[1]).find('ot a git repo') != -1:
@@ -261,8 +263,10 @@ try:
     git_version = ''
     pack_git_diff = False
     try:
-      execfile(commitfile)
-      git_version = COMMIT
+      f = open(commitfile,"r")
+      string = f.readline().rstrip('\n')
+      f.close()
+      git_version = string.split('=')[1]
     except:
       pass
   elif cmd.returncode != 0:

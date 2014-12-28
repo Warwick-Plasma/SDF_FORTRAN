@@ -242,7 +242,7 @@ clean:
 	$(RM) -rf $(OBJDIR)
 
 cleanall:
-	$(RM) -rf $(OBJDIR) $(INCDIR) $(LIBDIR)
+	$(RM) -rf $(OBJDIR) $(INCDIR) $(LIBDIR) $(SRCDIR)/sdf_source_info.f90
 
 # help page
 help:
