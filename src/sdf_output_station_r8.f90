@@ -21,7 +21,7 @@ CONTAINS
     INTEGER :: errcode
 
     IF (.NOT.ASSOCIATED(h%current_block)) THEN
-      IF (h%print_warnings .AND. h%rank .EQ. h%rank_master) THEN
+      IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** WARNING ***'
         PRINT*,'SDF block cannot be found. Ignoring call.'
       ENDIF
@@ -29,8 +29,8 @@ CONTAINS
     ENDIF
 
     b => h%current_block
-    IF (b%blocktype .NE. c_blocktype_station) THEN
-      IF (h%print_warnings .AND. h%rank .EQ. h%rank_master) THEN
+    IF (b%blocktype /= c_blocktype_station) THEN
+      IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** WARNING ***'
         PRINT*,'SDF unable to write station data. Ignoring call.'
       ENDIF
@@ -40,7 +40,7 @@ CONTAINS
     h%time = time
     h%step = step
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       h%current_location = b%data_location + b%data_length
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)

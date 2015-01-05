@@ -18,9 +18,9 @@ CONTAINS
 
     n = 0
 
-    IF (SIZE(sdf_bytes) .GT. 1 .OR. &
-          (TRIM(sdf_bytes_checksum_type) .NE. '' .AND. &
-          ICHAR(sdf_bytes_checksum_type(1:1)) .NE. 0)) THEN
+    IF (SIZE(sdf_bytes) > 1 .OR. &
+          (TRIM(sdf_bytes_checksum_type) /= '' .AND. &
+          ICHAR(sdf_bytes_checksum_type(1:1)) /= 0)) THEN
       n = n + 1
       CALL sdf_safe_copy_id(h, 'sdf_source/source', stitched_ids(n))
       CALL sdf_write_datablock(h, stitched_ids(n), &
@@ -29,7 +29,7 @@ CONTAINS
           sdf_bytes_checksum_type, sdf_bytes_checksum)
     ENDIF
 
-    IF (SIZE(sdf_bytes) .EQ. 1 .AND. SIZE(sdf_diff_bytes) .GT. 1) THEN
+    IF (SIZE(sdf_bytes) == 1 .AND. SIZE(sdf_diff_bytes) > 1) THEN
       n = n + 1
       CALL sdf_safe_copy_id(h, 'sdf_source/diff', stitched_ids(n))
       CALL sdf_write_datablock(h, stitched_ids(n), &

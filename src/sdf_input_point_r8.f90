@@ -59,7 +59,7 @@ CONTAINS
     ! Read the real data
 
     npoints = INT(b%npoints)
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, npoints, b%mpitype, &
@@ -92,7 +92,7 @@ CONTAINS
     ! Read the real data
 
     npoints = INT(b%npoints)
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, npoints, b%mpitype, &
@@ -101,7 +101,7 @@ CONTAINS
 
     CALL MPI_BCAST(x, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, y, npoints, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
@@ -132,7 +132,7 @@ CONTAINS
     ! Read the real data
 
     npoints = INT(b%npoints)
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, npoints, b%mpitype, &
@@ -141,14 +141,14 @@ CONTAINS
 
     CALL MPI_BCAST(x, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, y, npoints, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
     CALL MPI_BCAST(y, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, z, npoints, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
@@ -207,7 +207,7 @@ CONTAINS
       CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
           distribution, 'native', MPI_INFO_NULL, errcode)
 
-      DO WHILE (npoint_this_it .GT. 0)
+      DO WHILE (npoint_this_it > 0)
         CALL MPI_FILE_READ(h%filehandle, array, npoint_this_it, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
 
@@ -295,7 +295,7 @@ CONTAINS
     npoint_this_it8 = MIN(npoint_remain, npoint_per_it8)
     npoint_this_it  = INT(npoint_this_it8)
 
-    DO WHILE (npoint_this_it .GT. 0)
+    DO WHILE (npoint_this_it > 0)
       npoint_this_it8 = MIN(npoint_remain, npoint_per_it8)
       npoint_this_it  = INT(npoint_this_it8)
       CALL MPI_FILE_READ(h%filehandle, array, npoint_this_it, b%mpitype, &
@@ -336,7 +336,7 @@ CONTAINS
     ! Read the real data
 
     npoints = INT(b%npoints)
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, array, npoints, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
     ENDIF

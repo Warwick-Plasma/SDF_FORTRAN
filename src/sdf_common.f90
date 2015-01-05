@@ -378,7 +378,7 @@ CONTAINS
     INTEGER :: i
     LOGICAL :: found, use_truncated
 
-    use_truncated = (LEN_TRIM(block_id) .GT. c_id_length)
+    use_truncated = (LEN_TRIM(block_id) > c_id_length)
 
     found = .TRUE.
     b => h%blocklist
@@ -475,19 +475,19 @@ CONTAINS
     len1 = LEN_TRIM(str1)
     len2 = LEN_TRIM(str2)
 
-    IF (len1 .GT. 0) THEN
-      IF (IACHAR(str1(len1:len1)) .EQ. 0) len1 = len1 - 1
+    IF (len1 > 0) THEN
+      IF (IACHAR(str1(len1:len1)) == 0) len1 = len1 - 1
     ENDIF
-    IF (len2 .GT. 0) THEN
-      IF (IACHAR(str2(len2:len2)) .EQ. 0) len2 = len2 - 1
+    IF (len2 > 0) THEN
+      IF (IACHAR(str2(len2:len2)) == 0) len2 = len2 - 1
     ENDIF
 
-    IF (len1 .NE. len2) THEN
+    IF (len1 /= len2) THEN
       equal = .FALSE.
       RETURN
     ENDIF
 
-    equal = (str1(1:len1) .EQ. str2(1:len1))
+    equal = (str1(1:len1) == str2(1:len1))
 
   END FUNCTION sdf_string_equal
 
@@ -502,7 +502,7 @@ CONTAINS
     len1 = LEN_TRIM(s1)
     len2 = LEN(s2)
     olen = MIN(len1,len2)
-    IF (olen .GT. 0) THEN
+    IF (olen > 0) THEN
       s2(1:olen) = s1(1:olen)
       DO i = olen+1,len2
         s2(i:i) = ' '
@@ -523,8 +523,8 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: id
     CHARACTER(LEN=c_id_length), INTENT(OUT) :: new_id
 
-    IF (LEN_TRIM(id) .GT. c_id_length) THEN
-      IF (h%print_warnings .AND. h%rank .EQ. h%rank_master) THEN
+    IF (LEN_TRIM(id) > c_id_length) THEN
+      IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*, '*** WARNING ***'
         PRINT*, 'SDF ID string "' // TRIM(id) // '" was truncated.'
       ENDIF
@@ -546,11 +546,11 @@ CONTAINS
     INTEGER :: i, n, num, pos
     TYPE(sdf_block_type), POINTER :: tmp
 
-    IF (LEN_TRIM(id) .GT. c_id_length) THEN
+    IF (LEN_TRIM(id) > c_id_length) THEN
       b%truncated_id = .TRUE.
       CALL sdf_safe_copy_string(id, b%long_id)
-      IF (LEN_TRIM(id) .GT. c_long_id_length) THEN
-        IF (h%print_warnings .AND. h%rank .EQ. h%rank_master) THEN
+      IF (LEN_TRIM(id) > c_long_id_length) THEN
+        IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
           PRINT*, '*** WARNING ***'
           PRINT*, 'SDF ID string "' // TRIM(id) // '" was truncated.'
         ENDIF
@@ -568,7 +568,7 @@ CONTAINS
       n = MOD(num,10)
       b%id(pos:pos) = numbers(n+1:n+1)
       num = num / 10
-      DO WHILE(num .GT. 0)
+      DO WHILE(num > 0)
         pos = pos - 1
         n = MOD(num,10)
         b%id(pos:pos) = numbers(n+1:n+1)
@@ -693,14 +693,14 @@ CONTAINS
     IF (ASSOCIATED(var%buffer)) DEALLOCATE(var%buffer)
     IF (ASSOCIATED(var%station_ids)) DEALLOCATE(var%station_ids)
 
-    IF (var%errhandler .NE. 0) THEN
+    IF (var%errhandler /= 0) THEN
       CALL MPI_ERRHANDLER_FREE(var%errhandler, errcode)
     ENDIF
 
-    IF (var%comm .NE. 0) CALL MPI_COMM_FREE(var%comm, errcode)
+    IF (var%comm /= 0) CALL MPI_COMM_FREE(var%comm, errcode)
 
     DO i = 1, max_handles
-      IF (sdf_handles(i)%filehandle .EQ. var%filehandle) THEN
+      IF (sdf_handles(i)%filehandle == var%filehandle) THEN
         sdf_handles(i)%filehandle = 0
         EXIT
       ENDIF
@@ -719,7 +719,7 @@ CONTAINS
 
     errcode = c_err_unknown
     DO i = 1, max_mpi_error_codes
-      IF (error_code .EQ. mpi_error_codes(i)) THEN
+      IF (error_code == mpi_error_codes(i)) THEN
         errcode = i + c_mpi_error_start - 1
         RETURN
       ENDIF
@@ -743,7 +743,7 @@ CONTAINS
 
     found = .FALSE.
     DO i = 1, max_handles
-      IF (sdf_handles(i)%filehandle .EQ. filehandle) THEN
+      IF (sdf_handles(i)%filehandle == filehandle) THEN
         h => sdf_handles(i)%handle
         found = .TRUE.
         EXIT
@@ -782,7 +782,7 @@ CONTAINS
 
       CALL MPI_FILE_GET_INFO(filehandle, info, ierr)
       CALL MPI_INFO_GET_NKEYS(info, nkeys, ierr)
-      IF (nkeys .GT. 0) THEN
+      IF (nkeys > 0) THEN
         WRITE(0,*) 'Info:'
         DO i = 0,nkeys-1
           CALL MPI_INFO_GET_NTHKEY(info, i, key, ierr)

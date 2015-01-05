@@ -21,12 +21,12 @@ CONTAINS
     CALL MPI_COMM_RANK(h%comm, h%rank, errcode)
 
     ierr = KIND(errcode)
-    IF (ierr .EQ. i4) THEN
+    IF (ierr == i4) THEN
       ! Should use MPI_SIZEOF() but this breaks on scalimpi
       h%soi = 4
       h%datatype_integer = c_datatype_integer4
       h%mpitype_integer = MPI_INTEGER4
-    ELSE IF (ierr .EQ. i8) THEN
+    ELSE IF (ierr == i8) THEN
       h%soi = 8
       h%datatype_integer = c_datatype_integer8
       h%mpitype_integer = MPI_INTEGER8
@@ -36,14 +36,14 @@ CONTAINS
       RETURN
     ENDIF
 
-    IF (mode .EQ. c_sdf_write) THEN
+    IF (mode == c_sdf_write) THEN
       h%writing = .TRUE.
       h%mode = MPI_MODE_CREATE + MPI_MODE_WRONLY
 
       ! Delete file
-      IF (h%rank .EQ. h%rank_master) &
+      IF (h%rank == h%rank_master) &
           CALL MPI_FILE_DELETE(TRIM(filename), MPI_INFO_NULL, errcode)
-    ELSE IF (mode .EQ. c_sdf_append) THEN
+    ELSE IF (mode == c_sdf_append) THEN
       h%writing = .TRUE.
       h%mode = MPI_MODE_CREATE + MPI_MODE_RDWR
     ELSE
@@ -56,14 +56,14 @@ CONTAINS
     CALL MPI_INFO_SET(info, 'romio_cb_write', 'enable', errcode)
     CALL MPI_FILE_OPEN(h%comm, TRIM(filename), h%mode, info, &
         h%filehandle, errcode)
-    IF (errcode .NE. 0) h%error_code = map_error_code(errcode)
+    IF (errcode /= 0) h%error_code = map_error_code(errcode)
     CALL MPI_INFO_FREE(info, errcode)
 
-    IF (h%rank .EQ. h%rank_master .AND. h%filehandle .NE. 0) THEN
+    IF (h%rank == h%rank_master .AND. h%filehandle /= 0) THEN
       CALL MPI_FILE_CREATE_ERRHANDLER(error_handler, h%errhandler, errcode)
       CALL MPI_FILE_SET_ERRHANDLER(h%filehandle, h%errhandler, errcode)
       DO i = 1, max_handles
-        IF (sdf_handles(i)%filehandle .EQ. 0) THEN
+        IF (sdf_handles(i)%filehandle == 0) THEN
           sdf_handles(i)%filehandle = h%filehandle
           sdf_handles(i)%handle => h
           EXIT
@@ -81,7 +81,7 @@ CONTAINS
     INTEGER :: errcode
 
     ! No open file
-    IF (h%filehandle .EQ. -1) RETURN
+    IF (h%filehandle == -1) RETURN
 
     ! If writing
     IF (h%writing) THEN

@@ -41,10 +41,10 @@ CONTAINS
 
     b => h%current_block
 
-    IF (b%datatype .EQ. c_datatype_real4) THEN
+    IF (b%datatype == c_datatype_real4) THEN
       real4 = TRANSFER(b%const_value, real4)
       value = REAL(real4,r4)
-    ELSE IF (b%datatype .EQ. c_datatype_real8) THEN
+    ELSE IF (b%datatype == c_datatype_real8) THEN
       real8 = TRANSFER(b%const_value, real8)
       value = REAL(real8,r4)
     ENDIF
@@ -70,7 +70,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, values, n1, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
     ENDIF
@@ -101,7 +101,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, values, n1, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
     ENDIF
@@ -132,7 +132,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, values, n1, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
     ENDIF

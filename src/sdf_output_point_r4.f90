@@ -25,7 +25,7 @@ CONTAINS
     REAL(r8), DIMENSION(ndims) :: gmn, gmx
     TYPE(sdf_block_type), POINTER :: b
 
-    IF (npoint_global .LE. 0) RETURN
+    IF (npoint_global <= 0) RETURN
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -55,7 +55,7 @@ CONTAINS
 
     ! Write the real data
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       h%current_location = b%data_location
 
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
@@ -102,7 +102,7 @@ CONTAINS
     REAL(r8), DIMENSION(ndims) :: gmn, gmx
     TYPE(sdf_block_type), POINTER :: b
 
-    IF (npoint_global .LE. 0) RETURN
+    IF (npoint_global <= 0) RETURN
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -134,7 +134,7 @@ CONTAINS
 
     ! Write the real data
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       h%current_location = b%data_location
 
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
@@ -192,7 +192,7 @@ CONTAINS
     REAL(r8), DIMENSION(ndims) :: gmn, gmx
     TYPE(sdf_block_type), POINTER :: b
 
-    IF (npoint_global .LE. 0) RETURN
+    IF (npoint_global <= 0) RETURN
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -226,7 +226,7 @@ CONTAINS
 
     ! Write the real data
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       h%current_location = b%data_location
 
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
@@ -406,7 +406,7 @@ CONTAINS
     TYPE(sdf_block_type), POINTER :: b
     REAL(r4) :: ret
 
-    IF (npoint_global .LE. 0) RETURN
+    IF (npoint_global <= 0) RETURN
 
     ! Allocate buffer arrays
 
@@ -417,7 +417,7 @@ CONTAINS
       ALLOCATE(array(npoint_per_iteration), STAT=stat1)
       IF (convert) ALLOCATE(r4array(npoint_per_iteration), STAT=stat2)
 
-      IF (stat1 + stat2 .EQ. 0) EXIT
+      IF (stat1 + stat2 == 0) EXIT
 
       DEALLOCATE(array, STAT=stat1)
       IF (convert) DEALLOCATE(r4array, STAT=stat2)
@@ -425,8 +425,8 @@ CONTAINS
       start = .TRUE.
       npoint_per_iteration = npoint_per_iteration / 4
 
-      IF (npoint_per_iteration .LT. 2) THEN
-        IF (h%print_errors .AND. h%rank .EQ. h%rank_master) THEN
+      IF (npoint_per_iteration < 2) THEN
+        IF (h%print_errors .AND. h%rank == h%rank_master) THEN
           PRINT*, '*** ERROR ***'
           PRINT*, 'SDF library was unable to allocate memory for output buffer'
         ENDIF
@@ -436,7 +436,7 @@ CONTAINS
     ENDDO
 
     IF (start) THEN
-      IF (h%print_warnings .AND. h%rank .EQ. h%rank_master) THEN
+      IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*, '*** WARNING ***'
         PRINT*, 'SDF npoint_per_iteration reduced to ', npoint_per_iteration
       ENDIF
@@ -487,7 +487,7 @@ CONTAINS
         nmax = npoint_this_cycle
         CALL MPI_ALLREDUCE(npoint_this_cycle, nmax, 1, MPI_INTEGER, &
             MPI_MAX, h%comm, errcode)
-        IF (nmax .LE. 0) EXIT
+        IF (nmax <= 0) EXIT
 
         start = .FALSE.
         gmn(idim) = MIN(gmn(idim),REAL(MINVAL(array(1:npoint_this_cycle)),r8))
@@ -527,7 +527,7 @@ CONTAINS
     CALL MPI_ALLREDUCE(gmx, b%extents(ndims+1), ndims, MPI_REAL8, MPI_MAX, &
         h%comm, errcode)
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       offset_for_min_max = b%block_start + h%block_header_length &
           + (sof8 + 2 * c_id_length) * ndims + sof4
 
@@ -558,7 +558,7 @@ CONTAINS
     INTEGER :: npoint_max, npoint_rem, errcode
     TYPE(sdf_block_type), POINTER :: b
 
-    IF (npoint_global .LE. 0) RETURN
+    IF (npoint_global <= 0) RETURN
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -576,7 +576,7 @@ CONTAINS
 
     ! Write the real data
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       h%current_location = b%data_location
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
@@ -692,7 +692,7 @@ CONTAINS
     TYPE(sdf_block_type), POINTER :: b
     REAL(r4) :: ret
 
-    IF (npoint_global .LE. 0) RETURN
+    IF (npoint_global <= 0) RETURN
 
     ! Allocate buffer arrays
 
@@ -703,7 +703,7 @@ CONTAINS
       ALLOCATE(array(npoint_per_iteration), STAT=stat1)
       IF (convert) ALLOCATE(r4array(npoint_per_iteration), STAT=stat2)
 
-      IF (stat1 + stat2 .EQ. 0) EXIT
+      IF (stat1 + stat2 == 0) EXIT
 
       DEALLOCATE(array, STAT=stat1)
       IF (convert) DEALLOCATE(r4array, STAT=stat2)
@@ -711,8 +711,8 @@ CONTAINS
       start = .TRUE.
       npoint_per_iteration = npoint_per_iteration / 4
 
-      IF (npoint_per_iteration .LT. 2) THEN
-        IF (h%print_errors .AND. h%rank .EQ. h%rank_master) THEN
+      IF (npoint_per_iteration < 2) THEN
+        IF (h%print_errors .AND. h%rank == h%rank_master) THEN
           PRINT*, '*** ERROR ***'
           PRINT*, 'SDF library was unable to allocate memory for output buffer'
         ENDIF
@@ -722,7 +722,7 @@ CONTAINS
     ENDDO
 
     IF (start) THEN
-      IF (h%print_warnings .AND. h%rank .EQ. h%rank_master) THEN
+      IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*, '*** WARNING ***'
         PRINT*, 'SDF npoint_per_iteration reduced to ', npoint_per_iteration
       ENDIF
@@ -766,7 +766,7 @@ CONTAINS
       nmax = npoint_this_cycle
       CALL MPI_ALLREDUCE(npoint_this_cycle, nmax, 1, MPI_INTEGER, &
           MPI_MAX, h%comm, errcode)
-      IF (nmax .LE. 0) EXIT
+      IF (nmax <= 0) EXIT
 
       IF (start) start = .FALSE.
 

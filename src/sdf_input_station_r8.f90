@@ -27,16 +27,16 @@ CONTAINS
 
     bstart = b%data_location
     bstop = bstart + b%data_length
-    IF (.NOT. (h%current_location .GT. bstart &
-        .AND. h%current_location .LT. bstop)) THEN
+    IF (.NOT. (h%current_location > bstart &
+        .AND. h%current_location < bstop)) THEN
       h%current_location = b%data_location
-      IF (h%rank .EQ. h%rank_master) THEN
+      IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
             errcode)
       ENDIF
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, time, 1, mpitype_real, &
           MPI_STATUS_IGNORE, errcode)
       CALL MPI_FILE_READ(h%filehandle, array, b%nvariables-1, mpitype_real, &

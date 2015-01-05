@@ -13,7 +13,7 @@ CONTAINS
     INTEGER :: i, errcode
     TYPE(sdf_block_type), POINTER :: b
 
-    IF (h%rank .NE. h%rank_master) RETURN
+    IF (h%rank /= h%rank_master) RETURN
     IF (.NOT.ASSOCIATED(h%current_block)) RETURN
 
     b => h%current_block
@@ -55,44 +55,44 @@ CONTAINS
 
     b => h%current_block
 
-    IF (b%blocktype .EQ. c_blocktype_plain_mesh &
-        .OR. b%blocktype .EQ. c_blocktype_lagrangian_mesh) THEN
+    IF (b%blocktype == c_blocktype_plain_mesh &
+        .OR. b%blocktype == c_blocktype_lagrangian_mesh) THEN
       CALL write_mesh_meta_r8(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_point_mesh) THEN
+    ELSE IF (b%blocktype == c_blocktype_point_mesh) THEN
       CALL write_point_mesh_meta_r8(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_plain_variable) THEN
+    ELSE IF (b%blocktype == c_blocktype_plain_variable) THEN
       CALL write_mesh_variable_meta_r8(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_point_variable) THEN
+    ELSE IF (b%blocktype == c_blocktype_point_variable) THEN
       CALL write_point_variable_meta_r8(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_constant) THEN
+    ELSE IF (b%blocktype == c_blocktype_constant) THEN
       CALL write_constant_meta(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_array) THEN
+    ELSE IF (b%blocktype == c_blocktype_array) THEN
       CALL write_array_meta(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_cpu_split) THEN
+    ELSE IF (b%blocktype == c_blocktype_cpu_split) THEN
       CALL write_cpu_split_meta(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_run_info) THEN
+    ELSE IF (b%blocktype == c_blocktype_run_info) THEN
       CALL write_run_info_meta(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_source) THEN
+    ELSE IF (b%blocktype == c_blocktype_source) THEN
       CALL write_block_header(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_datablock) THEN
+    ELSE IF (b%blocktype == c_blocktype_datablock) THEN
       CALL write_datablock_meta(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_stitched &
-        .OR. b%blocktype .EQ. c_blocktype_contiguous &
-        .OR. b%blocktype .EQ. c_blocktype_stitched_tensor &
-        .OR. b%blocktype .EQ. c_blocktype_contiguous_tensor) THEN
+    ELSE IF (b%blocktype == c_blocktype_stitched &
+        .OR. b%blocktype == c_blocktype_contiguous &
+        .OR. b%blocktype == c_blocktype_stitched_tensor &
+        .OR. b%blocktype == c_blocktype_contiguous_tensor) THEN
       CALL sdf_write_stitched(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_stitched_material &
-        .OR. b%blocktype .EQ. c_blocktype_contiguous_material) THEN
+    ELSE IF (b%blocktype == c_blocktype_stitched_material &
+        .OR. b%blocktype == c_blocktype_contiguous_material) THEN
       CALL sdf_write_stitched_material(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_stitched_matvar &
-        .OR. b%blocktype .EQ. c_blocktype_contiguous_matvar) THEN
+    ELSE IF (b%blocktype == c_blocktype_stitched_matvar &
+        .OR. b%blocktype == c_blocktype_contiguous_matvar) THEN
       CALL sdf_write_stitched_matvar(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_stitched_species &
-        .OR. b%blocktype .EQ. c_blocktype_contiguous_species) THEN
+    ELSE IF (b%blocktype == c_blocktype_stitched_species &
+        .OR. b%blocktype == c_blocktype_contiguous_species) THEN
       CALL sdf_write_stitched_species(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_stitched_obstacle_group) THEN
+    ELSE IF (b%blocktype == c_blocktype_stitched_obstacle_group) THEN
       CALL sdf_write_stitched_obstacle_group(h)
-    ELSE IF (b%blocktype .EQ. c_blocktype_namevalue) THEN
+    ELSE IF (b%blocktype == c_blocktype_namevalue) THEN
       CALL write_namevalue_meta(h)
     ELSE
       CALL write_block_header(h)

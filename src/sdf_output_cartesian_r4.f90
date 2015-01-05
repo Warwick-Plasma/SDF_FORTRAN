@@ -57,7 +57,7 @@ CONTAINS
 
     b%dims(1) = INT(SIZE(x),i4)
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       b%extents(1) = REAL(x(1),r8)
       b%extents(ndims+1) = REAL(x(b%dims(1)),r8)
     ENDIF
@@ -68,7 +68,7 @@ CONTAINS
 
     ! Write the actual data
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       h%current_location = b%data_location
 
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
@@ -147,7 +147,7 @@ CONTAINS
     b%dims(1) = INT(SIZE(x),i4)
     b%dims(2) = INT(SIZE(y),i4)
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       b%extents(1) = REAL(x(1),r8)
       b%extents(2) = REAL(y(1),r8)
       b%extents(ndims+1) = REAL(x(b%dims(1)),r8)
@@ -160,7 +160,7 @@ CONTAINS
 
     ! Write the actual data
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       h%current_location = b%data_location
 
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
@@ -249,7 +249,7 @@ CONTAINS
     b%dims(2) = INT(SIZE(y),i4)
     b%dims(3) = INT(SIZE(z),i4)
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       b%extents(1) = REAL(x(1),r8)
       b%extents(2) = REAL(y(1),r8)
       b%extents(3) = REAL(z(1),r8)
@@ -264,7 +264,7 @@ CONTAINS
 
     ! Write the actual data
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       h%current_location = b%data_location
 
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
@@ -1002,7 +1002,7 @@ CONTAINS
     b%stagger = stagger
 
     nd = ndims
-    IF (nm .GT. 1) THEN
+    IF (nm > 1) THEN
       b%dims(nd) = nm
       nd = nd - 1
     ENDIF
@@ -1088,7 +1088,7 @@ CONTAINS
     b%stagger = stagger
 
     nd = ndims
-    IF (nm .GT. 1) THEN
+    IF (nm > 1) THEN
       b%dims(nd) = nm
       nd = nd - 1
     ENDIF
@@ -1174,7 +1174,7 @@ CONTAINS
     b%stagger = stagger
 
     nd = ndims
-    IF (nm .GT. 1) THEN
+    IF (nm > 1) THEN
       b%dims(nd) = nm
       nd = nd - 1
     ENDIF
@@ -1260,7 +1260,7 @@ CONTAINS
     b%stagger = stagger
 
     nd = ndims
-    IF (nm .GT. 1) THEN
+    IF (nm > 1) THEN
       b%dims(nd) = nm
       nd = nd - 1
     ENDIF
@@ -1766,7 +1766,7 @@ CONTAINS
 
     data_length = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(material_names(i)) == 0) THEN
         variable_ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &
@@ -1783,7 +1783,7 @@ CONTAINS
     h%data_location = h%current_block%data_location
     idx = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) CYCLE
+      IF (LEN_TRIM(material_names(i)) == 0) CYCLE
       idx = idx + 1
       CALL sdf_safe_string_composite(h, name, material_names(i), temp_name)
       IF (last) THEN
@@ -1858,7 +1858,7 @@ CONTAINS
 
     data_length = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(material_names(i)) == 0) THEN
         variable_ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &
@@ -1875,7 +1875,7 @@ CONTAINS
     h%data_location = h%current_block%data_location
     idx = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) CYCLE
+      IF (LEN_TRIM(material_names(i)) == 0) CYCLE
       idx = idx + 1
       CALL sdf_safe_string_composite(h, name, material_names(i), temp_name)
       IF (last) THEN
@@ -1950,7 +1950,7 @@ CONTAINS
 
     data_length = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(material_names(i)) == 0) THEN
         variable_ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &
@@ -1967,7 +1967,7 @@ CONTAINS
     h%data_location = h%current_block%data_location
     idx = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) CYCLE
+      IF (LEN_TRIM(material_names(i)) == 0) CYCLE
       idx = idx + 1
       CALL sdf_safe_string_composite(h, name, material_names(i), temp_name)
       IF (last) THEN
@@ -2042,7 +2042,7 @@ CONTAINS
 
     data_length = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(material_names(i)) == 0) THEN
         variable_ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &
@@ -2059,7 +2059,7 @@ CONTAINS
     h%data_location = h%current_block%data_location
     idx = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) CYCLE
+      IF (LEN_TRIM(material_names(i)) == 0) CYCLE
       idx = idx + 1
       CALL sdf_safe_string_composite(h, name, material_names(i), temp_name)
       IF (last) THEN
@@ -2134,7 +2134,7 @@ CONTAINS
 
     data_length = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(material_names(i)) == 0) THEN
         variable_ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &
@@ -2151,7 +2151,7 @@ CONTAINS
     h%data_location = h%current_block%data_location
     idx = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) CYCLE
+      IF (LEN_TRIM(material_names(i)) == 0) CYCLE
       idx = idx + 1
       CALL sdf_safe_string_composite(h, name, material_names(i), temp_name)
       IF (last) THEN
@@ -2226,7 +2226,7 @@ CONTAINS
 
     data_length = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(material_names(i)) == 0) THEN
         variable_ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &
@@ -2243,7 +2243,7 @@ CONTAINS
     h%data_location = h%current_block%data_location
     idx = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) CYCLE
+      IF (LEN_TRIM(material_names(i)) == 0) CYCLE
       idx = idx + 1
       CALL sdf_safe_string_composite(h, name, material_names(i), temp_name)
       IF (last) THEN
@@ -2319,7 +2319,7 @@ CONTAINS
 
     data_length = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(specnames(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(specnames(i)) == 0) THEN
         variable_ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &
@@ -2336,7 +2336,7 @@ CONTAINS
     h%data_location = h%current_block%data_location
     idx = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(specnames(i)) .EQ. 0) CYCLE
+      IF (LEN_TRIM(specnames(i)) == 0) CYCLE
       idx = idx + 1
       CALL sdf_safe_string_composite(h, name, specnames(i), temp_name)
       IF (last) THEN
@@ -2412,7 +2412,7 @@ CONTAINS
 
     data_length = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(specnames(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(specnames(i)) == 0) THEN
         variable_ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &
@@ -2429,7 +2429,7 @@ CONTAINS
     h%data_location = h%current_block%data_location
     idx = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(specnames(i)) .EQ. 0) CYCLE
+      IF (LEN_TRIM(specnames(i)) == 0) CYCLE
       idx = idx + 1
       CALL sdf_safe_string_composite(h, name, specnames(i), temp_name)
       IF (last) THEN
@@ -2505,7 +2505,7 @@ CONTAINS
 
     data_length = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(specnames(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(specnames(i)) == 0) THEN
         variable_ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &
@@ -2522,7 +2522,7 @@ CONTAINS
     h%data_location = h%current_block%data_location
     idx = 0
     DO i = 1,nmat
-      IF (LEN_TRIM(specnames(i)) .EQ. 0) CYCLE
+      IF (LEN_TRIM(specnames(i)) == 0) CYCLE
       idx = idx + 1
       CALL sdf_safe_string_composite(h, name, specnames(i), temp_name)
       IF (last) THEN

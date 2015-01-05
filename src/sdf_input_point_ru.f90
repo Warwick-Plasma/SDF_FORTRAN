@@ -52,7 +52,7 @@ CONTAINS
       CALL read_entry_int8(h, b%npoints)
 
       ! species_id field added in version 1.3
-      IF (1000 * h%file_version + h%file_revision .GT. 1002) THEN
+      IF (1000 * h%file_version + h%file_revision > 1002) THEN
         CALL read_entry_id(h, b%species_id)
       ELSE
         CALL sdf_safe_copy_id(h, '__unknown__', b%species_id)
@@ -118,7 +118,7 @@ CONTAINS
       CALL read_entry_int8(h, b%npoints)
 
       ! species_id field added in version 1.3
-      IF (1000 * h%file_version + h%file_revision .GT. 1002) THEN
+      IF (1000 * h%file_version + h%file_revision > 1002) THEN
         CALL read_entry_id(h, b%species_id)
       ELSE
         CALL sdf_safe_copy_id(h, '__unknown__', b%species_id)
@@ -163,7 +163,7 @@ CONTAINS
     ! Read the real data
 
     npoints = INT(b%npoints)
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, array, npoints, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
     ENDIF
@@ -197,7 +197,7 @@ CONTAINS
     npoints = INT(b%npoints)
     ALLOCATE(cvalues(npoints))
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, cvalues, &
           npoints, b%mpitype, MPI_STATUS_IGNORE, errcode)
     ENDIF
@@ -205,7 +205,7 @@ CONTAINS
     CALL MPI_BCAST(cvalues, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 
     DO i = 1,npoints
-      IF (cvalues(i) .EQ. ACHAR(0)) THEN
+      IF (cvalues(i) == ACHAR(0)) THEN
         array(i) = .FALSE.
       ELSE
         array(i) = .TRUE.
@@ -264,7 +264,7 @@ CONTAINS
     npoint_this_it8 = MIN(npoint_remain, npoint_per_it8)
     npoint_this_it  = INT(npoint_this_it8)
 
-    DO WHILE (npoint_this_it .GT. 0)
+    DO WHILE (npoint_this_it > 0)
       npoint_this_it8 = MIN(npoint_remain, npoint_per_it8)
       npoint_this_it  = INT(npoint_this_it8)
       CALL MPI_FILE_READ(h%filehandle, array, npoint_this_it, b%mpitype, &
@@ -331,7 +331,7 @@ CONTAINS
     npoint_this_it8 = MIN(npoint_remain, npoint_per_it8)
     npoint_this_it  = INT(npoint_this_it8)
 
-    DO WHILE (npoint_this_it .GT. 0)
+    DO WHILE (npoint_this_it > 0)
       npoint_this_it8 = MIN(npoint_remain, npoint_per_it8)
       npoint_this_it  = INT(npoint_this_it8)
       CALL MPI_FILE_READ(h%filehandle, array, npoint_this_it, b%mpitype, &

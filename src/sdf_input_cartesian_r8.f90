@@ -57,7 +57,7 @@ CONTAINS
     h%current_location = b%data_location
 
     intn = b%dims(1)
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, intn, b%mpitype, &
@@ -89,7 +89,7 @@ CONTAINS
     h%current_location = b%data_location
 
     intn = b%dims(1)
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, intn, b%mpitype, &
@@ -99,7 +99,7 @@ CONTAINS
     CALL MPI_BCAST(x, intn, b%mpitype, h%rank_master, h%comm, errcode)
 
     intn = b%dims(2)
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, y, intn, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
@@ -129,7 +129,7 @@ CONTAINS
     h%current_location = b%data_location
 
     intn = b%dims(1)
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, intn, b%mpitype, &
@@ -139,7 +139,7 @@ CONTAINS
     CALL MPI_BCAST(x, intn, b%mpitype, h%rank_master, h%comm, errcode)
 
     intn = b%dims(2)
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, y, intn, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
@@ -147,7 +147,7 @@ CONTAINS
     CALL MPI_BCAST(y, intn, b%mpitype, h%rank_master, h%comm, errcode)
 
     intn = b%dims(3)
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, z, intn, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
@@ -672,13 +672,13 @@ CONTAINS
     nm = cur%ndims
     nsub = 0
     DO i = 1,nm
-      IF (cur%variable_ids(i) .NE. '') nsub = nsub + 1
+      IF (cur%variable_ids(i) /= '') nsub = nsub + 1
     ENDDO
 
     j = 0
     IF (last) THEN
       DO i = 1,nm
-        IF (cur%variable_ids(i) .EQ. '') CYCLE
+        IF (cur%variable_ids(i) == '') CYCLE
         found = sdf_find_block(h, b, cur%variable_ids(i))
         IF (.NOT. found) RETURN
         h%current_block => b
@@ -688,7 +688,7 @@ CONTAINS
       ENDDO
     ELSE
       DO i = 1,nm
-        IF (cur%variable_ids(i) .EQ. '') CYCLE
+        IF (cur%variable_ids(i) == '') CYCLE
         found = sdf_find_block(h, b, cur%variable_ids(i))
         IF (.NOT. found) RETURN
         h%current_block => b
@@ -729,13 +729,13 @@ CONTAINS
     nm = cur%ndims
     nsub = 0
     DO i = 1,nm
-      IF (cur%variable_ids(i) .NE. '') nsub = nsub + 1
+      IF (cur%variable_ids(i) /= '') nsub = nsub + 1
     ENDDO
 
     j = 0
     IF (last) THEN
       DO i = 1,nm
-        IF (cur%variable_ids(i) .EQ. '') CYCLE
+        IF (cur%variable_ids(i) == '') CYCLE
         found = sdf_find_block(h, b, cur%variable_ids(i))
         IF (.NOT. found) RETURN
         h%current_block => b
@@ -745,7 +745,7 @@ CONTAINS
       ENDDO
     ELSE
       DO i = 1,nm
-        IF (cur%variable_ids(i) .EQ. '') CYCLE
+        IF (cur%variable_ids(i) == '') CYCLE
         found = sdf_find_block(h, b, cur%variable_ids(i))
         IF (.NOT. found) RETURN
         h%current_block => b
@@ -786,13 +786,13 @@ CONTAINS
     nm = cur%ndims
     nsub = 0
     DO i = 1,nm
-      IF (cur%variable_ids(i) .NE. '') nsub = nsub + 1
+      IF (cur%variable_ids(i) /= '') nsub = nsub + 1
     ENDDO
 
     j = 0
     IF (last) THEN
       DO i = 1,nm
-        IF (cur%variable_ids(i) .EQ. '') CYCLE
+        IF (cur%variable_ids(i) == '') CYCLE
         found = sdf_find_block(h, b, cur%variable_ids(i))
         IF (.NOT. found) RETURN
         h%current_block => b
@@ -802,7 +802,7 @@ CONTAINS
       ENDDO
     ELSE
       DO i = 1,nm
-        IF (cur%variable_ids(i) .EQ. '') CYCLE
+        IF (cur%variable_ids(i) == '') CYCLE
         found = sdf_find_block(h, b, cur%variable_ids(i))
         IF (.NOT. found) RETURN
         h%current_block => b
@@ -832,7 +832,7 @@ CONTAINS
     TYPE(sdf_block_type), POINTER :: b
 
     b => h%current_block
-    IF (b%blocktype .EQ. c_blocktype_plain_variable) THEN
+    IF (b%blocktype == c_blocktype_plain_variable) THEN
       CALL read_nd_float_r8(h, variable(1,1), distribution, subarray)
     ELSE
       CALL read_1d_material_r8(h, variable, distribution, subarray, last_in)
@@ -856,7 +856,7 @@ CONTAINS
     TYPE(sdf_block_type), POINTER :: b
 
     b => h%current_block
-    IF (b%blocktype .EQ. c_blocktype_plain_variable) THEN
+    IF (b%blocktype == c_blocktype_plain_variable) THEN
       CALL read_nd_float_r8(h, variable(1,1,1), distribution, subarray)
     ELSE
       CALL read_2d_material_r8(h, variable, distribution, subarray, last_in)

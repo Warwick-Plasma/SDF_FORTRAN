@@ -30,7 +30,7 @@ CONTAINS
     CHARACTER(LEN=4) :: padding
     TYPE(sdf_block_type), POINTER :: b
 
-    IF (nstations .LE. 0) RETURN
+    IF (nstations <= 0) RETURN
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -57,8 +57,8 @@ CONTAINS
       ALLOCATE(b%station_grid(b%nstations,b%ndims))
 
       b%nvariables = 0
-      IF (b%step_increment .NE. 1) b%nvariables = b%nvariables + 1
-      IF (ABS(b%time_increment - 1.0_r8) .GT. c_tiny) &
+      IF (b%step_increment /= 1) b%nvariables = b%nvariables + 1
+      IF (ABS(b%time_increment - 1.0_r8) > c_tiny) &
           b%nvariables = b%nvariables + 1
       DO i = 1,b%nstations
         CALL sdf_safe_copy_id(h, station_ids(i), b%station_ids(i))
@@ -66,8 +66,8 @@ CONTAINS
         b%station_nvars(i) = station_nvars(i)
         b%station_move(i) = station_move(i)
         b%station_grid(i,1) = station_x(i)
-        IF (b%ndims .GT. 1) b%station_grid(i,2) = station_y(i)
-        IF (b%ndims .GT. 2) b%station_grid(i,3) = station_z(i)
+        IF (b%ndims > 1) b%station_grid(i,2) = station_y(i)
+        IF (b%ndims > 2) b%station_grid(i,3) = station_z(i)
         b%nvariables = b%nvariables + b%station_nvars(i)
       ENDDO
 
@@ -123,7 +123,7 @@ CONTAINS
         + (b%nstations + b%nvariables) * h%string_length + 4
     b%data_length = b%nelements * b%type_size
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       IF (PRESENT(id)) THEN
         CALL sdf_write_block_header(h, id, name)
       ELSE
@@ -415,7 +415,7 @@ CONTAINS
     INTEGER :: errcode
     INTEGER(KIND=MPI_OFFSET_KIND) :: offset
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       b => h%current_block
       b%next_block_location = b%data_location + b%data_length
 
@@ -454,7 +454,7 @@ CONTAINS
     ALLOCATE(variable_ids(nmat))
 
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(material_names(i)) == 0) THEN
         variable_ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &
@@ -489,7 +489,7 @@ CONTAINS
     ALLOCATE(variable_ids(nmat))
 
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(material_names(i)) == 0) THEN
         variable_ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &
@@ -525,7 +525,7 @@ CONTAINS
     ALLOCATE(variable_ids(nmat))
 
     DO i = 1,nmat
-      IF (LEN_TRIM(specnames(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(specnames(i)) == 0) THEN
         variable_ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &

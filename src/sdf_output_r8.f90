@@ -66,7 +66,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
@@ -128,12 +128,12 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
       ! Actual array
-      IF (n1 .EQ. SIZE(array,1)) THEN
+      IF (n1 == SIZE(array,1)) THEN
         var_len = INT(b%nelements)
         CALL MPI_FILE_WRITE(h%filehandle, array, var_len, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)

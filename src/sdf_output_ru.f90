@@ -21,7 +21,7 @@ CONTAINS
     CHARACTER(LEN=6) :: padding
 
     IF (h%done_header) THEN
-      IF (h%print_warnings .AND. h%rank .EQ. h%rank_master) THEN
+      IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** WARNING ***'
         PRINT*,'SDF header already written. Ignoring extra call.'
       ENDIF
@@ -48,7 +48,7 @@ CONTAINS
     h%current_location = 0
     h%data_location = 0
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
@@ -164,7 +164,7 @@ CONTAINS
     ! If this routine is changed then the value of h%block_header_length
     ! must be changed accordingly in sdf_write_header
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       h%current_location = b%block_start
 
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
@@ -226,7 +226,7 @@ CONTAINS
     ! must be changed accordingly in sdf_open_clobber
 
     IF (.NOT. h%done_header) THEN
-      IF (h%print_warnings .AND. h%rank .EQ. h%rank_master) THEN
+      IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** WARNING ***'
         PRINT*,'SDF header not yet written. Ignoring write call.'
       ENDIF
@@ -234,14 +234,14 @@ CONTAINS
     ENDIF
 
     IF (b%done_header) THEN
-      IF (h%print_warnings .AND. h%rank .EQ. h%rank_master) THEN
+      IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** WARNING ***'
         PRINT*,'SDF block header already written. Ignoring extra call.'
       ENDIF
       RETURN
     ENDIF
 
-    IF (h%data_location .NE. 0) THEN
+    IF (h%data_location /= 0) THEN
       b%data_location = h%data_location
       b%next_block_location = b%block_start + b%info_length
     ELSE
@@ -270,8 +270,8 @@ CONTAINS
 
     len_s = LEN_TRIM(string)
 
-    IF (h%print_warnings .AND. len_s .GT. length &
-        .AND. h%rank .EQ. h%rank_master) THEN
+    IF (h%print_warnings .AND. len_s > length &
+        .AND. h%rank == h%rank_master) THEN
       PRINT*, '*** WARNING ***'
       PRINT*, 'Output string "' // TRIM(string) // '" has been truncated'
     ENDIF
@@ -285,7 +285,7 @@ CONTAINS
 
     ! If this isn't the full string length then tag in a ACHAR(0) to help
     ! With C++ string handling
-    IF (len_s + 1 .LT. length) output(len_s+1:length) = ACHAR(0)
+    IF (len_s + 1 < length) output(len_s+1:length) = ACHAR(0)
 
     CALL MPI_FILE_WRITE(h%filehandle, output, length, &
         MPI_CHARACTER, MPI_STATUS_IGNORE, errcode)
@@ -336,7 +336,7 @@ CONTAINS
 
     DO i = 1, LEN(string_out)
       idx = INDEX(upr, string_out(i:i))
-      IF (idx .NE. 0) string_out(i:i) = lwr(idx:idx)
+      IF (idx /= 0) string_out(i:i) = lwr(idx:idx)
     ENDDO
 
   END FUNCTION sdf_string_lowercase
@@ -409,7 +409,7 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       ! Write metadata
       CALL MPI_FILE_WRITE(h%filehandle, b%run%version, 1, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
@@ -530,7 +530,7 @@ CONTAINS
       ENDIF
     ENDIF
 
-    IF (h%datatype .GT. 0) b%datatype = h%datatype
+    IF (h%datatype > 0) b%datatype = h%datatype
 
     ! Metadata is
     ! - stagger   INTEGER(i4)
@@ -552,7 +552,7 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       ! Write metadata
       CALL MPI_FILE_WRITE(h%filehandle, b%stagger, 1, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
@@ -565,7 +565,7 @@ CONTAINS
     ENDIF
 
     h%rank_master = h%default_rank
-    IF (b%data_length .GT. 0) THEN
+    IF (b%data_length > 0) THEN
       h%current_location = b%next_block_location
     ELSE
       h%current_location = b%block_start + b%info_length
@@ -670,7 +670,7 @@ CONTAINS
     ALLOCATE(ids(nmat))
 
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) THEN
+      IF (LEN_TRIM(material_names(i)) == 0) THEN
         ids(i) = ''
       ELSE
         CALL sdf_safe_string_composite(h, id, &
@@ -680,7 +680,7 @@ CONTAINS
 
     ALLOCATE(new_variable_ids(ndims))
     DO i = 1,nmat
-      IF (LEN_TRIM(material_names(i)) .EQ. 0) CYCLE
+      IF (LEN_TRIM(material_names(i)) == 0) CYCLE
       DO j = 1,ndims
         CALL sdf_safe_string_composite(h, variable_ids(j), &
             sdf_string_lowercase(material_names(i)), new_variable_ids(j))
@@ -709,7 +709,7 @@ CONTAINS
     INTEGER :: i, errcode
     TYPE(sdf_block_type), POINTER :: b
 
-    IF (h%blocktype .EQ. c_blocktype_contiguous) THEN
+    IF (h%blocktype == c_blocktype_contiguous) THEN
       CALL sdf_write_stitched(h, id, name, mesh_id, stagger, &
           variable_ids, ndims, data_length)
       RETURN
@@ -760,7 +760,7 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       ! Write metadata
       CALL MPI_FILE_WRITE(h%filehandle, b%stagger, 1, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
@@ -777,7 +777,7 @@ CONTAINS
     ENDIF
 
     h%rank_master = h%default_rank
-    IF (b%data_length .GT. 0) THEN
+    IF (b%data_length > 0) THEN
       h%current_location = b%next_block_location
     ELSE
       h%current_location = b%block_start + b%info_length
@@ -844,7 +844,7 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       ! Write metadata
       CALL MPI_FILE_WRITE(h%filehandle, b%stagger, 1, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
@@ -859,7 +859,7 @@ CONTAINS
     ENDIF
 
     h%rank_master = h%default_rank
-    IF (b%data_length .GT. 0) THEN
+    IF (b%data_length > 0) THEN
       h%current_location = b%next_block_location
     ELSE
       h%current_location = b%block_start + b%info_length
@@ -933,7 +933,7 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       ! Write metadata
       CALL MPI_FILE_WRITE(h%filehandle, b%stagger, 1, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
@@ -954,7 +954,7 @@ CONTAINS
     ENDIF
 
     h%rank_master = h%default_rank
-    IF (b%data_length .GT. 0) THEN
+    IF (b%data_length > 0) THEN
       h%current_location = b%next_block_location
     ELSE
       h%current_location = b%block_start + b%info_length
@@ -1019,7 +1019,7 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       ! Write metadata
       CALL MPI_FILE_WRITE(h%filehandle, b%stagger, 1, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
@@ -1065,7 +1065,7 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       ! Write data (in metadata section)
       CALL MPI_FILE_WRITE(h%filehandle, b%const_value, var_len, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
@@ -1162,7 +1162,7 @@ CONTAINS
 
     IF (PRESENT(rank_write)) h%rank_master = rank_write
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       sz   = SIZE(array)
       len1 = LEN(array)
       len2 = LEN(last)
@@ -1177,7 +1177,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
@@ -1221,7 +1221,7 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       ! Write metadata
       CALL sdf_safe_write_id(h, b%mimetype)
       CALL sdf_safe_write_id(h, b%checksum_type)
@@ -1262,7 +1262,7 @@ CONTAINS
     ! - checksum       CHARACTER(string_length)
 
     b%info_length = h%block_header_length + 2 * c_id_length + h%string_length
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       n1 = SIZE(array)
       b%data_length = n1 * soi8 - b%padding
     ENDIF
@@ -1278,7 +1278,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
@@ -1324,7 +1324,7 @@ CONTAINS
 
     b%info_length = h%block_header_length + 2 * c_id_length + h%string_length
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       sz   = SIZE(array)
       len1 = LEN(array)
       len2 = LEN(last)
@@ -1342,7 +1342,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
@@ -1389,40 +1389,40 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       ! Write metadata
       DO i = 1, b%ndims
         CALL sdf_safe_write_string(h, b%material_names(i))
       ENDDO
 
-      IF (b%datatype .EQ. c_datatype_integer4) THEN
+      IF (b%datatype == c_datatype_integer4) THEN
         CALL MPI_FILE_WRITE(h%filehandle, b%i4_array, b%ndims, &
             b%mpitype, MPI_STATUS_IGNORE, errcode)
 
-      ELSE IF (b%datatype .EQ. c_datatype_integer8) THEN
+      ELSE IF (b%datatype == c_datatype_integer8) THEN
         CALL MPI_FILE_WRITE(h%filehandle, b%i8_array, b%ndims, &
             b%mpitype, MPI_STATUS_IGNORE, errcode)
 
-      ELSE IF (b%datatype .EQ. c_datatype_real4) THEN
+      ELSE IF (b%datatype == c_datatype_real4) THEN
         CALL MPI_FILE_WRITE(h%filehandle, b%r4_array, b%ndims, &
             b%mpitype, MPI_STATUS_IGNORE, errcode)
 
-      ELSE IF (b%datatype .EQ. c_datatype_real8) THEN
+      ELSE IF (b%datatype == c_datatype_real8) THEN
         CALL MPI_FILE_WRITE(h%filehandle, b%r8_array, b%ndims, &
             b%mpitype, MPI_STATUS_IGNORE, errcode)
 
-      ELSE IF (b%datatype .EQ. c_datatype_logical) THEN
+      ELSE IF (b%datatype == c_datatype_logical) THEN
         CALL MPI_FILE_WRITE(h%filehandle, b%logical_array, b%ndims, &
             b%mpitype, MPI_STATUS_IGNORE, errcode)
 
-      ELSE IF (b%datatype .EQ. c_datatype_character) THEN
+      ELSE IF (b%datatype == c_datatype_character) THEN
         CALL MPI_FILE_WRITE(h%filehandle, b%string_array, &
             b%ndims * h%string_length, b%mpitype, MPI_STATUS_IGNORE, errcode)
       ENDIF
     ENDIF
 
     h%rank_master = h%default_rank
-    IF (b%data_length .GT. 0) THEN
+    IF (b%data_length > 0) THEN
       h%current_location = b%next_block_location
     ELSE
       h%current_location = b%block_start + b%info_length
@@ -1681,7 +1681,7 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_WRITE(h%filehandle, b%geometry, 1, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
       CALL MPI_FILE_WRITE(h%filehandle, b%dims, ndims, MPI_INTEGER4, &
@@ -1724,7 +1724,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
@@ -1785,18 +1785,18 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
       ! Actual array
       CALL MPI_FILE_WRITE(h%filehandle, nmax1, b%dims(1), b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-      IF (b%ndims .GT. 1) THEN
+      IF (b%ndims > 1) THEN
         CALL MPI_FILE_WRITE(h%filehandle, nmax2, b%dims(2), b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
       ENDIF
-      IF (b%ndims .GT. 2) THEN
+      IF (b%ndims > 2) THEN
         CALL MPI_FILE_WRITE(h%filehandle, nmax3, b%dims(3), b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
       ENDIF
@@ -1877,7 +1877,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
@@ -1888,7 +1888,7 @@ CONTAINS
       npt = npt * n2
       CALL MPI_FILE_WRITE(h%filehandle, nmax2, npt, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-      IF (b%ndims .GT. 2) THEN
+      IF (b%ndims > 2) THEN
         npt = npt * n3
         CALL MPI_FILE_WRITE(h%filehandle, nmax3, npt, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
@@ -1936,7 +1936,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
@@ -1985,7 +1985,7 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_WRITE(h%filehandle, b%dims, ndims, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
@@ -2026,7 +2026,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
@@ -2088,12 +2088,12 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
       ! Actual array
-      IF (n1 .EQ. SIZE(array,1)) THEN
+      IF (n1 == SIZE(array,1)) THEN
         var_len = INT(b%nelements)
         CALL MPI_FILE_WRITE(h%filehandle, array, var_len, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
@@ -2159,7 +2159,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
@@ -2233,7 +2233,7 @@ CONTAINS
 
     h%current_location = b%data_location
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
 
@@ -2259,41 +2259,41 @@ CONTAINS
     INTEGER(i4) :: int4
 
     ! No open file or not writing
-    IF (h%filehandle .EQ. -1 .OR. .NOT.h%writing) RETURN
+    IF (h%filehandle == -1 .OR. .NOT.h%writing) RETURN
 
     ! Update summary and nblocks info
-    IF (h%rank .EQ. h%rank_master) THEN
-      IF (h%error_code .NE. 0) THEN
+    IF (h%rank == h%rank_master) THEN
+      IF (h%error_code /= 0) THEN
         h%nblocks = -h%error_code
         h%summary_location = 0
         h%summary_size = 0
       ENDIF
-      IF (h%summary_location .NE. h%summary_location_wrote) THEN
+      IF (h%summary_location /= h%summary_location_wrote) THEN
         offset = c_summary_offset
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, h%summary_location, 1, &
             MPI_INTEGER8, MPI_STATUS_IGNORE, errcode)
         h%summary_location_wrote = h%summary_location
       ENDIF
-      IF (h%summary_size .NE. h%summary_size_wrote) THEN
+      IF (h%summary_size /= h%summary_size_wrote) THEN
         offset = c_summary_offset + 8
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, h%summary_size, 1, &
             MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
         h%summary_size_wrote = h%summary_size
       ENDIF
-      IF (h%nblocks .NE. h%nblocks_wrote) THEN
+      IF (h%nblocks /= h%nblocks_wrote) THEN
         offset = c_summary_offset + 12
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, h%nblocks, 1, &
             MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
         h%nblocks_wrote = h%nblocks
       ENDIF
-      IF (h%step .NE. h%step_wrote) THEN
+      IF (h%step /= h%step_wrote) THEN
         offset = c_summary_offset + 20
         int4 = INT(h%step,i4)
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, int4, 1, &
             MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
         h%step_wrote = h%step
       ENDIF
-      IF (ABS(h%time - h%time_wrote) .GT. c_tiny) THEN
+      IF (ABS(h%time - h%time_wrote) > c_tiny) THEN
         offset = c_summary_offset + 24
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, h%time, 1, &
             MPI_REAL8, MPI_STATUS_IGNORE, errcode)

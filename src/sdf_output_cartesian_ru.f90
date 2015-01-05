@@ -19,7 +19,7 @@ CONTAINS
     b => h%current_block
 
     ndims = b%ndims
-    IF (b%blocktype .EQ. c_blocktype_lagrangian_mesh) THEN
+    IF (b%blocktype == c_blocktype_lagrangian_mesh) THEN
       b%nelements = ndims
       DO i = 1,ndims
         b%nelements = b%nelements * b%dims(i)
@@ -55,9 +55,9 @@ CONTAINS
           CALL sdf_safe_copy_id(h, dim_labels(i), b%dim_labels(i))
         ENDDO
       ELSE
-        IF (ndims .GE. 1) CALL sdf_safe_copy_id(h, 'X', b%dim_labels(1))
-        IF (ndims .GE. 2) CALL sdf_safe_copy_id(h, 'Y', b%dim_labels(2))
-        IF (ndims .GE. 3) CALL sdf_safe_copy_id(h, 'Z', b%dim_labels(3))
+        IF (ndims >= 1) CALL sdf_safe_copy_id(h, 'X', b%dim_labels(1))
+        IF (ndims >= 2) CALL sdf_safe_copy_id(h, 'Y', b%dim_labels(2))
+        IF (ndims >= 3) CALL sdf_safe_copy_id(h, 'Z', b%dim_labels(3))
       ENDIF
 
       IF (PRESENT(dim_units)) THEN
@@ -85,7 +85,7 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_WRITE(h%filehandle, b%dim_mults, ndims, MPI_REAL8, &
           MPI_STATUS_IGNORE, errcode)
 
@@ -186,7 +186,7 @@ CONTAINS
       CALL write_block_header(h)
     ENDIF
 
-    IF (h%rank .EQ. h%rank_master) THEN
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_WRITE(h%filehandle, b%mult, 1, MPI_REAL8, &
           MPI_STATUS_IGNORE, errcode)
 
