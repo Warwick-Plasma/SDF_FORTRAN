@@ -158,8 +158,8 @@ ifeq ($(strip $(COMPILER)),hector)
     FFLAGS = -O0 -g -ea -ec -eC -eD -eI -en -hfp_trap -Ktrap=fp -m0 -M1438,7413
   endif
   MODFLAG := -em -I/usr/include -I$(INCDIR) -I$(OBJDIR)
-  PUBMODULE  := $(MODFLAG) -J=$(INCDIR)
-  MODULEFLAG := $(MODFLAG) -J=$(OBJDIR)
+  PUBMODULE  := $(MODFLAG) -J$(INCDIR)
+  MODULEFLAG := $(MODFLAG) -J$(OBJDIR)
   MPIF90 = ftn
 endif
 
@@ -186,7 +186,8 @@ FC  = $(MPIF90)
 AR  = ar
 RANLIB = ranlib
 
-FC_INFO := $(shell ${FC} --version | grep '[a-zA-Z]' | head -n 1)
+FC_INFO := $(shell ${FC} --version 2>/dev/null \
+    || ${FC} -V 2>&1 | grep '[a-zA-Z]' | head -n 1)
 
 # objectlist file
 include Makefile-objs
