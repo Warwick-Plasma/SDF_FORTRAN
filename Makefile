@@ -201,7 +201,7 @@ VPATH = $(SRCDIR):$(OBJDIR):$(LIBDIR):$(INCDIR)
 all: $(LIB)
 
 $(SRCDIR)/COMMIT: FORCE
-	@./$(SRCDIR)/gen_commit_string || exit 0
+	@sh $(SRCDIR)/gen_commit_string.sh || exit 0
 
 # Not real file targets
 .PHONY: Makefile Makefile-deps Makefile-objs all clean cleanall help FORCE
@@ -216,7 +216,7 @@ sdf.o sdf_job_info.o:
 	$(FC) -c $(FFLAGS) $(PUBMODULE) -o $(OBJDIR)/$@ $<
 
 $(SRCDIR)/sdf_source_info.f90: $(SOURCE_ALL)
-	$(PACK_SDF) $(PACK_OPTS) $@ "$(FC_INFO)" "$(FFLAGS)" $^
+	sh $(PACK_SDF) $(PACK_OPTS) $@ "$(FC_INFO)" "$(FFLAGS)" $^
 sdf_source_info.o: sdf_source_info.f90 $(SOURCE_ALL)
 	$(FC) -c $(FFLAGS) $(INFO_FLAGS) $(MODULEFLAG) -o $(OBJDIR)/$@ $<
 
