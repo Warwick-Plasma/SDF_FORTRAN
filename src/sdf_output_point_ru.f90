@@ -701,6 +701,12 @@ CONTAINS
 
     IF (npoint_global <= 0) RETURN
 
+    IF (PRESENT(convert_in)) THEN
+      convert = convert_in
+    ELSE
+      convert = .FALSE.
+    ENDIF
+
     ! Allocate buffer arrays
 
     start = .FALSE.
@@ -737,12 +743,6 @@ CONTAINS
 
     CALL sdf_get_next_block(h)
     b => h%current_block
-
-    IF (PRESENT(convert_in)) THEN
-      convert = convert_in
-    ELSE
-      convert = .FALSE.
-    ENDIF
 
     IF (convert) THEN
       b%type_size = 4
