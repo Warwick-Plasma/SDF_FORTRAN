@@ -11,6 +11,7 @@ MODULE sdf
   USE sdf_output_point
   USE sdf_output_station
   USE sdf_output_source
+  USE sdf_md5
 
   IMPLICIT NONE
 
@@ -94,6 +95,10 @@ MODULE sdf
   PUBLIC :: c_blocktypes_char
   PUBLIC :: c_datatypes_char
   PUBLIC :: c_type_sizes
+
+  PUBLIC :: sdf_md5_init
+  PUBLIC :: sdf_md5_generate
+  PUBLIC :: sdf_md5_append
 
   PUBLIC :: sdf_open
   PUBLIC :: sdf_close
