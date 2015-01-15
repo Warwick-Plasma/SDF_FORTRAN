@@ -63,7 +63,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: string
     CHARACTER(LEN=32), INTENT(INOUT) :: md5
     LOGICAL, INTENT(IN) :: generate
-    CHARACTER(LEN=LEN(string)+64) :: new_string
+    CHARACTER(LEN=LEN(string)+72) :: new_string
     CHARACTER(LEN=8) :: wtmp
     LOGICAL :: pad_string
 
