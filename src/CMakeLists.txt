@@ -38,6 +38,7 @@ set(SOURCES
    sdf_output_station_r8.f90
    sdf_output_station_ru.f90
    sdf_output_util.f90
+   sdf_md5.f90
    )
 
 find_program(PACK_SDF pack.sh
