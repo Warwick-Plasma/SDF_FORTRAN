@@ -1,6 +1,7 @@
 project(SDF Fortran)
 cmake_minimum_required(VERSION 2.8.8)
 find_package(MPI REQUIRED)
+find_package(PackSDF REQUIRED PATHS CMake)
 
 set(INHERIT_FLAGS OFF CACHE BOOL "Inherit compiler flags")
 
@@ -41,15 +42,13 @@ if(NOT INHERIT_FLAGS)
    endif()
 endif()
 
-set(TOPLEVEL "${CMAKE_CURRENT_SOURCE_DIR}")
-file(GLOB SOURCE_ALL CMakeLists.txt Makefile*)
+file(GLOB_RECURSE SOURCE_ALL CMakeLists.txt Makefile* *.f90 ${PACK_FILES})
 
 set(PACK_SOURCE_CODE 1 CACHE STRING "Pack source code")
 set(PACK_GIT_DIFF 1 CACHE STRING "Pack git diff")
 set(PACK_GIT_DIFF_FROM_ORIGIN 1 CACHE STRING "Pack git diff from origin")
 set(GENERATE_CHECKSUM 1 CACHE 1 "Generate checksum")
 set(F77_OUTPUT 0)
-set(GIT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(${MPI_Fortran_INCLUDE_PATH})
 add_subdirectory(src lib)

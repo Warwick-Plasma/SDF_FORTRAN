@@ -41,10 +41,6 @@ set(SOURCES
    sdf_md5.f90
    )
 
-find_program(PACK_SDF pack.sh
-   PATHS .
-   DOC "pack source info into a Fortran byte array")
-
 execute_process(COMMAND ${CMAKE_Fortran_COMPILER} --version
   COMMAND grep [a-zA-Z] COMMAND head -n 1
   OUTPUT_VARIABLE FC_INFO OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -58,20 +54,11 @@ else()
 endif()
 
 set(INFO_FILE sdf_source_info.f90)
-file(GLOB SOURCE_ALL RELATIVE "${TOPLEVEL}" ${SOURCE_ALL} ${SOURCES}
-   CMakeLists.txt pack.py pack.sh)
 
 set(PACK_OPTS ${GIT_DIR} sdf ${PACK_SOURCE_CODE} ${PACK_GIT_DIFF}
    ${PACK_GIT_DIFF_FROM_ORIGIN} ${GENERATE_CHECKSUM} ${F77_OUTPUT})
-add_custom_command(
-   OUTPUT ${INFO_FILE}
-   COMMAND ${CMAKE_COMMAND} -E remove -f ${FORT}
-   COMMAND ${PACK_SDF} ${PACK_OPTS}
-      ${CMAKE_CURRENT_BINARY_DIR}/${INFO_FILE} ${FC_INFO}
-      \"${FFLAGS}\" ${SOURCE_ALL}
-   WORKING_DIRECTORY ${TOPLEVEL}
-   DEPENDS ${PACK_SDF} VERBATIM)
 
+include(${CONFIGURE_PACK_TARGET})
 list(APPEND SOURCES ${INFO_FILE})
 
 if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
