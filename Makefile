@@ -23,6 +23,7 @@ PACK_OPTS = $(GIT_WORK_TREE) sdf $(PACK_SOURCE_CODE) $(PACK_GIT_DIFF) \
     $(PACK_GIT_DIFF_FROM_ORIGIN) $(GENERATE_CHECKSUM) $(F77_OUTPUT)
 
 CPU = p7
+AR  = ar
 
 ifeq (linux-ix86_64,$(ARCH))
    M64_FLAG = -m64
@@ -70,7 +71,9 @@ ifeq ($(strip $(COMPILER)),intel)
   FFLAGS += -fpe0 -mcmodel=medium -heap-arrays 64
   MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
   PUBMODULE  := $(MODFLAG) -module $(INCDIR)
-  MODULEFLAG := $(MODFLAG) -module $(OBJDIR)
+  MODULEFLAG := $(MODFLAG) -module $(INCDIR)
+  # Intel compiler needs to use xiar rather than ar due to -ipo
+  AR = xiar
 endif
 
 # gfortran
@@ -183,7 +186,6 @@ MKDIR   = mkdir
 
 # compiler & archiver
 FC  = $(MPIF90)
-AR  = ar
 RANLIB = ranlib
 
 FC_INFO := $(shell ${FC} --version 2>/dev/null \
