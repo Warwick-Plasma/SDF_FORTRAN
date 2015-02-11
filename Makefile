@@ -203,7 +203,7 @@ VPATH = $(SRCDIR):$(OBJDIR):$(LIBDIR):$(INCDIR)
 all: $(LIB)
 
 $(SRCDIR)/COMMIT: FORCE
-	@sh $(SRCDIR)/gen_commit_string.sh || exit 0
+	@sh $(SRCDIR)/gen_commit_string.sh
 
 # Not real file targets
 .PHONY: Makefile Makefile-deps Makefile-objs all clean cleanall help FORCE
