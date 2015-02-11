@@ -103,6 +103,8 @@ MODULE sdf
   PUBLIC :: sdf_open
   PUBLIC :: sdf_close
   PUBLIC :: sdf_set_string_length
+  PUBLIC :: sdf_get_string_length
+  PUBLIC :: sdf_get_max_string_length
   PUBLIC :: sdf_set_default_rank
   PUBLIC :: sdf_set_point_array_size
   PUBLIC :: sdf_get_point_array_size

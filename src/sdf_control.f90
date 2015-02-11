@@ -144,9 +144,30 @@ CONTAINS
     TYPE(sdf_file_handle) :: h
     INTEGER, INTENT(IN) :: maxlen
 
-    h%string_length = INT(maxlen,i4)
+    h%string_length = MIN(INT(maxlen,i4), c_max_string_length)
 
   END SUBROUTINE sdf_set_string_length
+
+
+
+  FUNCTION sdf_get_string_length(h) RESULT(length)
+
+    TYPE(sdf_file_handle) :: h
+    INTEGER :: length
+
+    length = INT(h%string_length)
+
+  END FUNCTION sdf_get_string_length
+
+
+
+  FUNCTION sdf_get_max_string_length() RESULT(length)
+
+    INTEGER :: length
+
+    length = INT(c_max_string_length)
+
+  END FUNCTION sdf_get_max_string_length
 
 
 
