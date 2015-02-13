@@ -1416,8 +1416,9 @@ CONTAINS
             b%mpitype, MPI_STATUS_IGNORE, errcode)
 
       ELSE IF (b%datatype == c_datatype_character) THEN
-        CALL MPI_FILE_WRITE(h%filehandle, b%string_array, &
-            b%ndims * h%string_length, b%mpitype, MPI_STATUS_IGNORE, errcode)
+        DO i = 1, b%ndims
+          CALL sdf_safe_write_string(h, b%string_array(i))
+        ENDDO
       ENDIF
     ENDIF
 
