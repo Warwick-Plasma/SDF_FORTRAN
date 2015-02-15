@@ -55,7 +55,11 @@ endif
 # Intel
 # =====
 ifeq ($(strip $(COMPILER)),intel)
-  FFLAGS = -O3 -ipo
+  FFLAGS = -O3
+  # If you use the -ipo flag then you must also create the library file using
+  # Intel's xiar utility.
+  #AR = xiar
+  #FFLAGS = -O3 -ipo
   #FFLAGS = -O3 -ipo -xHost # Optimised (B)
   #FFLAGS = -O3 -ipo -xAVX  # Optimised (W)
   ifeq (debug,$(findstring debug,$(MODE)))
@@ -72,8 +76,6 @@ ifeq ($(strip $(COMPILER)),intel)
   MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
   PUBMODULE  := $(MODFLAG) -module $(INCDIR)
   MODULEFLAG := $(MODFLAG) -module $(INCDIR)
-  # Intel compiler needs to use xiar rather than ar due to -ipo
-  AR = xiar
 endif
 
 # gfortran
