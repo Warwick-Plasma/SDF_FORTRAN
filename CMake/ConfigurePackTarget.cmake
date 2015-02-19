@@ -8,6 +8,15 @@ execute_process(
    WORKING_DIRECTORY ${GIT_WORK_TREE}
    OUTPUT_VARIABLE GIT_DIR
    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# Force GIT_DIR to be an absolute path
+if(NOT IS_ABSOLUTE ${GIT_DIR})
+   unset(GIT_DIR1)
+   find_file(GIT_DIR1 ${GIT_DIR} PATHS ${GIT_WORK_TREE} NO_DEFAULT_PATH)
+   set(GIT_DIR ${GIT_DIR1})
+   unset(GIT_DIR1 CACHE)
+endif()
+
 configure_file(${PACK_CMAKE_IN} pack.cmake)
 add_custom_command(
    OUTPUT ${INFO_FILE}
