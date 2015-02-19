@@ -9,4 +9,4 @@ find_file(CONFIGURE_PACK_TARGET ConfigurePackTarget.cmake
    PATHS ${CMAKE_CURRENT_LIST_DIR}
    DOC "Path to ConfigurePackTarget.cmake")
 set(PACK_FILES ${PACK_PY} ${PACK_CMAKE_IN} ${CONFIGURE_PACK_TARGET}
-   CACHE STRING "Python and CMake scripts for packig Fortran source")
+   CACHE STRING "Python and CMake scripts for packing Fortran source")
