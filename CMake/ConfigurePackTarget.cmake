@@ -11,7 +11,13 @@ execute_process(
 
 # Force GIT_DIR to be an absolute path
 if(NOT IS_ABSOLUTE ${GIT_DIR})
+   # FIXME: These unset commands will break any project that rely on
+   #        GIT_DIR1 being defined in the cache.
+   #        Ideally, we should create a temporary unique variable
+   #        name, similar to the 'mktemp' command, but I don't know
+   #        how to do that in cmake. (AMW)
    unset(GIT_DIR1)
+   unset(GIT_DIR1 CACHE)
    find_file(GIT_DIR1 ${GIT_DIR} PATHS ${GIT_WORK_TREE} NO_DEFAULT_PATH)
    set(GIT_DIR ${GIT_DIR1})
    unset(GIT_DIR1 CACHE)
