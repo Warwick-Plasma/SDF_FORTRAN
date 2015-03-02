@@ -233,7 +233,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_1d_integer_i4_r8(h, id, name, units, dims, stagger, &
-      mesh_id, variable, distribution, subarray, mult)
+      mesh_id, variable, distribution, subarray, convert_in, mult)
 
     INTEGER, PARAMETER :: ndims = 1
     TYPE(sdf_file_handle) :: h
@@ -243,6 +243,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: mesh_id
     INTEGER(i4), DIMENSION(:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
     INTEGER :: i, errcode
     TYPE(sdf_block_type), POINTER :: b
@@ -295,7 +296,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_2d_integer_i4_r8(h, id, name, units, dims, stagger, &
-      mesh_id, variable, distribution, subarray, mult)
+      mesh_id, variable, distribution, subarray, convert_in, mult)
 
     INTEGER, PARAMETER :: ndims = 2
     TYPE(sdf_file_handle) :: h
@@ -305,6 +306,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: mesh_id
     INTEGER(i4), DIMENSION(:,:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
     INTEGER :: i, errcode
     TYPE(sdf_block_type), POINTER :: b
@@ -357,7 +359,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_3d_integer_i4_r8(h, id, name, units, dims, stagger, &
-      mesh_id, variable, distribution, subarray, mult)
+      mesh_id, variable, distribution, subarray, convert_in, mult)
 
     INTEGER, PARAMETER :: ndims = 3
     TYPE(sdf_file_handle) :: h
@@ -367,6 +369,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: mesh_id
     INTEGER(i4), DIMENSION(:,:,:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
     INTEGER :: i, errcode
     TYPE(sdf_block_type), POINTER :: b
@@ -412,7 +415,7 @@ CONTAINS
 
 
   SUBROUTINE write_1d_integer_i4_r4(h, id, name, units, dims, stagger, &
-      mesh_id, variable, distribution, subarray, mult)
+      mesh_id, variable, distribution, subarray, convert_in, mult)
 
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name, units
@@ -421,17 +424,18 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: mesh_id
     INTEGER(i4), DIMENSION(:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, INTENT(IN) :: convert_in
     REAL(r4), INTENT(IN) :: mult
 
     CALL write_1d_integer_i4_r8(h, id, name, units, dims, stagger, &
-        mesh_id, variable, distribution, subarray, REAL(mult,r8))
+        mesh_id, variable, distribution, subarray, convert_in, REAL(mult,r8))
 
   END SUBROUTINE write_1d_integer_i4_r4
 
 
 
   SUBROUTINE write_2d_integer_i4_r4(h, id, name, units, dims, stagger, &
-      mesh_id, variable, distribution, subarray, mult)
+      mesh_id, variable, distribution, subarray, convert_in, mult)
 
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name, units
@@ -440,17 +444,18 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: mesh_id
     INTEGER(i4), DIMENSION(:,:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, INTENT(IN) :: convert_in
     REAL(r4), INTENT(IN) :: mult
 
     CALL write_2d_integer_i4_r8(h, id, name, units, dims, stagger, &
-        mesh_id, variable, distribution, subarray, REAL(mult,r8))
+        mesh_id, variable, distribution, subarray, convert_in, REAL(mult,r8))
 
   END SUBROUTINE write_2d_integer_i4_r4
 
 
 
   SUBROUTINE write_3d_integer_i4_r4(h, id, name, units, dims, stagger, &
-      mesh_id, variable, distribution, subarray, mult)
+      mesh_id, variable, distribution, subarray, convert_in, mult)
 
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name, units
@@ -459,10 +464,11 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: mesh_id
     INTEGER(i4), DIMENSION(:,:,:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, INTENT(IN) :: convert_in
     REAL(r4), INTENT(IN) :: mult
 
     CALL write_3d_integer_i4_r8(h, id, name, units, dims, stagger, &
-        mesh_id, variable, distribution, subarray, REAL(mult,r8))
+        mesh_id, variable, distribution, subarray, convert_in, REAL(mult,r8))
 
   END SUBROUTINE write_3d_integer_i4_r4
 
@@ -476,7 +482,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_1d_integer_i8_r8(h, id, name, units, dims, stagger, &
-      mesh_id, variable, distribution, subarray, mult)
+      mesh_id, variable, distribution, subarray, convert_in, mult)
 
     INTEGER, PARAMETER :: ndims = 1
     TYPE(sdf_file_handle) :: h
@@ -486,16 +492,31 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: mesh_id
     INTEGER(i8), DIMENSION(:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER(i4), DIMENSION(:), ALLOCATABLE :: i4array
     INTEGER :: i, errcode
     TYPE(sdf_block_type), POINTER :: b
+    LOGICAL :: convert
 
     CALL sdf_get_next_block(h)
     b => h%current_block
 
-    b%type_size = 8
-    b%datatype = c_datatype_integer8
-    b%mpitype = MPI_INTEGER8
+    IF (PRESENT(convert_in)) THEN
+      convert = convert_in
+    ELSE
+      convert = .FALSE.
+    ENDIF
+
+    IF (convert) THEN
+      b%type_size = 4
+      b%datatype = c_datatype_integer4
+      b%mpitype = MPI_INTEGER4
+    ELSE
+      b%type_size = 8
+      b%datatype = c_datatype_integer8
+      b%mpitype = MPI_INTEGER8
+    ENDIF
     b%ndims = ndims
     b%stagger = stagger
 
@@ -517,8 +538,16 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
-        MPI_STATUS_IGNORE, errcode)
+    IF (convert) THEN
+      ALLOCATE(i4array(b%dims(1)))
+      i4array = INT(variable,i4)
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, 1, subarray, &
+          MPI_STATUS_IGNORE, errcode)
+      DEALLOCATE(i4array)
+    ELSE
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+          MPI_STATUS_IGNORE, errcode)
+    ENDIF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -538,7 +567,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_2d_integer_i8_r8(h, id, name, units, dims, stagger, &
-      mesh_id, variable, distribution, subarray, mult)
+      mesh_id, variable, distribution, subarray, convert_in, mult)
 
     INTEGER, PARAMETER :: ndims = 2
     TYPE(sdf_file_handle) :: h
@@ -548,16 +577,31 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: mesh_id
     INTEGER(i8), DIMENSION(:,:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER(i4), DIMENSION(:,:), ALLOCATABLE :: i4array
     INTEGER :: i, errcode
     TYPE(sdf_block_type), POINTER :: b
+    LOGICAL :: convert
 
     CALL sdf_get_next_block(h)
     b => h%current_block
 
-    b%type_size = 8
-    b%datatype = c_datatype_integer8
-    b%mpitype = MPI_INTEGER8
+    IF (PRESENT(convert_in)) THEN
+      convert = convert_in
+    ELSE
+      convert = .FALSE.
+    ENDIF
+
+    IF (convert) THEN
+      b%type_size = 4
+      b%datatype = c_datatype_integer4
+      b%mpitype = MPI_INTEGER4
+    ELSE
+      b%type_size = 8
+      b%datatype = c_datatype_integer8
+      b%mpitype = MPI_INTEGER8
+    ENDIF
     b%ndims = ndims
     b%stagger = stagger
 
@@ -579,8 +623,16 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
-        MPI_STATUS_IGNORE, errcode)
+    IF (convert) THEN
+      ALLOCATE(i4array(b%dims(1),b%dims(2)))
+      i4array = INT(variable,i4)
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, 1, subarray, &
+          MPI_STATUS_IGNORE, errcode)
+      DEALLOCATE(i4array)
+    ELSE
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+          MPI_STATUS_IGNORE, errcode)
+    ENDIF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -600,7 +652,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_3d_integer_i8_r8(h, id, name, units, dims, stagger, &
-      mesh_id, variable, distribution, subarray, mult)
+      mesh_id, variable, distribution, subarray, convert_in, mult)
 
     INTEGER, PARAMETER :: ndims = 3
     TYPE(sdf_file_handle) :: h
@@ -610,16 +662,31 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: mesh_id
     INTEGER(i8), DIMENSION(:,:,:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER(i4), DIMENSION(:,:,:), ALLOCATABLE :: i4array
     INTEGER :: i, errcode
     TYPE(sdf_block_type), POINTER :: b
+    LOGICAL :: convert
 
     CALL sdf_get_next_block(h)
     b => h%current_block
 
-    b%type_size = 8
-    b%datatype = c_datatype_integer8
-    b%mpitype = MPI_INTEGER8
+    IF (PRESENT(convert_in)) THEN
+      convert = convert_in
+    ELSE
+      convert = .FALSE.
+    ENDIF
+
+    IF (convert) THEN
+      b%type_size = 4
+      b%datatype = c_datatype_integer4
+      b%mpitype = MPI_INTEGER4
+    ELSE
+      b%type_size = 8
+      b%datatype = c_datatype_integer8
+      b%mpitype = MPI_INTEGER8
+    ENDIF
     b%ndims = ndims
     b%stagger = stagger
 
@@ -641,8 +708,16 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
-        MPI_STATUS_IGNORE, errcode)
+    IF (convert) THEN
+      ALLOCATE(i4array(b%dims(1),b%dims(2),b%dims(3)))
+      i4array = INT(variable,i4)
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, 1, subarray, &
+          MPI_STATUS_IGNORE, errcode)
+      DEALLOCATE(i4array)
+    ELSE
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+          MPI_STATUS_IGNORE, errcode)
+    ENDIF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -655,7 +730,7 @@ CONTAINS
 
 
   SUBROUTINE write_1d_integer_i8_r4(h, id, name, units, dims, stagger, &
-      mesh_id, variable, distribution, subarray, mult)
+      mesh_id, variable, distribution, subarray, convert_in, mult)
 
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name, units
@@ -664,17 +739,18 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: mesh_id
     INTEGER(i8), DIMENSION(:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, INTENT(IN) :: convert_in
     REAL(r4), INTENT(IN) :: mult
 
     CALL write_1d_integer_i8_r8(h, id, name, units, dims, stagger, &
-        mesh_id, variable, distribution, subarray, REAL(mult,r8))
+        mesh_id, variable, distribution, subarray, convert_in, REAL(mult,r8))
 
   END SUBROUTINE write_1d_integer_i8_r4
 
 
 
   SUBROUTINE write_2d_integer_i8_r4(h, id, name, units, dims, stagger, &
-      mesh_id, variable, distribution, subarray, mult)
+      mesh_id, variable, distribution, subarray, convert_in, mult)
 
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name, units
@@ -683,17 +759,18 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: mesh_id
     INTEGER(i8), DIMENSION(:,:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, INTENT(IN) :: convert_in
     REAL(r4), INTENT(IN) :: mult
 
     CALL write_2d_integer_i8_r8(h, id, name, units, dims, stagger, &
-        mesh_id, variable, distribution, subarray, REAL(mult,r8))
+        mesh_id, variable, distribution, subarray, convert_in, REAL(mult,r8))
 
   END SUBROUTINE write_2d_integer_i8_r4
 
 
 
   SUBROUTINE write_3d_integer_i8_r4(h, id, name, units, dims, stagger, &
-      mesh_id, variable, distribution, subarray, mult)
+      mesh_id, variable, distribution, subarray, convert_in, mult)
 
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name, units
@@ -702,10 +779,11 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: mesh_id
     INTEGER(i8), DIMENSION(:,:,:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, INTENT(IN) :: convert_in
     REAL(r4), INTENT(IN) :: mult
 
     CALL write_3d_integer_i8_r8(h, id, name, units, dims, stagger, &
-        mesh_id, variable, distribution, subarray, REAL(mult,r8))
+        mesh_id, variable, distribution, subarray, convert_in, REAL(mult,r8))
 
   END SUBROUTINE write_3d_integer_i8_r4
 
