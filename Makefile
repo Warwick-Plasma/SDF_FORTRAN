@@ -48,8 +48,7 @@ ifeq ($(strip $(COMPILER)),pgi)
   endif
   FFLAGS += -Mnodefaultunit -Ktrap=fp -Mdclchk -tp $(CPU) -mcmodel=medium
   MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
-  PUBMODULE  := $(MODFLAG) -module $(INCDIR)
-  MODULEFLAG := $(MODFLAG) -module $(OBJDIR)
+  MODULEFLAG := $(MODFLAG) -module $(INCDIR)
 endif
 
 # Intel
@@ -74,7 +73,6 @@ ifeq ($(strip $(COMPILER)),intel)
   endif
   FFLAGS += -fpe0 -mcmodel=medium -heap-arrays 64
   MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
-  PUBMODULE  := $(MODFLAG) -module $(INCDIR)
   MODULEFLAG := $(MODFLAG) -module $(INCDIR)
 endif
 
@@ -115,8 +113,7 @@ ifeq ($(strip $(COMPILER)),gfortran)
   endif
   FFLAGS += -frecord-marker=4
   MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
-  PUBMODULE  := $(MODFLAG) -J$(INCDIR)
-  MODULEFLAG := $(MODFLAG) -J$(OBJDIR)
+  MODULEFLAG := $(MODFLAG) -J$(INCDIR)
   INFO_FLAGS = -Wno-conversion -fno-range-check
 endif
 
@@ -132,8 +129,7 @@ ifeq ($(strip $(COMPILER)),g95)
   endif
   FFLAGS += -fPIC -Wno=155 $(M64_FLAG)
   MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
-  PUBMODULE  := $(MODFLAG) -fmod=$(INCDIR)
-  MODULEFLAG := $(MODFLAG) -fmod=$(OBJDIR)
+  MODULEFLAG := $(MODFLAG) -fmod=$(INCDIR)
 endif
 
 # IBM Bluegene
@@ -147,8 +143,7 @@ ifeq ($(strip $(COMPILER)),ibm)
     #FFLAGS = -qthreaded -qsmp=noauto -qsmp=omp # Hybrid stuff
   endif
   MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
-  PUBMODULE  := $(MODFLAG) -qmoddir=$(INCDIR)
-  MODULEFLAG := $(MODFLAG) -qmoddir=$(OBJDIR)
+  MODULEFLAG := $(MODFLAG) -qmoddir=$(INCDIR)
   MPIF90 = mpixlf90_r
 
   # IBM compiler needs a -WF to recognise preprocessor directives
@@ -163,8 +158,7 @@ ifeq ($(strip $(COMPILER)),hector)
     FFLAGS = -O0 -g -ea -ec -eC -eD -eI -en -hfp_trap -Ktrap=fp -m0 -M1438,7413
   endif
   MODFLAG := -em -I/usr/include -I$(INCDIR) -I$(OBJDIR)
-  PUBMODULE  := $(MODFLAG) -J$(INCDIR)
-  MODULEFLAG := $(MODFLAG) -J$(OBJDIR)
+  MODULEFLAG := $(MODFLAG) -J$(INCDIR)
   MPIF90 = ftn
 endif
 
@@ -215,9 +209,6 @@ $(SRCDIR)/COMMIT: FORCE
 # implicit rules
 %.o: %.f90
 	$(FC) -c $(FFLAGS) $(MODULEFLAG) -o $(OBJDIR)/$@ $<
-
-sdf.o sdf_job_info.o:
-	$(FC) -c $(FFLAGS) $(PUBMODULE) -o $(OBJDIR)/$@ $<
 
 $(SRCDIR)/sdf_source_info.f90: $(SOURCE_ALL)
 	sh $(PACK_SDF) $(PACK_OPTS) $@ "$(FC_INFO)" "$(FFLAGS)" $^
