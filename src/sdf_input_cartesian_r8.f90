@@ -231,6 +231,8 @@ CONTAINS
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
+    h%current_location = h%current_location + b%dims(1) * b%type_size
+
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution(2), 'native', MPI_INFO_NULL, errcode)
 
@@ -282,6 +284,8 @@ CONTAINS
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
+    h%current_location = h%current_location + b%dims(1) * b%type_size
+
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution(2), 'native', MPI_INFO_NULL, errcode)
 
@@ -292,6 +296,8 @@ CONTAINS
       CALL MPI_FILE_READ_ALL(h%filehandle, y, SIZE(y), b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
+
+    h%current_location = h%current_location + b%dims(2) * b%type_size
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution(3), 'native', MPI_INFO_NULL, errcode)
