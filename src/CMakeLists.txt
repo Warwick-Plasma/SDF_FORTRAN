@@ -69,4 +69,5 @@ endif()
 
 if(NOT TARGET sdf)
    add_library(sdf ${SOURCES})
+   set_target_properties(sdf PROPERTIES COMPILE_FLAGS "-mcmodel=medium")
 endif()
