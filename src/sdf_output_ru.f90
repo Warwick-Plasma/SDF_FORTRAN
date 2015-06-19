@@ -1170,8 +1170,7 @@ CONTAINS
       b%data_length = sz*len1 + len2
     ENDIF
 
-    ! Since this call is done in serial, we should not use collective comms
-    !CALL MPI_BCAST(b%data_length, 1, MPI_INTEGER8, 0, h%comm, errcode)
+    CALL MPI_BCAST(b%data_length, 1, MPI_INTEGER8, 0, h%comm, errcode)
 
     ! Write header
     CALL sdf_write_block_header(h, id, name)
@@ -1268,8 +1267,7 @@ CONTAINS
       b%data_length = n1 * soi8 - b%padding
     ENDIF
 
-    ! Since this call is done in serial, we should not use collective comms
-    !CALL MPI_BCAST(b%data_length, 1, MPI_INTEGER8, 0, h%comm, errcode)
+    CALL MPI_BCAST(b%data_length, 1, MPI_INTEGER8, 0, h%comm, errcode)
     b%nelements = b%data_length
 
     CALL sdf_safe_copy_id(h, mimetype, b%mimetype)
@@ -1333,8 +1331,7 @@ CONTAINS
       b%data_length = sz*len1 + len2
     ENDIF
 
-    ! Since this call is done in serial, we should not use collective comms
-    !CALL MPI_BCAST(b%data_length, 1, MPI_INTEGER8, 0, h%comm, errcode)
+    CALL MPI_BCAST(b%data_length, 1, MPI_INTEGER8, 0, h%comm, errcode)
     b%nelements = b%data_length
 
     CALL sdf_safe_copy_id(h, mimetype, b%mimetype)
