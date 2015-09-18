@@ -80,7 +80,7 @@ varname = "%s_bytes" % prefix
 diffname = "%s_diff_bytes" % prefix
 module_name = "%s_source_info" % prefix
 outfile = args.outfile
-incfile = outfile.split('.')[0] + '_include.inc'
+incfile = os.path.splitext(outfile)[0] + '_include.inc'
 
 f77_output = args.f77_output
 nbytes = 8
