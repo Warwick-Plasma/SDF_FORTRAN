@@ -136,9 +136,21 @@ CONTAINS
       CALL MPI_FILE_WRITE(h%filehandle, flag, 1, &
           MPI_CHARACTER, MPI_STATUS_IGNORE, errcode)
 
+      IF (h%station_file) THEN
+        flag = ACHAR(1)
+      ELSE
+        flag = ACHAR(0)
+      ENDIF
+
+      ! station_file
       ! c_summary_offset + 8 * soi4 + soi8 + sof8 + 2
+      CALL MPI_FILE_WRITE(h%filehandle, flag, 1, &
+          MPI_CHARACTER, MPI_STATUS_IGNORE, errcode)
+      h%station_file_wrote = h%station_file
+
+      ! c_summary_offset + 8 * soi4 + soi8 + sof8 + 3
       padding = ACHAR(0)
-      CALL MPI_FILE_WRITE(h%filehandle, padding, 6, &
+      CALL MPI_FILE_WRITE(h%filehandle, padding, 5, &
           MPI_CHARACTER, MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -2272,6 +2284,7 @@ CONTAINS
     INTEGER(KIND=MPI_OFFSET_KIND) :: offset
     INTEGER :: errcode
     INTEGER(i4) :: int4
+    CHARACTER(LEN=1) :: flag
 
     ! No open file or not writing
     IF (h%filehandle == -1 .OR. .NOT.h%writing) RETURN
@@ -2313,6 +2326,17 @@ CONTAINS
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, h%time, 1, &
             MPI_REAL8, MPI_STATUS_IGNORE, errcode)
         h%time_wrote = h%time
+      ENDIF
+      IF (h%station_file .NEQV. h%station_file_wrote) THEN
+        offset = c_summary_offset + 8 * soi4 + soi8 + sof8 + 2
+        IF (h%station_file) THEN
+          flag = ACHAR(1)
+        ELSE
+          flag = ACHAR(0)
+        ENDIF
+        CALL MPI_FILE_WRITE_AT(h%filehandle, offset, flag, 1, &
+            MPI_CHARACTER, MPI_STATUS_IGNORE, errcode)
+        h%station_file_wrote = h%station_file
       ENDIF
     ENDIF
 

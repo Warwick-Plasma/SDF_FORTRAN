@@ -83,6 +83,7 @@ MODULE sdf_common
     INTEGER :: errhandler, nstations
     LOGICAL :: done_header, restart_flag, other_domains, writing, handled_error
     LOGICAL :: station_file, first, print_errors, print_warnings, exit_on_error
+    LOGICAL :: station_file_wrote
     CHARACTER(LEN=1), POINTER :: buffer(:)
     CHARACTER(LEN=c_id_length) :: code_name
     CHARACTER(LEN=c_id_length), POINTER :: station_ids(:)
