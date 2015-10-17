@@ -155,6 +155,8 @@ CONTAINS
       b => b%next_block
     ENDDO
 
+    h%station_file = found
+
     IF (.NOT.found) RETURN
 
     found = .TRUE.
