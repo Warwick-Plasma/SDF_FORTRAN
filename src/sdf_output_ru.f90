@@ -75,37 +75,46 @@ CONTAINS
           MPI_INTEGER8, MPI_STATUS_IGNORE, errcode)
       h%summary_location_wrote = h%summary_location
 
+      ! c_summary_offset + soi8
       CALL MPI_FILE_WRITE(h%filehandle, h%summary_size, 1, &
           MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
       h%summary_size_wrote = h%summary_size
 
+      ! c_summary_offset + soi4 + soi8
       CALL MPI_FILE_WRITE(h%filehandle, h%nblocks, 1, &
           MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
       h%nblocks_wrote = h%nblocks
 
+      ! c_summary_offset + 2 * soi4 + soi8
       CALL MPI_FILE_WRITE(h%filehandle, h%block_header_length, 1, &
           MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
 
+      ! c_summary_offset + 3 * soi4 + soi8
       int4 = INT(step,i4)
       CALL MPI_FILE_WRITE(h%filehandle, int4, 1, &
           MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
       h%step = step
       h%step_wrote = h%step
 
+      ! c_summary_offset + 4 * soi4 + soi8
       CALL MPI_FILE_WRITE(h%filehandle, time, 1, &
           MPI_REAL8, MPI_STATUS_IGNORE, errcode)
       h%time = time
       h%time_wrote = h%time
 
+      ! c_summary_offset + 4 * soi4 + soi8 + sof8
       CALL MPI_FILE_WRITE(h%filehandle, h%jobid%start_seconds, 1, &
           MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
 
+      ! c_summary_offset + 5 * soi4 + soi8 + sof8
       CALL MPI_FILE_WRITE(h%filehandle, h%jobid%start_milliseconds, 1, &
           MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
 
+      ! c_summary_offset + 6 * soi4 + soi8 + sof8
       CALL MPI_FILE_WRITE(h%filehandle, h%string_length, 1, &
           MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
 
+      ! c_summary_offset + 7 * soi4 + soi8 + sof8
       int4 = INT(code_io_version,i4)
       CALL MPI_FILE_WRITE(h%filehandle, int4, 1, &
           MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
@@ -116,13 +125,18 @@ CONTAINS
         flag = ACHAR(0)
       ENDIF
 
+      ! restart_flag
+      ! c_summary_offset + 8 * soi4 + soi8 + sof8
       CALL MPI_FILE_WRITE(h%filehandle, flag, 1, &
           MPI_CHARACTER, MPI_STATUS_IGNORE, errcode)
 
+      ! other_domains
+      ! c_summary_offset + 8 * soi4 + soi8 + sof8 + 1
       flag = ACHAR(0)
       CALL MPI_FILE_WRITE(h%filehandle, flag, 1, &
           MPI_CHARACTER, MPI_STATUS_IGNORE, errcode)
 
+      ! c_summary_offset + 8 * soi4 + soi8 + sof8 + 2
       padding = ACHAR(0)
       CALL MPI_FILE_WRITE(h%filehandle, padding, 6, &
           MPI_CHARACTER, MPI_STATUS_IGNORE, errcode)
@@ -2276,26 +2290,26 @@ CONTAINS
         h%summary_location_wrote = h%summary_location
       ENDIF
       IF (h%summary_size /= h%summary_size_wrote) THEN
-        offset = c_summary_offset + 8
+        offset = c_summary_offset + soi8
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, h%summary_size, 1, &
             MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
         h%summary_size_wrote = h%summary_size
       ENDIF
       IF (h%nblocks /= h%nblocks_wrote) THEN
-        offset = c_summary_offset + 12
+        offset = c_summary_offset + soi4 + soi8
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, h%nblocks, 1, &
             MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
         h%nblocks_wrote = h%nblocks
       ENDIF
       IF (h%step /= h%step_wrote) THEN
-        offset = c_summary_offset + 20
+        offset = c_summary_offset + 3 * soi4 + soi8
         int4 = INT(h%step,i4)
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, int4, 1, &
             MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
         h%step_wrote = h%step
       ENDIF
       IF (ABS(h%time - h%time_wrote) > c_tiny) THEN
-        offset = c_summary_offset + 24
+        offset = c_summary_offset + 4 * soi4 + soi8
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, h%time, 1, &
             MPI_REAL8, MPI_STATUS_IGNORE, errcode)
         h%time_wrote = h%time
