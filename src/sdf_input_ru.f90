@@ -67,6 +67,8 @@ CONTAINS
 
     CALL read_entry_logical(h, h%other_domains)
 
+    CALL read_entry_logical(h, h%station_file)
+
   END SUBROUTINE read_header
 
 
