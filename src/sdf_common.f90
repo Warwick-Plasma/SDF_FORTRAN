@@ -83,6 +83,7 @@ MODULE sdf_common
     INTEGER :: errhandler, nstations
     LOGICAL :: done_header, restart_flag, other_domains, writing, handled_error
     LOGICAL :: station_file, first, print_errors, print_warnings, exit_on_error
+    LOGICAL :: station_file_wrote
     CHARACTER(LEN=1), POINTER :: buffer(:)
     CHARACTER(LEN=c_id_length) :: code_name
     CHARACTER(LEN=c_id_length), POINTER :: station_ids(:)
@@ -179,8 +180,8 @@ MODULE sdf_common
   CHARACTER(LEN=*), PARAMETER :: c_checksum_sha1 = 'sha1'
   CHARACTER(LEN=*), PARAMETER :: c_checksum_sha256 = 'sha256'
 
-  INTEGER(i4), PARAMETER :: sdf_version = 1, sdf_revision = 3
-  INTEGER(i4), PARAMETER :: sdf_minor_rev = 1
+  INTEGER(i4), PARAMETER :: sdf_version = 1, sdf_revision = 4
+  INTEGER(i4), PARAMETER :: sdf_minor_rev = 0
 
   INTEGER(i4), PARAMETER :: soi4 = 4 ! Size of 4-byte integer
   INTEGER(i4), PARAMETER :: soi8 = 8 ! Size of 8-byte integer
