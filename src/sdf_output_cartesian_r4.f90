@@ -17,7 +17,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_srl_1d_mesh_r4(h, id, name, x, convert_in, &
-      dim_labels, dim_units, dim_mults, rank_write)
+      dim_labels, dim_units, dim_mults, geometry, rank_write)
 
     INTEGER, PARAMETER :: ndims = 1
     TYPE(sdf_file_handle) :: h
@@ -26,7 +26,7 @@ CONTAINS
     LOGICAL, INTENT(IN), OPTIONAL :: convert_in
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r4), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
-    INTEGER, INTENT(IN), OPTIONAL :: rank_write
+    INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
     INTEGER :: errcode, intn
     TYPE(sdf_block_type), POINTER :: b
@@ -50,7 +50,12 @@ CONTAINS
       b%datatype = datatype_real
       b%mpitype = mpitype_real
     ENDIF
-    b%geometry = c_geometry_cartesian
+
+    IF (PRESENT(geometry)) THEN
+      b%geometry = geometry
+    ELSE
+      b%geometry = c_geometry_cartesian
+    ENDIF
     b%ndims = ndims
 
     IF (PRESENT(rank_write)) h%rank_master = rank_write
@@ -106,7 +111,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_srl_2d_mesh_r4(h, id, name, x, y, convert_in, &
-      dim_labels, dim_units, dim_mults, rank_write)
+      dim_labels, dim_units, dim_mults, geometry, rank_write)
 
     INTEGER, PARAMETER :: ndims = 2
     TYPE(sdf_file_handle) :: h
@@ -115,7 +120,7 @@ CONTAINS
     LOGICAL, INTENT(IN), OPTIONAL :: convert_in
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r4), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
-    INTEGER, INTENT(IN), OPTIONAL :: rank_write
+    INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
     INTEGER :: errcode, intn
     TYPE(sdf_block_type), POINTER :: b
@@ -139,7 +144,12 @@ CONTAINS
       b%datatype = datatype_real
       b%mpitype = mpitype_real
     ENDIF
-    b%geometry = c_geometry_cartesian
+
+    IF (PRESENT(geometry)) THEN
+      b%geometry = geometry
+    ELSE
+      b%geometry = c_geometry_cartesian
+    ENDIF
     b%ndims = ndims
 
     IF (PRESENT(rank_write)) h%rank_master = rank_write
@@ -207,7 +217,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_srl_3d_mesh_r4(h, id, name, x, y, z, convert_in, &
-      dim_labels, dim_units, dim_mults, rank_write)
+      dim_labels, dim_units, dim_mults, geometry, rank_write)
 
     INTEGER, PARAMETER :: ndims = 3
     TYPE(sdf_file_handle) :: h
@@ -216,7 +226,7 @@ CONTAINS
     LOGICAL, INTENT(IN), OPTIONAL :: convert_in
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r4), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
-    INTEGER, INTENT(IN), OPTIONAL :: rank_write
+    INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
     INTEGER :: errcode, intn
     TYPE(sdf_block_type), POINTER :: b
@@ -240,7 +250,12 @@ CONTAINS
       b%datatype = datatype_real
       b%mpitype = mpitype_real
     ENDIF
-    b%geometry = c_geometry_cartesian
+
+    IF (PRESENT(geometry)) THEN
+      b%geometry = geometry
+    ELSE
+      b%geometry = c_geometry_cartesian
+    ENDIF
     b%ndims = ndims
 
     IF (PRESENT(rank_write)) h%rank_master = rank_write
@@ -322,7 +337,7 @@ CONTAINS
 
   SUBROUTINE write_1d_mesh_r4(h, id, name, x, dims, xmin, xmax, &
       distribution, subarray, convert_in, dim_labels, &
-      dim_units, dim_mults)
+      dim_units, dim_mults, geometry)
 
     INTEGER, PARAMETER :: ndims = 1
     TYPE(sdf_file_handle) :: h
@@ -334,6 +349,7 @@ CONTAINS
     LOGICAL, INTENT(IN), OPTIONAL :: convert_in
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r4), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
+    INTEGER, INTENT(IN), OPTIONAL :: geometry
     REAL(r8), DIMENSION(ndims) :: gmn, gmx
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
     INTEGER :: i, errcode, intn = 0
@@ -361,7 +377,12 @@ CONTAINS
       b%datatype = datatype_real
       b%mpitype = mpitype_real
     ENDIF
-    b%geometry = c_geometry_cartesian
+
+    IF (PRESENT(geometry)) THEN
+      b%geometry = geometry
+    ELSE
+      b%geometry = c_geometry_cartesian
+    ENDIF
     b%ndims = ndims
 
     DO i = 1,ndims
@@ -413,7 +434,7 @@ CONTAINS
 
   SUBROUTINE write_2d_mesh_r4(h, id, name, x, y, dims, xmin, xmax, &
       ymin, ymax, distribution, subarray, convert_in, dim_labels, &
-      dim_units, dim_mults)
+      dim_units, dim_mults, geometry)
 
     INTEGER, PARAMETER :: ndims = 2
     TYPE(sdf_file_handle) :: h
@@ -425,6 +446,7 @@ CONTAINS
     LOGICAL, INTENT(IN), OPTIONAL :: convert_in
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r4), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
+    INTEGER, INTENT(IN), OPTIONAL :: geometry
     REAL(r8), DIMENSION(ndims) :: gmn, gmx
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
     INTEGER :: i, errcode, sz(ndims), intn
@@ -455,7 +477,12 @@ CONTAINS
       b%datatype = datatype_real
       b%mpitype = mpitype_real
     ENDIF
-    b%geometry = c_geometry_cartesian
+
+    IF (PRESENT(geometry)) THEN
+      b%geometry = geometry
+    ELSE
+      b%geometry = c_geometry_cartesian
+    ENDIF
     b%ndims = ndims
 
     DO i = 1,ndims
@@ -524,7 +551,7 @@ CONTAINS
 
   SUBROUTINE write_3d_mesh_r4(h, id, name, x, y, z, dims, xmin, xmax, &
       ymin, ymax, zmin, zmax, distribution, subarray, convert_in, dim_labels, &
-      dim_units, dim_mults)
+      dim_units, dim_mults, geometry)
 
     INTEGER, PARAMETER :: ndims = 3
     TYPE(sdf_file_handle) :: h
@@ -536,6 +563,7 @@ CONTAINS
     LOGICAL, INTENT(IN), OPTIONAL :: convert_in
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r4), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
+    INTEGER, INTENT(IN), OPTIONAL :: geometry
     REAL(r8), DIMENSION(ndims) :: gmn, gmx
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
     INTEGER :: i, errcode, sz(ndims), intn
@@ -567,7 +595,12 @@ CONTAINS
       b%datatype = datatype_real
       b%mpitype = mpitype_real
     ENDIF
-    b%geometry = c_geometry_cartesian
+
+    IF (PRESENT(geometry)) THEN
+      b%geometry = geometry
+    ELSE
+      b%geometry = c_geometry_cartesian
+    ENDIF
     b%ndims = ndims
 
     DO i = 1,ndims
@@ -652,7 +685,7 @@ CONTAINS
 
   SUBROUTINE write_1d_lag_mesh_r4(h, id, name, x, dims, xmin, xmax, &
       distribution, subarray, convert_in, dim_labels, &
-      dim_units, dim_mults)
+      dim_units, dim_mults, geometry)
 
     INTEGER, PARAMETER :: ndims = 1
     TYPE(sdf_file_handle) :: h
@@ -664,6 +697,7 @@ CONTAINS
     LOGICAL, INTENT(IN), OPTIONAL :: convert_in
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r4), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
+    INTEGER, INTENT(IN), OPTIONAL :: geometry
     REAL(r8), DIMENSION(ndims) :: gmn, gmx
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
     INTEGER :: i, errcode, sz(ndims)
@@ -692,7 +726,12 @@ CONTAINS
       b%datatype = datatype_real
       b%mpitype = mpitype_real
     ENDIF
-    b%geometry = c_geometry_cartesian
+
+    IF (PRESENT(geometry)) THEN
+      b%geometry = geometry
+    ELSE
+      b%geometry = c_geometry_cartesian
+    ENDIF
     b%ndims = ndims
 
     DO i = 1,ndims
@@ -746,7 +785,7 @@ CONTAINS
 
   SUBROUTINE write_2d_lag_mesh_r4(h, id, name, x, y, dims, xmin, xmax, &
       ymin, ymax, distribution, subarray, convert_in, dim_labels, &
-      dim_units, dim_mults)
+      dim_units, dim_mults, geometry)
 
     INTEGER, PARAMETER :: ndims = 2
     TYPE(sdf_file_handle) :: h
@@ -758,6 +797,7 @@ CONTAINS
     LOGICAL, INTENT(IN), OPTIONAL :: convert_in
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r4), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
+    INTEGER, INTENT(IN), OPTIONAL :: geometry
     REAL(r8), DIMENSION(ndims) :: gmn, gmx
     REAL(r4), DIMENSION(:,:), ALLOCATABLE :: r4array
     INTEGER :: i, errcode, sz(ndims)
@@ -787,7 +827,12 @@ CONTAINS
       b%datatype = datatype_real
       b%mpitype = mpitype_real
     ENDIF
-    b%geometry = c_geometry_cartesian
+
+    IF (PRESENT(geometry)) THEN
+      b%geometry = geometry
+    ELSE
+      b%geometry = c_geometry_cartesian
+    ENDIF
     b%ndims = ndims
 
     DO i = 1,ndims
@@ -850,7 +895,7 @@ CONTAINS
 
   SUBROUTINE write_3d_lag_mesh_r4(h, id, name, x, y, z, dims, xmin, xmax, &
       ymin, ymax, zmin, zmax, distribution, subarray, convert_in, dim_labels, &
-      dim_units, dim_mults)
+      dim_units, dim_mults, geometry)
 
     INTEGER, PARAMETER :: ndims = 3
     TYPE(sdf_file_handle) :: h
@@ -862,6 +907,7 @@ CONTAINS
     LOGICAL, INTENT(IN), OPTIONAL :: convert_in
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r4), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
+    INTEGER, INTENT(IN), OPTIONAL :: geometry
     REAL(r8), DIMENSION(ndims) :: gmn, gmx
     REAL(r4), DIMENSION(:,:,:), ALLOCATABLE :: r4array
     INTEGER :: i, errcode, sz(ndims)
@@ -892,7 +938,12 @@ CONTAINS
       b%datatype = datatype_real
       b%mpitype = mpitype_real
     ENDIF
-    b%geometry = c_geometry_cartesian
+
+    IF (PRESENT(geometry)) THEN
+      b%geometry = geometry
+    ELSE
+      b%geometry = c_geometry_cartesian
+    ENDIF
     b%ndims = ndims
 
     DO i = 1,ndims
