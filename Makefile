@@ -115,7 +115,10 @@ ifeq ($(strip $(COMPILER)),gfortran)
     FFLAGS += -p
   endif
   FFLAGS += -frecord-marker=4
-  MODFLAG := -I/usr/include -I$(INCDIR) -I$(OBJDIR)
+  MODFLAG := -I$(INCDIR) -I$(OBJDIR)
+  ifneq ($(wildcard /usr/include/.),)
+    MODFLAG := -I/usr/include $(MODFLAG)
+  endif
   MODULEFLAG := $(MODFLAG) -J$(INCDIR)
   INFO_FLAGS = -Wno-conversion -fno-range-check
 endif
