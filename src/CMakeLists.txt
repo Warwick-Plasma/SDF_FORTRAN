@@ -69,6 +69,11 @@ endif()
 
 if(NOT TARGET sdf)
    add_library(sdf ${SOURCES})
-   set_target_properties(sdf PROPERTIES COMPILE_FLAGS "-mcmodel=medium")
+   set_target_properties(
+       sdf
+       PROPERTIES
+       COMPILE_FLAGS "-mcmodel=medium"
+       Fortran_MODULE_DIRECTORY include)
    install(TARGETS sdf DESTINATION lib COMPONENT develop)
+   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include  DESTINATION . COMPONENT develop)
 endif()
