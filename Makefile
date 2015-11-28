@@ -223,7 +223,7 @@ sdf_source_info.o: sdf_source_info.f90 $(SOURCE_ALL)
 
 $(LIB): $(OBJS)
 	$(RM) -f $@
-	$(AR) -rsu $@ $(addprefix $(OBJDIR)/,$(OBJS))
+	$(AR) -crs $@ $(addprefix $(OBJDIR)/,$(OBJS))
 	$(RANLIB) $@
 
 $(OBJS): | $(OBJDIR) $(INCDIR)
