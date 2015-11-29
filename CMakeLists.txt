@@ -13,8 +13,7 @@ if(NOT INHERIT_FLAGS)
       endif()
 
       set(CMAKE_Fortran_FLAGS
-         "-Mnodefaultunit -Ktrap=fp -mcmodel=medium -Mdclchk ${CPU} "
-         "${MPI_Fortran_COMPILE_FLAGS}"
+         "-Mnodefaultunit -Ktrap=fp -mcmodel=medium -Mdclchk ${CPU} ${MPI_Fortran_COMPILE_FLAGS}"
          CACHE STRING "Fortran flags" FORCE)
       set(CMAKE_Fortran_FLAGS_RELEASE "-O2 -Mvect -Munroll"
          CACHE STRING "Fortran flags for release build" FORCE)
@@ -28,8 +27,7 @@ if(NOT INHERIT_FLAGS)
       set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -ip -vec-report0"
          CACHE STRING "Fortran flags for release build" FORCE)
       set(CMAKE_Fortran_FLAGS_DEBUG
-         "-O0 -g -u -ftrapuv -traceback -nothreads -fltconsistency -C -warn "
-         "-save-temps -fpic -Wl,-no_pie"
+         "-O0 -g -u -ftrapuv -traceback -nothreads -fltconsistency -C -warn -save-temps -fpic -Wl,-no_pie"
          CACHE STRING "Fortran flags for debug build" FORCE)
 
    elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
@@ -38,8 +36,7 @@ if(NOT INHERIT_FLAGS)
       set(CMAKE_Fortran_FLAGS_RELEASE "-O3"
          CACHE STRING "Fortran flags for release build" FORCE)
       set(CMAKE_Fortran_FLAGS_DEBUG
-         "-O0 -g -fimplicit-none -fbounds-check -fbacktrace -Wextra "
-         "-ffpe-trap=invalid,zero,overflow -pedantic"
+         "-O0 -g -fimplicit-none -fbounds-check -fbacktrace -Wextra -ffpe-trap=invalid,zero,overflow -pedantic"
          CACHE STRING "Fortran flags for debug build" FORCE)
 
    endif()
