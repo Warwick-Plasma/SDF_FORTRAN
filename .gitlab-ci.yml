@@ -1,0 +1,19 @@
+test_ubuntu_gfortran:
+  script:
+    - COMPILER=gfortran sh -x src/test.sh
+  tags:
+    - ubuntu
+    - gfortran
+
+test_ubuntu_intel:
+  script:
+    - COMPILER=intel sh -x src/test.sh
+  tags:
+    - ubuntu
+    - intel
+
+test_osx:
+  script:
+    - COMPILER=gfortran sh -x src/test.sh
+  tags:
+    - osx
