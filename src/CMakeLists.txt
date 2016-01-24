@@ -61,19 +61,19 @@ set(PACK_OPTS ${GIT_DIR} sdf ${PACK_SOURCE_CODE} ${PACK_GIT_DIFF}
 include(${CONFIGURE_PACK_TARGET})
 list(APPEND SOURCES ${INFO_FILE})
 
+set(MCMODEL "-mcmodel=medium")
+
 if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
    set(INFO_FLAGS "-Wno-conversion -fno-range-check")
    set_source_files_properties(${INFO_FILE} PROPERTIES COMPILE_FLAGS
       ${INFO_FLAGS})
+   if(APPLE)
+      set(MCMODEL " ")
+   endif()
 endif()
 
 if(NOT TARGET sdf)
    add_library(sdf ${SOURCES})
-   if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU" && NOT APPLE)
-      set(MCMODEL " ")
-   else()
-      set(MCMODEL "-mcmodel=medium")
-   endif()
    set_target_properties(
        sdf
        PROPERTIES
