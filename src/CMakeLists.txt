@@ -69,10 +69,15 @@ endif()
 
 if(NOT TARGET sdf)
    add_library(sdf ${SOURCES})
+   if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU" && NOT APPLE)
+      set(MCMODEL " ")
+   else()
+      set(MCMODEL "-mcmodel=medium")
+   endif()
    set_target_properties(
        sdf
        PROPERTIES
-       COMPILE_FLAGS "-mcmodel=medium"
+       COMPILE_FLAGS ${MCMODEL}
        Fortran_MODULE_DIRECTORY include)
    install(TARGETS sdf DESTINATION lib COMPONENT develop)
    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include  DESTINATION . COMPONENT develop)
