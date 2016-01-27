@@ -43,4 +43,15 @@ MODULE sdf_input
         read_run_info_minor
   END INTERFACE sdf_read_run_info
 
+  INTERFACE sdf_read_namevalue
+    MODULE PROCEDURE &
+        read_namevalue, &
+        read_namevalue_i4, &
+        read_namevalue_i8, &
+        read_namevalue_r4, &
+        read_namevalue_r8, &
+        read_namevalue_logical, &
+        read_namevalue_string
+  END INTERFACE sdf_read_namevalue
+
 END MODULE sdf_input
