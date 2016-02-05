@@ -1316,6 +1316,50 @@ CONTAINS
 
 
 
+  SUBROUTINE read_entry_array_logical_c(h, value, nentries)
+
+    INTEGER, PARAMETER :: n = 1
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=n), INTENT(OUT) :: value(:)
+    INTEGER, INTENT(IN) :: nentries
+    INTEGER(i8) :: i
+    INTEGER :: j, errcode, mpitype = MPI_CHARACTER
+
+    IF (ASSOCIATED(h%buffer)) THEN
+      i = h%current_location - h%start_location + 1
+      DO j = 1, nentries
+        value(j) = h%buffer(i)
+        i = i + 1
+      ENDDO
+    ELSE
+      IF (h%rank == h%rank_master) THEN
+        CALL MPI_FILE_READ(h%filehandle, value, nentries, mpitype, &
+            MPI_STATUS_IGNORE, errcode)
+      ENDIF
+      CALL MPI_BCAST(value, nentries, mpitype, h%rank_master, h%comm, errcode)
+    ENDIF
+
+    h%current_location = h%current_location + n * nentries
+
+  END SUBROUTINE read_entry_array_logical_c
+
+
+
+  SUBROUTINE read_entry_array_string(h, value, nentries)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(OUT) :: value(:)
+    INTEGER, INTENT(IN) :: nentries
+    INTEGER :: i
+
+    DO i = 1, nentries
+      CALL read_entry_string(h, value(i))
+    END DO
+
+  END SUBROUTINE read_entry_array_string
+
+
+
   SUBROUTINE sdf_safe_read_string(h, string)
 
     TYPE(sdf_file_handle) :: h
@@ -1437,5 +1481,187 @@ CONTAINS
     ENDIF
 
   END FUNCTION sdf_info_init
+
+
+
+  SUBROUTINE read_namevalue(h, names)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(OUT), OPTIONAL :: names(:)
+    INTEGER :: i
+    TYPE(sdf_block_type), POINTER :: b
+
+    IF (sdf_info_init(h)) RETURN
+
+    b => h%current_block
+    IF (.NOT. b%done_info) THEN
+      ALLOCATE(b%material_names(b%ndims))
+
+      DO i = 1,b%ndims
+        CALL read_entry_string(h, b%material_names(i))
+      ENDDO
+
+      IF (b%datatype == c_datatype_integer4) THEN
+        ALLOCATE(b%i4_array(b%ndims))
+        CALL read_entry_array_int4(h, b%i4_array, INT(b%ndims))
+
+      ELSE IF (b%datatype == c_datatype_integer8) THEN
+        ALLOCATE(b%i8_array(b%ndims))
+        CALL read_entry_array_int8(h, b%i8_array, INT(b%ndims))
+
+      ELSE IF (b%datatype == c_datatype_real4) THEN
+        ALLOCATE(b%r4_array(b%ndims))
+        CALL read_entry_array_real4(h, b%r4_array, INT(b%ndims))
+
+      ELSE IF (b%datatype == c_datatype_real8) THEN
+        ALLOCATE(b%r8_array(b%ndims))
+        CALL read_entry_array_real8(h, b%r8_array, INT(b%ndims))
+
+      ELSE IF (b%datatype == c_datatype_logical) THEN
+        ALLOCATE(b%logical_array(b%ndims))
+        CALL read_entry_array_logical_c(h, b%logical_array, INT(b%ndims))
+
+      ELSE IF (b%datatype == c_datatype_character) THEN
+        ALLOCATE(b%string_array(b%ndims))
+        CALL read_entry_array_string(h, b%string_array, INT(b%ndims))
+
+      ENDIF
+    ENDIF
+
+    IF (PRESENT(names)) THEN
+      DO i = 1,b%ndims
+        CALL sdf_safe_copy_string(b%material_names(i), names(i))
+      ENDDO
+    ENDIF
+
+    h%current_location = b%data_location + b%data_length
+    b%done_info = .TRUE.
+    b%done_data = .TRUE.
+
+  END SUBROUTINE read_namevalue
+
+
+
+  SUBROUTINE read_namevalue_i4(h, names, values)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(OUT) :: names(:)
+    INTEGER(i4), INTENT(OUT) :: values(:)
+    INTEGER :: i
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL read_namevalue(h, names)
+
+    b => h%current_block
+
+    DO i = 1,b%ndims
+      values(i) = b%i4_array(i)
+    ENDDO
+
+  END SUBROUTINE read_namevalue_i4
+
+
+
+  SUBROUTINE read_namevalue_i8(h, names, values)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(OUT) :: names(:)
+    INTEGER(i8), INTENT(OUT) :: values(:)
+    INTEGER :: i
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL read_namevalue(h, names)
+
+    b => h%current_block
+
+    DO i = 1,b%ndims
+      values(i) = b%i8_array(i)
+    ENDDO
+
+  END SUBROUTINE read_namevalue_i8
+
+
+
+  SUBROUTINE read_namevalue_r4(h, names, values)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(OUT) :: names(:)
+    REAL(r4), INTENT(OUT) :: values(:)
+    INTEGER :: i
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL read_namevalue(h, names)
+
+    b => h%current_block
+
+    DO i = 1,b%ndims
+      values(i) = b%r4_array(i)
+    ENDDO
+
+  END SUBROUTINE read_namevalue_r4
+
+
+
+  SUBROUTINE read_namevalue_r8(h, names, values)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(OUT) :: names(:)
+    REAL(r8), INTENT(OUT) :: values(:)
+    INTEGER :: i
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL read_namevalue(h, names)
+
+    b => h%current_block
+
+    DO i = 1,b%ndims
+      values(i) = b%r8_array(i)
+    ENDDO
+
+  END SUBROUTINE read_namevalue_r8
+
+
+
+  SUBROUTINE read_namevalue_logical(h, names, values)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(OUT) :: names(:)
+    LOGICAL, INTENT(OUT) :: values(:)
+    INTEGER :: i
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL read_namevalue(h, names)
+
+    b => h%current_block
+
+    DO i = 1,b%ndims
+      IF (b%logical_array(i) == ACHAR(0)) THEN
+        values(i) = .FALSE.
+      ELSE
+        values(i) = .TRUE.
+      ENDIF
+    ENDDO
+
+  END SUBROUTINE read_namevalue_logical
+
+
+
+  SUBROUTINE read_namevalue_string(h, names, values)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(OUT) :: names(:)
+    CHARACTER(LEN=*), INTENT(OUT) :: values(:)
+    INTEGER :: i
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL read_namevalue(h, names)
+
+    b => h%current_block
+
+    DO i = 1,b%ndims
+      CALL sdf_safe_copy_string(b%string_array(i), names(i))
+    ENDDO
+
+  END SUBROUTINE read_namevalue_string
 
 END MODULE sdf_input_ru

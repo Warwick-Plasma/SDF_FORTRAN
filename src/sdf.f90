@@ -146,6 +146,7 @@ MODULE sdf
   PUBLIC :: sdf_read_station_info_arrays
   PUBLIC :: sdf_read_station_info_arrays_all
   PUBLIC :: sdf_read_station_array
+  PUBLIC :: sdf_read_namevalue
   PUBLIC :: sdf_write_header
   PUBLIC :: sdf_write_run_info
   PUBLIC :: sdf_write_source_code
