@@ -98,6 +98,8 @@ CONTAINS
       CALL sdf_read_stitched_obstacle_group(h)
     ELSE IF (b%blocktype == c_blocktype_station) THEN
       CALL sdf_read_station_info(h)
+    ELSE IF (b%blocktype == c_blocktype_namevalue) THEN
+      CALL sdf_read_namevalue(h)
     ENDIF
 
   END SUBROUTINE sdf_read_block_info

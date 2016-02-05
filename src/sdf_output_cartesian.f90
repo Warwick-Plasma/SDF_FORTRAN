@@ -22,18 +22,14 @@ MODULE sdf_output_cartesian
         write_3d_mesh_r4, &
         write_1d_mesh_r8, &
         write_2d_mesh_r8, &
-        write_3d_mesh_r8
-  END INTERFACE sdf_write_plain_mesh
-
-  INTERFACE sdf_write_lagrangian_mesh
-    MODULE PROCEDURE &
+        write_3d_mesh_r8, &
         write_1d_lag_mesh_r4, &
         write_2d_lag_mesh_r4, &
         write_3d_lag_mesh_r4, &
         write_1d_lag_mesh_r8, &
         write_2d_lag_mesh_r8, &
         write_3d_lag_mesh_r8
-  END INTERFACE sdf_write_lagrangian_mesh
+  END INTERFACE sdf_write_plain_mesh
 
   INTERFACE sdf_write_plain_variable
     MODULE PROCEDURE &
