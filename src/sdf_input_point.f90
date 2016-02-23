@@ -1,3 +1,11 @@
+!
+! SDF (Self-Describing Format) Fortran Library
+! Copyright (c) 2010-2016, SDF Development Team
+!
+! Distributed under the terms of the BSD 3-clause License.
+! See the LICENSE file for details.
+!
+
 MODULE sdf_input_point
 
   USE sdf_input_point_r4
