@@ -1,3 +1,11 @@
+!
+! SDF (Self-Describing Format) Fortran Library
+! Copyright (c) 2013-2016, SDF Development Team
+!
+! Distributed under the terms of the BSD 3-clause License.
+! See the LICENSE file for details.
+!
+
 MODULE sdf_output_station
 
   USE sdf_output_station_r4
