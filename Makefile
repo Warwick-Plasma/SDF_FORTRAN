@@ -208,9 +208,13 @@ $(SRCDIR)/COMMIT: FORCE
 	@sh $(SRCDIR)/gen_commit_string.sh
 
 # Not real file targets
-.PHONY: Makefile Makefile-deps Makefile-objs all clean cleanall help FORCE
+.PHONY: Makefile Makefile-deps Makefile-objs all clean cleanall help FORCE MPI_CHECK
 
 .SUFFIXES: .o .f90
+
+MPI_CHECK: mpi_version.f90
+	$(FC) $(FFLAGS) $(MODULEFLAG) -o $(OBJDIR)/$@ $<
+	$(OBJDIR)/$@
 
 # implicit rules
 %.o: %.f90
@@ -226,7 +230,7 @@ $(LIB): $(OBJS)
 	$(AR) -crs $@ $(addprefix $(OBJDIR)/,$(OBJS))
 	$(RANLIB) $@
 
-$(OBJS): | $(OBJDIR) $(INCDIR)
+$(OBJS): | $(OBJDIR) $(INCDIR) MPI_CHECK
 
 $(OBJDIR):
 	$(MKDIR) -p $(OBJDIR)
