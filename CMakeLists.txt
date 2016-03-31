@@ -2,6 +2,7 @@ project(SDF Fortran)
 cmake_minimum_required(VERSION 2.8.8)
 find_package(MPI REQUIRED)
 find_package(PackSDF REQUIRED PATHS CMake)
+include(CMake/CheckMPIVersion.cmake)
 
 set(INHERIT_FLAGS OFF CACHE BOOL "Inherit compiler flags")
 
