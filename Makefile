@@ -213,7 +213,7 @@ $(SRCDIR)/COMMIT: FORCE
 .SUFFIXES: .o .f90
 
 MPI_CHECK: mpi_version.f90
-	$(FC) $(FFLAGS) $(MODULEFLAG) -o $(OBJDIR)/$@ $<
+	$(FC) $(MODULEFLAG) -o $(OBJDIR)/$@ $<
 	$(OBJDIR)/$@
 
 # implicit rules
