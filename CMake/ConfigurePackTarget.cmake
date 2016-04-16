@@ -5,11 +5,16 @@ if(GIT)
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         OUTPUT_VARIABLE GIT_WORK_TREE
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-    execute_process(
-        COMMAND git rev-parse --git-dir
-        WORKING_DIRECTORY ${GIT_WORK_TREE}
-        OUTPUT_VARIABLE GIT_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(NOT "${GIT_WORK_TREE}" STREQUAL "")
+        execute_process(
+            COMMAND git rev-parse --git-dir
+            WORKING_DIRECTORY ${GIT_WORK_TREE}
+            OUTPUT_VARIABLE GIT_DIR
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+    else()
+        set(GIT_WORK_TREE ${PROJECT_SOURCE_DIR})
+        set(GIT_DIR ${PROJECT_SOURCE_DIR})
+    endif()
 
     # Force GIT_DIR to be an absolute path
     if(NOT IS_ABSOLUTE ${GIT_DIR})
@@ -25,8 +30,8 @@ if(GIT)
         unset(GIT_DIR1 CACHE)
     endif()
 else()
-    set(GIT_WORK_TREE ${CMAKE_CURRENT_SOURCE_DIR})
-    set(GIT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    set(GIT_WORK_TREE ${PROJECT_SOURCE_DIR})
+    set(GIT_DIR ${PROJECT_SOURCE_DIR})
 endif()
 
 configure_file(${PACK_CMAKE_IN} pack.cmake)
