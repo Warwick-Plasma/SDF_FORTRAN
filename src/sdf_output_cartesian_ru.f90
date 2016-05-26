@@ -283,7 +283,7 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_WRITE(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -346,7 +346,7 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_WRITE(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -409,7 +409,7 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_WRITE(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -549,11 +549,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(i4array(b%dims(1)))
       i4array = INT(variable,i4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, i4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(i4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, variable, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -634,11 +634,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(i4array(b%dims(1),b%dims(2)))
       i4array = INT(variable,i4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, i4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(i4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, variable, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -719,11 +719,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(i4array(b%dims(1),b%dims(2),b%dims(3)))
       i4array = INT(variable,i4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, i4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(i4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, variable, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -846,7 +846,7 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_WRITE(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -908,7 +908,7 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_WRITE(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -970,7 +970,7 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_WRITE(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
