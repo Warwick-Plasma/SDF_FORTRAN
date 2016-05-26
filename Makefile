@@ -39,7 +39,7 @@ D = -D
 # PGI
 # ===
 ifeq ($(strip $(COMPILER)),pgi)
-  FFLAGS = -O2 -Mvect -Munroll
+  FFLAGS = -O2 -g -Mvect -Munroll
   ifeq ($(strip $(MODE)),debug)
     FFLAGS = -O0 -g -C -Ktrap=denorm -Mbounds -Mchkfpstk -Mdepchk -Mstandard
   endif
@@ -54,7 +54,7 @@ endif
 # Intel
 # =====
 ifeq ($(strip $(COMPILER)),intel)
-  FFLAGS = -O3
+  FFLAGS = -O3 -g
   # If you use the -ipo flag then you must also create the library file using
   # Intel's xiar utility.
   #AR = xiar
@@ -79,7 +79,7 @@ endif
 # gfortran
 # ========
 ifeq ($(strip $(COMPILER)),gfortran)
-  FFLAGS = -O3
+  FFLAGS = -O3 -g
   ifeq (debug,$(findstring debug,$(MODE)))
     FFLAGS = -O0 -g -Wall -Wextra -pedantic -fbounds-check \
              -ffpe-trap=invalid,zero,overflow -Wno-unused-parameter \
@@ -126,7 +126,7 @@ endif
 # g95
 # ========
 ifeq ($(strip $(COMPILER)),g95)
-  FFLAGS = -O3
+  FFLAGS = -O3 -g
   ifeq (debug,$(findstring debug,$(MODE)))
     FFLAGS = -O0 -g -Wall -Wimplicit-none -ftrace=full -fbounds-check -fzero
   endif
@@ -141,7 +141,7 @@ endif
 # IBM Bluegene
 # ============
 ifeq ($(strip $(COMPILER)),ibm)
-  FFLAGS = -O5 -qhot -qipa # Optimised
+  FFLAGS = -O5 -g -qhot -qipa # Optimised
   ifeq ($(strip $(MODE)),debug)
     FFLAGS = -O0 -C -g -qfullpath -qinfo #-qkeepparm -qflttrap \
           -qnosmp -qxflag=dvz -Q! -qnounwind -qnounroll # Debug
@@ -159,7 +159,7 @@ endif
 # HECToR
 # ========
 ifeq ($(strip $(COMPILER)),hector)
-  FFLAGS = -O3
+  FFLAGS = -O3 -g
   ifeq ($(strip $(MODE)),debug)
     FFLAGS = -O0 -g -ea -ec -eC -eD -eI -en -hfp_trap -Ktrap=fp -m0 -M1438,7413
   endif
