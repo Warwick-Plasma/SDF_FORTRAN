@@ -1,6 +1,9 @@
 # Try to detect the MPI implementation and version.
 # Raise a fatal error if a version known to be broken is detected.
 
+set(CMAKE_Fortran_FLAGS_SAVE ${CMAKE_Fortran_FLAGS})
+set(CMAKE_Fortran_FLAGS "")
+
 try_run(
     MPI_VERSION_RAN MPI_VERSION_COMPILED ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/mpi_version.f90
@@ -8,6 +11,9 @@ try_run(
     LINK_LIBRARIES ${MPI_Fortran_LIBRARIES}
     RUN_OUTPUT_VARIABLE MPI_VERSION
     COMPILE_OUTPUT_VARIABLE COMP)
+
+set(CMAKE_Fortran_FLAGS ${CMAKE_Fortran_FLAGS_SAVE})
+
 if(NOT MPI_VERSION_COMPILED)
     message("${COMP}")
     message(FATAL_ERROR "Could not compile mpi_version.f90")
