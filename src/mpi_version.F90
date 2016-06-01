@@ -5,6 +5,7 @@ PROGRAM check_mpi_version
   IMPLICIT INTEGER (o)
   CHARACTER(LEN=3) :: major, minor, release
 
+#ifdef OMPI_MPI_H
   WRITE(major, '(I3)') OMPI_MAJOR_VERSION
   WRITE(minor, '(I3)') OMPI_MINOR_VERSION
   WRITE(release, '(I3)') OMPI_RELEASE_VERSION
@@ -19,5 +20,6 @@ PROGRAM check_mpi_version
         'should not be used.'
     STOP 1
   END IF
+#endif
 
 END PROGRAM check_mpi_version
