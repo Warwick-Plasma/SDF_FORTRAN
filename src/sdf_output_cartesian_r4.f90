@@ -415,11 +415,11 @@ CONTAINS
         distribution(1), 'native', MPI_INFO_NULL, errcode)
     IF (convert) THEN
       r4array(1:intn) = REAL(x(1:intn),r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray(1), &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray(1), &
+      CALL MPI_FILE_WRITE(h%filehandle, x, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -518,10 +518,10 @@ CONTAINS
     IF (convert) THEN
       intn = sz(1)
       r4array(1:intn) = REAL(x(1:intn),r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray(1), &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray(1), &
+      CALL MPI_FILE_WRITE(h%filehandle, x, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -532,11 +532,11 @@ CONTAINS
     IF (convert) THEN
       intn = sz(2)
       r4array(1:intn) = REAL(y(1:intn),r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray(2), &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray(2), &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, y, 1, subarray(2), &
+      CALL MPI_FILE_WRITE(h%filehandle, y, 1, subarray(2), &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -638,10 +638,10 @@ CONTAINS
     IF (convert) THEN
       intn = sz(1)
       r4array(1:intn) = REAL(x(1:intn),r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray(1), &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray(1), &
+      CALL MPI_FILE_WRITE(h%filehandle, x, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -652,10 +652,10 @@ CONTAINS
     IF (convert) THEN
       intn = sz(2)
       r4array(1:intn) = REAL(y(1:intn),r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray(2), &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray(2), &
           MPI_STATUS_IGNORE, errcode)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, y, 1, subarray(2), &
+      CALL MPI_FILE_WRITE(h%filehandle, y, 1, subarray(2), &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -666,11 +666,11 @@ CONTAINS
     IF (convert) THEN
       intn = sz(3)
       r4array(1:intn) = REAL(z(1:intn),r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray(3), &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray(3), &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, z, 1, subarray(3), &
+      CALL MPI_FILE_WRITE(h%filehandle, z, 1, subarray(3), &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -681,6 +681,221 @@ CONTAINS
     b%done_data = .TRUE.
 
   END SUBROUTINE write_3d_mesh_r4
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a 2D lagrangian mesh in serial from the node with
+  ! rank {rank_write}
+  ! Serial operation, so no need to specify dims
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_srl_2d_lag_mesh_r4(h, id, name, x, y, convert_in, &
+      dim_labels, dim_units, dim_mults, geometry, rank_write)
+
+    INTEGER, PARAMETER :: ndims = 2
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name
+    REAL(r4), DIMENSION(:,:), INTENT(IN) :: x, y
+    LOGICAL, INTENT(IN), OPTIONAL :: convert_in
+    CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
+    REAL(r4), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
+    INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
+    REAL(r4), DIMENSION(:,:), ALLOCATABLE :: r4array
+    INTEGER :: i, errcode, intn
+    TYPE(sdf_block_type), POINTER :: b
+    LOGICAL :: convert
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    intn = 1
+    DO i = 1,ndims
+      b%dims(i) = INT(SIZE(x,i),i4)
+      intn = intn * b%dims(i)
+    ENDDO
+
+    IF (PRESENT(convert_in)) THEN
+      convert = convert_in
+    ELSE
+      convert = .FALSE.
+    ENDIF
+
+    IF (convert) THEN
+      b%type_size = 4
+      b%datatype = c_datatype_real4
+      b%mpitype = MPI_REAL4
+
+      ALLOCATE(r4array(b%dims(1),b%dims(2)))
+    ELSE
+      b%type_size = sof
+      b%datatype = datatype_real
+      b%mpitype = mpitype_real
+    ENDIF
+
+    IF (PRESENT(geometry)) THEN
+      b%geometry = geometry
+    ELSE
+      b%geometry = c_geometry_cartesian
+    ENDIF
+    b%ndims = ndims
+
+    IF (h%rank == h%rank_master) THEN
+      b%extents(1) = REAL(x(1,1),r8)
+      b%extents(2) = REAL(y(1,1),r8)
+      b%extents(ndims+1) = REAL(x(b%dims(1),b%dims(2)),r8)
+      b%extents(ndims+2) = REAL(y(b%dims(1),b%dims(2)),r8)
+    ENDIF
+
+    ! Write header
+
+    b%blocktype = c_blocktype_lagrangian_mesh
+    CALL write_mesh_meta_r4(h, id, name, dim_labels, dim_units, dim_mults)
+
+    ! Write the actual data
+
+    IF (h%rank == h%rank_master) THEN
+      h%current_location = b%data_location
+
+      CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
+          errcode)
+
+      IF (convert) THEN
+        r4array = REAL(x,r4)
+        CALL MPI_FILE_WRITE(h%filehandle, r4array, intn, b%mpitype, &
+            MPI_STATUS_IGNORE, errcode)
+
+        r4array = REAL(y,r4)
+        CALL MPI_FILE_WRITE(h%filehandle, r4array, intn, b%mpitype, &
+            MPI_STATUS_IGNORE, errcode)
+
+        DEALLOCATE(r4array)
+      ELSE
+        CALL MPI_FILE_WRITE(h%filehandle, x, intn, b%mpitype, &
+            MPI_STATUS_IGNORE, errcode)
+
+        CALL MPI_FILE_WRITE(h%filehandle, y, intn, b%mpitype, &
+            MPI_STATUS_IGNORE, errcode)
+      ENDIF
+    ENDIF
+
+    h%rank_master = h%default_rank
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_srl_2d_lag_mesh_r4
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a 3D lagrangian mesh in serial from the node with
+  ! rank {rank_write}
+  ! Serial operation, so no need to specify dims
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_srl_3d_lag_mesh_r4(h, id, name, x, y, z, convert_in, &
+      dim_labels, dim_units, dim_mults, geometry, rank_write)
+
+    INTEGER, PARAMETER :: ndims = 3
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name
+    REAL(r4), DIMENSION(:,:,:), INTENT(IN) :: x, y, z
+    LOGICAL, INTENT(IN), OPTIONAL :: convert_in
+    CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
+    REAL(r4), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
+    INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
+    REAL(r4), DIMENSION(:,:,:), ALLOCATABLE :: r4array
+    INTEGER :: i, errcode, intn
+    TYPE(sdf_block_type), POINTER :: b
+    LOGICAL :: convert
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    intn = 1
+    DO i = 1,ndims
+      b%dims(i) = INT(SIZE(x,i),i4)
+      intn = intn * b%dims(i)
+    ENDDO
+
+    IF (PRESENT(convert_in)) THEN
+      convert = convert_in
+    ELSE
+      convert = .FALSE.
+    ENDIF
+
+    IF (convert) THEN
+      b%type_size = 4
+      b%datatype = c_datatype_real4
+      b%mpitype = MPI_REAL4
+
+      ALLOCATE(r4array(b%dims(1),b%dims(2),b%dims(3)))
+    ELSE
+      b%type_size = sof
+      b%datatype = datatype_real
+      b%mpitype = mpitype_real
+    ENDIF
+
+    IF (PRESENT(geometry)) THEN
+      b%geometry = geometry
+    ELSE
+      b%geometry = c_geometry_cartesian
+    ENDIF
+    b%ndims = ndims
+
+    IF (h%rank == h%rank_master) THEN
+      b%extents(1) = REAL(x(1,1,1),r8)
+      b%extents(2) = REAL(y(1,1,1),r8)
+      b%extents(3) = REAL(z(1,1,1),r8)
+      b%extents(ndims+1) = REAL(x(b%dims(1),b%dims(2),b%dims(3)),r8)
+      b%extents(ndims+2) = REAL(y(b%dims(1),b%dims(2),b%dims(3)),r8)
+      b%extents(ndims+3) = REAL(z(b%dims(1),b%dims(2),b%dims(3)),r8)
+    ENDIF
+
+    ! Write header
+
+    b%blocktype = c_blocktype_lagrangian_mesh
+    CALL write_mesh_meta_r4(h, id, name, dim_labels, dim_units, dim_mults)
+
+    ! Write the actual data
+
+    IF (h%rank == h%rank_master) THEN
+      h%current_location = b%data_location
+
+      CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
+          errcode)
+
+      IF (convert) THEN
+        r4array = REAL(x,r4)
+        CALL MPI_FILE_WRITE(h%filehandle, r4array, intn, b%mpitype, &
+            MPI_STATUS_IGNORE, errcode)
+
+        r4array = REAL(y,r4)
+        CALL MPI_FILE_WRITE(h%filehandle, r4array, intn, b%mpitype, &
+            MPI_STATUS_IGNORE, errcode)
+
+        r4array = REAL(z,r4)
+        CALL MPI_FILE_WRITE(h%filehandle, r4array, intn, b%mpitype, &
+            MPI_STATUS_IGNORE, errcode)
+
+        DEALLOCATE(r4array)
+      ELSE
+        CALL MPI_FILE_WRITE(h%filehandle, x, intn, b%mpitype, &
+            MPI_STATUS_IGNORE, errcode)
+
+        CALL MPI_FILE_WRITE(h%filehandle, y, intn, b%mpitype, &
+            MPI_STATUS_IGNORE, errcode)
+
+        CALL MPI_FILE_WRITE(h%filehandle, z, intn, b%mpitype, &
+            MPI_STATUS_IGNORE, errcode)
+      ENDIF
+    ENDIF
+
+    h%rank_master = h%default_rank
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_srl_3d_lag_mesh_r4
 
 
 
@@ -765,12 +980,12 @@ CONTAINS
         distribution, 'native', MPI_INFO_NULL, errcode)
     IF (convert) THEN
       r4array = REAL(x,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, x, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -868,19 +1083,19 @@ CONTAINS
         distribution, 'native', MPI_INFO_NULL, errcode)
     IF (convert) THEN
       r4array = REAL(x,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
       r4array = REAL(y,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, x, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, y, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, y, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -981,26 +1196,26 @@ CONTAINS
         distribution, 'native', MPI_INFO_NULL, errcode)
     IF (convert) THEN
       r4array = REAL(x,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
       r4array = REAL(y,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
       r4array = REAL(z,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, x, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, y, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, y, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, z, 1, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, z, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -1082,11 +1297,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(r4array(sz(1)))
       r4array = REAL(variable,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nm, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -1168,11 +1383,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(r4array(sz(1),sz(2)))
       r4array = REAL(variable,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nm, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -1254,11 +1469,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(r4array(sz(1),sz(2),sz(3)))
       r4array = REAL(variable,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nm, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -1340,11 +1555,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(r4array(sz(1),sz(2),sz(3),sz(4)))
       r4array = REAL(variable,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nm, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, r4array, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
