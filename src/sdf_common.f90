@@ -748,7 +748,7 @@ CONTAINS
     CHARACTER(LEN=MPI_MAX_INFO_VAL) :: info_value
     INTEGER(KIND=MPI_OFFSET_KIND) :: filepos
     INTEGER :: sdf_error, message_len, info, nkeys, i, ierr
-    LOGICAL :: found, print_error, abort
+    LOGICAL :: found, print_error, do_abort
     REAL :: zz
 
     found = .FALSE.
@@ -763,11 +763,11 @@ CONTAINS
     sdf_error = map_error_code(error_code)
 
     print_error = print_errors
-    abort = exit_on_error
+    do_abort = exit_on_error
 
     IF (found) THEN
       print_error = .FALSE.
-      abort = h%exit_on_error
+      do_abort = h%exit_on_error
       IF (.NOT.h%handled_error) THEN
         h%error_code = sdf_error + 64 * h%nblocks
         h%handled_error = .TRUE.
@@ -804,7 +804,7 @@ CONTAINS
       CALL MPI_INFO_FREE(info, ierr)
     ENDIF
 
-    IF (abort) THEN
+    IF (do_abort) THEN
       ! First try to generate a floating-point error.
       ! This sometimes allows us to get a backtrace.
       zz = -1.0
