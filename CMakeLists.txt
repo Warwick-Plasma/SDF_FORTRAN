@@ -28,7 +28,7 @@ if(NOT INHERIT_FLAGS)
       set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -ip -vec-report0"
          CACHE STRING "Fortran flags for release build" FORCE)
       set(CMAKE_Fortran_FLAGS_DEBUG
-         "-O0 -g -u -ftrapuv -traceback -nothreads -fltconsistency -C -warn -save-temps -fpic -Wl,-no_pie"
+         "-O0 -g -u -init=snan -traceback -nothreads -fltconsistency -C -warn -save-temps -fpic -Wl,-no_pie"
          CACHE STRING "Fortran flags for debug build" FORCE)
 
    elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
