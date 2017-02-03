@@ -258,6 +258,7 @@ CONTAINS
     b%datatype = c_datatype_logical
     b%mpitype = MPI_CHARACTER
     b%ndims = 1
+    b%dims = 0
     b%npoints = npoint_global
 
     ! Write header
@@ -396,6 +397,7 @@ CONTAINS
     b%datatype = h%datatype_integer
     b%mpitype = h%mpitype_integer
     b%ndims = 1
+    b%dims = 0
     b%npoints = npoint_global
 
     ! Write header
@@ -596,6 +598,7 @@ CONTAINS
 
     b%blocktype = c_blocktype_point_variable
     b%ndims = 1
+    b%dims = 0
     b%npoints = npoint_global
 
     ! Write header
@@ -763,6 +766,7 @@ CONTAINS
     ENDIF
     b%blocktype = c_blocktype_point_variable
     b%ndims = 1
+    b%dims = 0
     b%npoints = npoint_global
 
     ! Write header
