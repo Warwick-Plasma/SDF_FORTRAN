@@ -623,7 +623,7 @@ CONTAINS
 
       CALL MPI_FILE_SET_VIEW(h%filehandle, file_offset, MPI_BYTE, &
           b%mpitype, 'native', MPI_INFO_NULL, errcode)
-      CALL MPI_FILE_WRITE(h%filehandle, array, npoint_this_cycle, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, array, npoint_this_cycle, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
 
       file_offset = file_offset + npoint_this_cycle * b%type_size
@@ -793,10 +793,10 @@ CONTAINS
           b%mpitype, 'native', MPI_INFO_NULL, errcode)
       IF (convert) THEN
         i4array(1:npoint_this_cycle) = INT(array(1:npoint_this_cycle),i4)
-        CALL MPI_FILE_WRITE(h%filehandle, i4array, npoint_this_cycle, &
+        CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, npoint_this_cycle, &
             b%mpitype, MPI_STATUS_IGNORE, errcode)
       ELSE
-        CALL MPI_FILE_WRITE(h%filehandle, array, npoint_this_cycle, &
+        CALL MPI_FILE_WRITE_ALL(h%filehandle, array, npoint_this_cycle, &
             b%mpitype, MPI_STATUS_IGNORE, errcode)
       ENDIF
 

@@ -415,11 +415,11 @@ CONTAINS
         distribution(1), 'native', MPI_INFO_NULL, errcode)
     IF (convert) THEN
       r4array(1:intn) = REAL(x(1:intn),r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray(1), &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, x, 1, subarray(1), &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -518,10 +518,10 @@ CONTAINS
     IF (convert) THEN
       intn = sz(1)
       r4array(1:intn) = REAL(x(1:intn),r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray(1), &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, x, 1, subarray(1), &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -532,11 +532,11 @@ CONTAINS
     IF (convert) THEN
       intn = sz(2)
       r4array(1:intn) = REAL(y(1:intn),r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray(2), &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray(2), &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, y, 1, subarray(2), &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, y, 1, subarray(2), &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -638,10 +638,10 @@ CONTAINS
     IF (convert) THEN
       intn = sz(1)
       r4array(1:intn) = REAL(x(1:intn),r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray(1), &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, x, 1, subarray(1), &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -652,10 +652,10 @@ CONTAINS
     IF (convert) THEN
       intn = sz(2)
       r4array(1:intn) = REAL(y(1:intn),r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray(2), &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray(2), &
           MPI_STATUS_IGNORE, errcode)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, y, 1, subarray(2), &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, y, 1, subarray(2), &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -666,11 +666,11 @@ CONTAINS
     IF (convert) THEN
       intn = sz(3)
       r4array(1:intn) = REAL(z(1:intn),r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray(3), &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray(3), &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, z, 1, subarray(3), &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, z, 1, subarray(3), &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -980,12 +980,12 @@ CONTAINS
         distribution, 'native', MPI_INFO_NULL, errcode)
     IF (convert) THEN
       r4array = REAL(x,r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, x, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -1083,19 +1083,19 @@ CONTAINS
         distribution, 'native', MPI_INFO_NULL, errcode)
     IF (convert) THEN
       r4array = REAL(x,r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
       r4array = REAL(y,r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, x, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
-      CALL MPI_FILE_WRITE(h%filehandle, y, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, y, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -1196,26 +1196,26 @@ CONTAINS
         distribution, 'native', MPI_INFO_NULL, errcode)
     IF (convert) THEN
       r4array = REAL(x,r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
       r4array = REAL(y,r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
       r4array = REAL(z,r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, x, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
-      CALL MPI_FILE_WRITE(h%filehandle, y, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, y, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
 
-      CALL MPI_FILE_WRITE(h%filehandle, z, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, z, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -1297,11 +1297,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(r4array(sz(1)))
       r4array = REAL(variable,r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, variable, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -1383,11 +1383,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(r4array(sz(1),sz(2)))
       r4array = REAL(variable,r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, variable, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -1469,11 +1469,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(r4array(sz(1),sz(2),sz(3)))
       r4array = REAL(variable,r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, variable, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 
@@ -1555,11 +1555,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(r4array(sz(1),sz(2),sz(3),sz(4)))
       r4array = REAL(variable,r4)
-      CALL MPI_FILE_WRITE(h%filehandle, r4array, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE(h%filehandle, variable, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
     ENDIF
 

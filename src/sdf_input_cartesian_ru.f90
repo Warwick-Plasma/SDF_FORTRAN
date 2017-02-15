@@ -145,7 +145,7 @@ CONTAINS
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
 
-    CALL MPI_FILE_READ(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_READ_ALL(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -183,7 +183,7 @@ CONTAINS
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
 
-    CALL MPI_FILE_READ(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_READ_ALL(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -221,7 +221,7 @@ CONTAINS
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
 
-    CALL MPI_FILE_READ(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_READ_ALL(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -259,7 +259,7 @@ CONTAINS
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
 
-    CALL MPI_FILE_READ(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_READ_ALL(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -297,7 +297,7 @@ CONTAINS
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
 
-    CALL MPI_FILE_READ(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_READ_ALL(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -335,7 +335,7 @@ CONTAINS
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
 
-    CALL MPI_FILE_READ(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_READ_ALL(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -373,7 +373,7 @@ CONTAINS
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
 
-    CALL MPI_FILE_READ(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_READ_ALL(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -411,7 +411,7 @@ CONTAINS
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
 
-    CALL MPI_FILE_READ(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_READ_ALL(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -449,7 +449,7 @@ CONTAINS
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
 
-    CALL MPI_FILE_READ(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_READ_ALL(h%filehandle, variable, 1, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
