@@ -1667,7 +1667,7 @@ CONTAINS
     b => h%current_block
 
     DO i = 1,b%ndims
-      CALL sdf_safe_copy_string(b%string_array(i), names(i))
+      CALL sdf_safe_copy_string(b%string_array(i), values(i))
     ENDDO
 
   END SUBROUTINE read_namevalue_string

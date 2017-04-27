@@ -553,7 +553,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: id
     LOGICAL :: found
     CHARACTER(LEN=*), PARAMETER :: numbers = '0123456789'
-    INTEGER :: i, n, num, pos
+    INTEGER :: i, n, num, pos, old_len
     TYPE(sdf_block_type), POINTER :: tmp
 
     IF (LEN_TRIM(id) > c_id_length) THEN
@@ -568,13 +568,26 @@ CONTAINS
     ENDIF
 
     CALL sdf_safe_copy_string(id, b%id)
+    old_len = LEN_TRIM(b%id)
     found = sdf_find_block(h, tmp, b%id)
     i = 1
     DO WHILE(found)
       num = i
 
+      ! Count digits
+      pos = 1
+      n = MOD(num,10)
+      num = num / 10
+      DO WHILE(num > 0)
+        pos = pos + 1
+        n = MOD(num,10)
+        num = num / 10
+      ENDDO
+
+      num = i
+
       ! Generate a new ID by adding ASCII digits to the end.
-      pos = c_id_length
+      pos = MIN(c_id_length, old_len+pos)
       n = MOD(num,10)
       b%id(pos:pos) = numbers(n+1:n+1)
       num = num / 10
