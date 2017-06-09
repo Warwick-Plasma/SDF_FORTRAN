@@ -104,6 +104,7 @@ CONTAINS
     CALL MPI_BARRIER(h%comm, errcode)
 
     CALL MPI_FILE_CLOSE(h%filehandle, errcode)
+    IF (h%errhandler /= 0) CALL MPI_ERRHANDLER_FREE(h%errhandler, errcode)
 
     CALL sdf_destroy_blocklist(h)
     CALL deallocate_file_handle(h)
