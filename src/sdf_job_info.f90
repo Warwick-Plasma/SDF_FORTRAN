@@ -47,8 +47,9 @@ CONTAINS
 
     days = (year - 1970)*365 + (year - 1969)/4 + days_since_new_year(month)
 
-    IF (MOD(year,400) == 0 .OR. &
-        (MOD(year,4) == 0 .AND. MOD(year,100) /= 0)) days = days + 1
+    IF ((MOD(year,400) == 0 &
+        .OR.  (MOD(year,4) == 0 .AND. MOD(year,100) /= 0)) &
+        .AND. month > 2) days = days + 1
 
     unix_seconds = INT((((days + day - 1)*24 + h)*60 + m)*60 + s,i4)
 
