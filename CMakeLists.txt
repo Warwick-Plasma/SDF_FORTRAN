@@ -14,7 +14,7 @@ if(NOT INHERIT_FLAGS)
       endif()
 
       set(CMAKE_Fortran_FLAGS
-         "-g -Mnodefaultunit -Ktrap=fp -mcmodel=medium -Mdclchk ${CPU} ${MPI_Fortran_COMPILE_FLAGS}"
+          "-g -Mnodefaultunit -Ktrap=fp -mcmodel=medium -Mdclchk -Mnofma ${CPU} ${MPI_Fortran_COMPILE_FLAGS}"
          CACHE STRING "Fortran flags" FORCE)
       set(CMAKE_Fortran_FLAGS_RELEASE "-O2 -g -Mvect -Munroll"
          CACHE STRING "Fortran flags for release build" FORCE)
