@@ -704,6 +704,18 @@ CONTAINS
     var%errhandler = 0
     var%comm = 0
 
+    var%summary_location = 0
+    var%summary_size = 0
+    var%step = 0
+    var%time = 0
+
+    var%summary_location_wrote = var%summary_location
+    var%summary_size_wrote = var%summary_size
+    var%nblocks_wrote = var%nblocks
+    var%step_wrote = var%step
+    var%time_wrote = var%time
+    var%station_file_wrote = var%station_file
+
   END SUBROUTINE initialise_file_handle
 
 
@@ -820,8 +832,8 @@ CONTAINS
     IF (do_abort) THEN
       ! First try to generate a floating-point error.
       ! This sometimes allows us to get a backtrace.
-      zz = -1.0
-      zz = SQRT(zz)
+      zz = 0.0
+      zz = 1.0 / zz
       CALL MPI_ABORT(MPI_COMM_WORLD, 10, ierr)
       STOP
     ENDIF
