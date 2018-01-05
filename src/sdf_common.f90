@@ -832,8 +832,8 @@ CONTAINS
     IF (do_abort) THEN
       ! First try to generate a floating-point error.
       ! This sometimes allows us to get a backtrace.
-      zz = -1.0
-      zz = SQRT(zz)
+      zz = 0.0
+      zz = 1.0 / zz
       CALL MPI_ABORT(MPI_COMM_WORLD, 10, ierr)
       STOP
     ENDIF
