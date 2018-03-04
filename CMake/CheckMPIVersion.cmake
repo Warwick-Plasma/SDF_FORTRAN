@@ -27,4 +27,10 @@ string(STRIP "${MPI_VERSION}" MPI_VERSION)
 if("${MPI_VERSION}" STREQUAL "OMPI_1.10.1" OR ${MPI_VERSION_RAN} EQUAL 1)
     message(FATAL_ERROR
         "OpenMPI 1.10.1 detected. This contains a serious bug and should not be used.")
+elseif("${MPI_VERSION}" STREQUAL "OMPI_2.1.1")
+    message(FATAL_ERROR
+        "OpenMPI 2.1.1 detected. This contains a serious bug and should not be used.")
+elseif("${MPI_VERSION}" STREQUAL "OMPI_2.1.2")
+    message(FATAL_ERROR
+        "OpenMPI 2.1.2 detected. This contains a serious bug and should not be used.")
 endif()
