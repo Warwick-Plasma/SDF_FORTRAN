@@ -556,6 +556,37 @@ CONTAINS
 
 
 
+  SUBROUTINE read_1d_array_integer8(h, values)
+
+    TYPE(sdf_file_handle) :: h
+    INTEGER(i8), DIMENSION(:), INTENT(OUT) :: values
+    INTEGER, DIMENSION(c_maxdims) :: dims
+    INTEGER :: errcode, n1
+    TYPE(sdf_block_type), POINTER :: b
+
+    IF (sdf_check_block_header(h)) RETURN
+
+    b => h%current_block
+    IF (.NOT. b%done_info) CALL sdf_read_array_info(h, dims)
+
+    n1 = b%dims(1)
+
+    h%current_location = b%data_location
+
+    IF (h%rank == h%rank_master) THEN
+      CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, values, n1, &
+          b%mpitype, MPI_STATUS_IGNORE, errcode)
+    ENDIF
+
+    CALL MPI_BCAST(values, n1, b%mpitype, h%rank_master, h%comm, errcode)
+
+    h%current_location = b%next_block_location
+    b%done_data = .TRUE.
+
+  END SUBROUTINE read_1d_array_integer8
+
+
+
   SUBROUTINE read_1d_array_logical(h, values)
 
     TYPE(sdf_file_handle) :: h

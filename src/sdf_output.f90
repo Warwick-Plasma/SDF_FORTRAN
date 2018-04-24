@@ -38,6 +38,8 @@ MODULE sdf_output
         write_1d_array_integer_spec, &
         write_2d_array_integer, &
         write_2d_array_integer_spec, &
+        write_1d_array_integer8, &
+        write_1d_array_integer8_spec, &
         write_1d_array_logical, &
         write_1d_array_logical_spec, &
         write_2d_array_character

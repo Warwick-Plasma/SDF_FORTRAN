@@ -2164,6 +2164,67 @@ CONTAINS
 
 
 
+  SUBROUTINE write_1d_array_integer8_spec(h, id, name, n1, array, rank_write)
+
+    INTEGER, PARAMETER :: ndims = 1
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name
+    INTEGER, INTENT(IN) :: n1
+    INTEGER(i8), DIMENSION(:), INTENT(IN) :: array
+    INTEGER, INTENT(IN), OPTIONAL :: rank_write
+    INTEGER :: errcode
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = INT(soi8,i4)
+    b%datatype = h%datatype_integer
+    b%mpitype = h%mpitype_integer
+    b%ndims = ndims
+
+    IF (PRESENT(rank_write)) h%rank_master = rank_write
+
+    b%dims(1) = n1
+
+    ! Write header
+
+    CALL write_array_meta(h, id, name)
+
+    h%current_location = b%data_location
+
+    IF (h%rank == h%rank_master) THEN
+      CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
+          errcode)
+
+      ! Actual array
+      CALL MPI_FILE_WRITE(h%filehandle, array, n1, b%mpitype, &
+          MPI_STATUS_IGNORE, errcode)
+    ENDIF
+
+    h%rank_master = h%default_rank
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_1d_array_integer8_spec
+
+
+
+  SUBROUTINE write_1d_array_integer8(h, id, name, array, rank_write)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name
+    INTEGER(i8), DIMENSION(:), INTENT(IN) :: array
+    INTEGER, INTENT(IN), OPTIONAL :: rank_write
+    INTEGER :: n1
+
+    n1 = SIZE(array,1)
+    CALL write_1d_array_integer8_spec(h, id, name, n1, array, rank_write)
+
+  END SUBROUTINE write_1d_array_integer8
+
+
+
   SUBROUTINE write_1d_array_logical_spec(h, id, name, n1, array, rank_write)
 
     INTEGER, PARAMETER :: ndims = 1
