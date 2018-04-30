@@ -88,7 +88,7 @@ MODULE sdf_common
     INTEGER(i4) :: blocktype, summary_size_wrote, nblocks_wrote, step_wrote
     INTEGER(i4) :: datatype
     INTEGER :: filehandle, comm, rank, rank_master, default_rank, mode
-    INTEGER :: errhandler, nstations
+    INTEGER :: errhandler, old_errhandler, nstations
     LOGICAL :: done_header, restart_flag, other_domains, writing, handled_error
     LOGICAL :: station_file, first, print_errors, print_warnings, exit_on_error
     LOGICAL :: station_file_wrote
@@ -681,6 +681,7 @@ CONTAINS
   SUBROUTINE initialise_file_handle(var)
 
     TYPE(sdf_file_handle) :: var
+    INTEGER :: ierr
 
     NULLIFY(var%buffer)
     NULLIFY(var%blocklist)
@@ -702,6 +703,7 @@ CONTAINS
     var%nblocks = 0
     var%error_code = 0
     var%errhandler = 0
+    var%old_errhandler = 0
     var%comm = 0
 
     var%summary_location = 0
@@ -715,6 +717,10 @@ CONTAINS
     var%step_wrote = var%step
     var%time_wrote = var%time
     var%station_file_wrote = var%station_file
+
+    CALL MPI_FILE_GET_ERRHANDLER(MPI_FILE_NULL, var%old_errhandler, ierr)
+    CALL MPI_FILE_CREATE_ERRHANDLER(error_handler, var%errhandler, ierr)
+    CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, var%errhandler, ierr)
 
   END SUBROUTINE initialise_file_handle
 
@@ -730,6 +736,7 @@ CONTAINS
 
     IF (var%errhandler /= 0) THEN
       CALL MPI_ERRHANDLER_FREE(var%errhandler, errcode)
+      CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, var%old_errhandler, errcode)
     ENDIF
 
     IF (var%comm /= 0) CALL MPI_COMM_FREE(var%comm, errcode)

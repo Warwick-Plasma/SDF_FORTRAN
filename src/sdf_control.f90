@@ -72,7 +72,6 @@ CONTAINS
     CALL MPI_INFO_FREE(info, errcode)
 
     IF (h%rank == h%rank_master .AND. h%filehandle /= 0) THEN
-      CALL MPI_FILE_CREATE_ERRHANDLER(error_handler, h%errhandler, errcode)
       CALL MPI_FILE_SET_ERRHANDLER(h%filehandle, h%errhandler, errcode)
       DO i = 1, max_handles
         IF (sdf_handles(i)%filehandle == 0) THEN
