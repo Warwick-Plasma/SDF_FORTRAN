@@ -777,13 +777,15 @@ CONTAINS
     REAL :: zz
 
     found = .FALSE.
-    DO i = 1, max_handles
-      IF (sdf_handles(i)%filehandle == filehandle) THEN
-        h => sdf_handles(i)%handle
-        found = .TRUE.
-        EXIT
-      ENDIF
-    ENDDO
+    IF (filehandle > 0) THEN
+      DO i = 1, max_handles
+        IF (sdf_handles(i)%filehandle == filehandle) THEN
+          h => sdf_handles(i)%handle
+          found = .TRUE.
+          EXIT
+        ENDIF
+      ENDDO
+    ENDIF
 
     sdf_error = map_error_code(error_code)
 
@@ -792,17 +794,18 @@ CONTAINS
 
     IF (found) THEN
       print_error = .FALSE.
-      do_abort = h%exit_on_error
-      IF (.NOT.h%handled_error) THEN
-        h%error_code = sdf_error + 64 * h%nblocks
-        h%handled_error = .TRUE.
-        print_error = h%print_errors
+      IF (filehandle > 0) THEN
+        do_abort = h%exit_on_error
+        IF (.NOT.h%handled_error) THEN
+          h%error_code = sdf_error + 64 * h%nblocks
+          h%handled_error = .TRUE.
+          print_error = h%print_errors
+        ENDIF
       ENDIF
     ENDIF
 
     IF (print_error) THEN
       CALL MPI_ERROR_STRING(error_code, message, message_len, ierr)
-      CALL MPI_FILE_GET_POSITION(filehandle, filepos, ierr)
 
       WRITE(0,*) 'An MPI-I/O error has occurred'
       IF (found) THEN
@@ -813,20 +816,25 @@ CONTAINS
       WRITE(0,*) 'Error code:  ', error_code
       WRITE(0,*) 'SDF error:   ' // TRIM(c_errcodes_char(sdf_error))
       WRITE(0,*) 'Message:     ' // TRIM(message)
-      WRITE(0,*) 'Position:    ', filepos
-
-      CALL MPI_FILE_GET_INFO(filehandle, info, ierr)
-      CALL MPI_INFO_GET_NKEYS(info, nkeys, ierr)
-      IF (nkeys > 0) THEN
-        WRITE(0,*) 'Info:'
-        DO i = 0,nkeys-1
-          CALL MPI_INFO_GET_NTHKEY(info, i, key, ierr)
-          CALL MPI_INFO_GET(info, key, MPI_MAX_INFO_VAL, info_value, &
-                            found, ierr)
-          WRITE(0,'(10X,A,": ",A)') TRIM(key), TRIM(info_value)
-        ENDDO
+      IF (filehandle > 0) THEN
+        CALL MPI_FILE_GET_POSITION(filehandle, filepos, ierr)
+        WRITE(0,*) 'Position:    ', filepos
       ENDIF
-      CALL MPI_INFO_FREE(info, ierr)
+
+      IF (filehandle > 0) THEN
+        CALL MPI_FILE_GET_INFO(filehandle, info, ierr)
+        CALL MPI_INFO_GET_NKEYS(info, nkeys, ierr)
+        IF (nkeys > 0) THEN
+          WRITE(0,*) 'Info:'
+          DO i = 0,nkeys-1
+            CALL MPI_INFO_GET_NTHKEY(info, i, key, ierr)
+            CALL MPI_INFO_GET(info, key, MPI_MAX_INFO_VAL, info_value, &
+                              found, ierr)
+            WRITE(0,'(10X,A,": ",A)') TRIM(key), TRIM(info_value)
+          ENDDO
+        ENDIF
+        CALL MPI_INFO_FREE(info, ierr)
+      ENDIF
     ENDIF
 
     IF (do_abort) THEN
