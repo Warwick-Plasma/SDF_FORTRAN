@@ -20,6 +20,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: filename
     INTEGER, INTENT(IN) :: sdf_comm_in, mode
     INTEGER :: errcode, ierr, i, info
+    LOGICAL :: exists
 
     CALL initialise_file_handle(h)
     CALL sdf_set_default_rank(h, 0)
@@ -49,8 +50,11 @@ CONTAINS
       h%mode = MPI_MODE_CREATE + MPI_MODE_WRONLY
 
       ! Delete file
-      IF (h%rank == h%rank_master) &
-          CALL MPI_FILE_DELETE(TRIM(filename), MPI_INFO_NULL, errcode)
+      IF (h%rank == h%rank_master) THEN
+        INQUIRE(file=TRIM(filename), exist=exists)
+        IF (exists) &
+            CALL MPI_FILE_DELETE(TRIM(filename), MPI_INFO_NULL, errcode)
+      ENDIF
     ELSE IF (mode == c_sdf_append) THEN
       h%writing = .TRUE.
       h%mode = MPI_MODE_CREATE + MPI_MODE_RDWR
