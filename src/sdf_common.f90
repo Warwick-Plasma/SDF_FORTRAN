@@ -682,7 +682,7 @@ CONTAINS
 
     TYPE(sdf_file_handle) :: var
     LOGICAL, INTENT(IN), OPTIONAL :: set_handler
-    LOGICAL :: set_err_handler = .TRUE.
+    LOGICAL :: set_err_handler
     INTEGER :: ierr
 
     NULLIFY(var%buffer)
@@ -704,8 +704,8 @@ CONTAINS
     var%exit_on_error = exit_on_error
     var%nblocks = 0
     var%error_code = 0
-    var%errhandler = 0
-    var%old_errhandler = 0
+    var%errhandler = MPI_ERRHANDLER_NULL
+    var%old_errhandler = MPI_ERRHANDLER_NULL
     var%comm = 0
 
     var%summary_location = 0
@@ -720,7 +720,11 @@ CONTAINS
     var%time_wrote = var%time
     var%station_file_wrote = var%station_file
 
-    IF (PRESENT(set_handler)) set_err_handler = set_handler
+    IF (PRESENT(set_handler)) THEN
+      set_err_handler = set_handler
+    ELSE
+      set_err_handler = .TRUE.
+    ENDIF
 
     IF (set_err_handler) THEN
       CALL MPI_FILE_GET_ERRHANDLER(MPI_FILE_NULL, var%old_errhandler, ierr)
@@ -740,11 +744,7 @@ CONTAINS
     IF (ASSOCIATED(var%buffer)) DEALLOCATE(var%buffer)
     IF (ASSOCIATED(var%station_ids)) DEALLOCATE(var%station_ids)
 
-    IF (var%errhandler /= 0) THEN
-      CALL MPI_ERRHANDLER_FREE(var%errhandler, errcode)
-    ENDIF
-
-    IF (var%old_errhandler /= 0) THEN
+    IF (var%old_errhandler /= MPI_ERRHANDLER_NULL) THEN
       CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, var%old_errhandler, errcode)
     ENDIF
 
