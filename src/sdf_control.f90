@@ -14,15 +14,18 @@ MODULE sdf_control
 
 CONTAINS
 
-  SUBROUTINE sdf_open(h, filename, sdf_comm_in, mode)
+  SUBROUTINE sdf_open(h, filename, sdf_comm_in, mode, handle_errors)
 
     TYPE(sdf_file_handle), TARGET :: h
     CHARACTER(LEN=*), INTENT(IN) :: filename
-    INTEGER, INTENT(IN) :: sdf_comm_in, mode
+    INTEGER, INTENT(IN) :: sdf_comm_in
+    INTEGER, INTENT(IN), OPTIONAL :: mode
+    LOGICAL, INTENT(IN), OPTIONAL :: handle_errors
     INTEGER :: errcode, ierr, i, info
     LOGICAL :: exists
+    INTEGER :: file_mode = c_sdf_write
 
-    CALL initialise_file_handle(h, set_handler=.TRUE.)
+    CALL initialise_file_handle(h, handle_errors)
     CALL sdf_set_default_rank(h, 0)
 
     h%filename = TRIM(filename)
@@ -45,7 +48,9 @@ CONTAINS
       RETURN
     ENDIF
 
-    IF (mode == c_sdf_write) THEN
+    IF (PRESENT(mode)) file_mode = mode
+
+    IF (file_mode == c_sdf_write) THEN
       h%writing = .TRUE.
       h%mode = MPI_MODE_CREATE + MPI_MODE_WRONLY
 
@@ -55,7 +60,7 @@ CONTAINS
         IF (exists) &
             CALL MPI_FILE_DELETE(TRIM(filename), MPI_INFO_NULL, errcode)
       ENDIF
-    ELSE IF (mode == c_sdf_append) THEN
+    ELSE IF (file_mode == c_sdf_append) THEN
       h%writing = .TRUE.
       h%mode = MPI_MODE_CREATE + MPI_MODE_RDWR
     ELSE
