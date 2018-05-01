@@ -21,9 +21,8 @@ CONTAINS
     INTEGER, INTENT(IN) :: sdf_comm_in
     INTEGER, INTENT(IN), OPTIONAL :: mode
     LOGICAL, INTENT(IN), OPTIONAL :: handle_errors
-    INTEGER :: errcode, ierr, i, info
+    INTEGER :: errcode, ierr, i, info, file_mode
     LOGICAL :: exists
-    INTEGER :: file_mode = c_sdf_write
 
     CALL initialise_file_handle(h, handle_errors)
     CALL sdf_set_default_rank(h, 0)
@@ -48,7 +47,11 @@ CONTAINS
       RETURN
     ENDIF
 
-    IF (PRESENT(mode)) file_mode = mode
+    IF (PRESENT(mode)) THEN
+      file_mode = mode
+    ELSE
+      file_mode = c_sdf_write
+    ENDIF
 
     IF (file_mode == c_sdf_write) THEN
       h%writing = .TRUE.
