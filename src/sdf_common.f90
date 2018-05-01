@@ -678,9 +678,11 @@ CONTAINS
 
 
 
-  SUBROUTINE initialise_file_handle(var)
+  SUBROUTINE initialise_file_handle(var, set_handler)
 
     TYPE(sdf_file_handle) :: var
+    LOGICAL, INTENT(IN), OPTIONAL :: set_handler
+    LOGICAL :: set_err_handler = .TRUE.
     INTEGER :: ierr
 
     NULLIFY(var%buffer)
@@ -718,9 +720,13 @@ CONTAINS
     var%time_wrote = var%time
     var%station_file_wrote = var%station_file
 
-    CALL MPI_FILE_GET_ERRHANDLER(MPI_FILE_NULL, var%old_errhandler, ierr)
-    CALL MPI_FILE_CREATE_ERRHANDLER(error_handler, var%errhandler, ierr)
-    CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, var%errhandler, ierr)
+    IF (PRESENT(set_handler)) set_err_handler = set_handler
+
+    IF (set_err_handler) THEN
+      CALL MPI_FILE_GET_ERRHANDLER(MPI_FILE_NULL, var%old_errhandler, ierr)
+      CALL MPI_FILE_CREATE_ERRHANDLER(error_handler, var%errhandler, ierr)
+      CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, var%errhandler, ierr)
+    ENDIF
 
   END SUBROUTINE initialise_file_handle
 
@@ -751,7 +757,7 @@ CONTAINS
       ENDIF
     ENDDO
 
-    CALL initialise_file_handle(var)
+    CALL initialise_file_handle(var, set_handler=.FALSE.)
 
   END SUBROUTINE deallocate_file_handle
 

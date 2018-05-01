@@ -22,7 +22,7 @@ CONTAINS
     INTEGER :: errcode, ierr, i, info
     LOGICAL :: exists
 
-    CALL initialise_file_handle(h)
+    CALL initialise_file_handle(h, set_handler=.TRUE.)
     CALL sdf_set_default_rank(h, 0)
 
     h%filename = TRIM(filename)
