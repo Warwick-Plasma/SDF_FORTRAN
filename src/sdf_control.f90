@@ -20,8 +20,9 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN) :: filename
     INTEGER, INTENT(IN) :: sdf_comm_in, mode
     INTEGER :: errcode, ierr, i, info
+    LOGICAL :: exists
 
-    CALL initialise_file_handle(h)
+    CALL initialise_file_handle(h, set_handler=.TRUE.)
     CALL sdf_set_default_rank(h, 0)
 
     h%filename = TRIM(filename)
@@ -49,8 +50,11 @@ CONTAINS
       h%mode = MPI_MODE_CREATE + MPI_MODE_WRONLY
 
       ! Delete file
-      IF (h%rank == h%rank_master) &
-          CALL MPI_FILE_DELETE(TRIM(filename), MPI_INFO_NULL, errcode)
+      IF (h%rank == h%rank_master) THEN
+        INQUIRE(file=TRIM(filename), exist=exists)
+        IF (exists) &
+            CALL MPI_FILE_DELETE(TRIM(filename), MPI_INFO_NULL, errcode)
+      ENDIF
     ELSE IF (mode == c_sdf_append) THEN
       h%writing = .TRUE.
       h%mode = MPI_MODE_CREATE + MPI_MODE_RDWR
@@ -68,8 +72,9 @@ CONTAINS
     CALL MPI_INFO_FREE(info, errcode)
 
     IF (h%rank == h%rank_master .AND. h%filehandle /= 0) THEN
-      CALL MPI_FILE_CREATE_ERRHANDLER(error_handler, h%errhandler, errcode)
-      CALL MPI_FILE_SET_ERRHANDLER(h%filehandle, h%errhandler, errcode)
+      IF (h%errhandler /= 0) THEN
+        CALL MPI_FILE_SET_ERRHANDLER(h%filehandle, h%errhandler, errcode)
+      ENDIF
       DO i = 1, max_handles
         IF (sdf_handles(i)%filehandle == 0) THEN
           sdf_handles(i)%filehandle = h%filehandle
