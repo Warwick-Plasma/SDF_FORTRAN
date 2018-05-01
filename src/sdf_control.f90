@@ -80,7 +80,7 @@ CONTAINS
     CALL MPI_INFO_FREE(info, errcode)
 
     IF (h%rank == h%rank_master .AND. h%filehandle /= 0) THEN
-      IF (h%errhandler /= 0) THEN
+      IF (h%errhandler /= MPI_ERRHANDLER_NULL) THEN
         CALL MPI_FILE_SET_ERRHANDLER(h%filehandle, h%errhandler, errcode)
       ENDIF
       DO i = 1, max_handles

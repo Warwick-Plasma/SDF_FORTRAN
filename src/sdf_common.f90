@@ -704,8 +704,8 @@ CONTAINS
     var%exit_on_error = exit_on_error
     var%nblocks = 0
     var%error_code = 0
-    var%errhandler = 0
-    var%old_errhandler = 0
+    var%errhandler = MPI_ERRHANDLER_NULL
+    var%old_errhandler = MPI_ERRHANDLER_NULL
     var%comm = 0
 
     var%summary_location = 0
@@ -744,7 +744,7 @@ CONTAINS
     IF (ASSOCIATED(var%buffer)) DEALLOCATE(var%buffer)
     IF (ASSOCIATED(var%station_ids)) DEALLOCATE(var%station_ids)
 
-    IF (var%old_errhandler /= 0) THEN
+    IF (var%old_errhandler /= MPI_ERRHANDLER_NULL) THEN
       CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, var%old_errhandler, errcode)
     ENDIF
 
