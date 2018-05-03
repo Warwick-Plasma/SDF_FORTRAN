@@ -81,6 +81,10 @@ CONTAINS
 
     IF (h%rank == h%rank_master .AND. h%filehandle /= 0) THEN
       IF (h%errhandler /= MPI_ERRHANDLER_NULL) THEN
+        IF (h%old_errhandler /= MPI_ERRHANDLER_NULL) THEN
+          CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, h%old_errhandler, errcode)
+          h%old_errhandler = MPI_ERRHANDLER_NULL
+        ENDIF
         CALL MPI_FILE_SET_ERRHANDLER(h%filehandle, h%errhandler, errcode)
       ENDIF
       DO i = 1, max_handles
@@ -117,6 +121,7 @@ CONTAINS
     CALL MPI_BARRIER(h%comm, errcode)
 
     CALL MPI_FILE_CLOSE(h%filehandle, errcode)
+    h%errhandler = MPI_ERRHANDLER_NULL
 
     CALL sdf_destroy_blocklist(h)
     CALL deallocate_file_handle(h)

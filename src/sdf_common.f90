@@ -744,8 +744,13 @@ CONTAINS
     IF (ASSOCIATED(var%buffer)) DEALLOCATE(var%buffer)
     IF (ASSOCIATED(var%station_ids)) DEALLOCATE(var%station_ids)
 
+    IF (var%errhandler /= MPI_ERRHANDLER_NULL) THEN
+      CALL MPI_ERRHANDLER_FREE(var%errhandler, errcode)
+    ENDIF
+
     IF (var%old_errhandler /= MPI_ERRHANDLER_NULL) THEN
       CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, var%old_errhandler, errcode)
+      var%old_errhandler = MPI_ERRHANDLER_NULL
     ENDIF
 
     IF (var%comm /= 0) CALL MPI_COMM_FREE(var%comm, errcode)
