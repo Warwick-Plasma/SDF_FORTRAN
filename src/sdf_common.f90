@@ -899,4 +899,24 @@ CONTAINS
 
   END FUNCTION sdf_get_point_array_size
 
+
+
+  SUBROUTINE sdf_set_exit_on_error(exit_on_error_val)
+
+    LOGICAL, INTENT(IN) :: exit_on_error_val
+
+    exit_on_error = exit_on_error_val
+
+  END SUBROUTINE sdf_set_exit_on_error
+
+
+
+  FUNCTION sdf_get_exit_on_error()
+
+    LOGICAL :: sdf_get_exit_on_error
+
+    sdf_get_exit_on_error = exit_on_error
+
+  END FUNCTION sdf_get_exit_on_error
+
 END MODULE sdf_common
