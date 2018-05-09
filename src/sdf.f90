@@ -116,6 +116,8 @@ MODULE sdf
   PUBLIC :: sdf_set_default_rank
   PUBLIC :: sdf_set_point_array_size
   PUBLIC :: sdf_get_point_array_size
+  PUBLIC :: sdf_set_exit_on_error
+  PUBLIC :: sdf_get_exit_on_error
   PUBLIC :: sdf_seek_start
   PUBLIC :: sdf_seek_block
   PUBLIC :: sdf_find_block_by_id
