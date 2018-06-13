@@ -107,6 +107,9 @@ MODULE sdf_common
   INTEGER, PARAMETER :: max_handles = 64
   TYPE(sdf_handle_type) :: sdf_handles(max_handles)
 
+  INTEGER, SAVE :: errhandler_handle = MPI_ERRHANDLER_NULL
+  INTEGER, SAVE :: open_handles = 0
+
   INTEGER, PARAMETER :: c_sdf_read = 0
   INTEGER, PARAMETER :: c_sdf_write = 1
   INTEGER, PARAMETER :: c_sdf_append = 3
@@ -728,7 +731,10 @@ CONTAINS
 
     IF (set_err_handler) THEN
       CALL MPI_FILE_GET_ERRHANDLER(MPI_FILE_NULL, var%old_errhandler, ierr)
-      CALL MPI_FILE_CREATE_ERRHANDLER(error_handler, var%errhandler, ierr)
+      IF (errhandler_handle == MPI_ERRHANDLER_NULL) THEN
+        CALL MPI_FILE_CREATE_ERRHANDLER(error_handler, errhandler_handle, ierr)
+      ENDIF
+      var%errhandler = errhandler_handle
       CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, var%errhandler, ierr)
     ENDIF
 
@@ -744,9 +750,7 @@ CONTAINS
     IF (ASSOCIATED(var%buffer)) DEALLOCATE(var%buffer)
     IF (ASSOCIATED(var%station_ids)) DEALLOCATE(var%station_ids)
 
-    IF (var%errhandler /= MPI_ERRHANDLER_NULL) THEN
-      CALL MPI_ERRHANDLER_FREE(var%errhandler, errcode)
-    ENDIF
+    var%errhandler = MPI_ERRHANDLER_NULL
 
     IF (var%old_errhandler /= MPI_ERRHANDLER_NULL) THEN
       CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, var%old_errhandler, errcode)
@@ -758,11 +762,17 @@ CONTAINS
     DO i = 1, max_handles
       IF (sdf_handles(i)%filehandle == var%filehandle) THEN
         sdf_handles(i)%filehandle = 0
+        open_handles = open_handles - 1
         EXIT
       ENDIF
     ENDDO
 
     CALL initialise_file_handle(var, set_handler=.FALSE.)
+
+    IF (open_handles == 0) THEN
+      CALL MPI_ERRHANDLER_FREE(errhandler_handle, errcode)
+      errhandler_handle = MPI_ERRHANDLER_NULL
+    ENDIF
 
   END SUBROUTINE deallocate_file_handle
 

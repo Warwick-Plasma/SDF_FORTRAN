@@ -87,10 +87,12 @@ CONTAINS
         ENDIF
         CALL MPI_FILE_SET_ERRHANDLER(h%filehandle, h%errhandler, errcode)
       ENDIF
+
       DO i = 1, max_handles
         IF (sdf_handles(i)%filehandle == 0) THEN
           sdf_handles(i)%filehandle = h%filehandle
           sdf_handles(i)%handle => h
+          open_handles = open_handles + 1
           EXIT
         ENDIF
       ENDDO
