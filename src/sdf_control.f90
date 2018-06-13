@@ -81,16 +81,21 @@ CONTAINS
 
     IF (h%rank == h%rank_master .AND. h%filehandle /= 0) THEN
       IF (h%errhandler /= MPI_ERRHANDLER_NULL) THEN
-        IF (h%old_errhandler /= MPI_ERRHANDLER_NULL) THEN
+        ! Restore default error handler if changed
+        CALL MPI_FILE_GET_ERRHANDLER(MPI_FILE_NULL, errcode, ierr)
+        IF (errcode /= h%old_errhandler) THEN
           CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, h%old_errhandler, errcode)
-          h%old_errhandler = MPI_ERRHANDLER_NULL
         ENDIF
+        h%old_errhandler = MPI_ERRHANDLER_NULL
+
         CALL MPI_FILE_SET_ERRHANDLER(h%filehandle, h%errhandler, errcode)
       ENDIF
+
       DO i = 1, max_handles
         IF (sdf_handles(i)%filehandle == 0) THEN
           sdf_handles(i)%filehandle = h%filehandle
           sdf_handles(i)%handle => h
+          open_handles = open_handles + 1
           EXIT
         ENDIF
       ENDDO
