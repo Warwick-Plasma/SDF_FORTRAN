@@ -769,7 +769,7 @@ CONTAINS
 
     CALL initialise_file_handle(var, set_handler=.FALSE.)
 
-    IF (open_handles == 0) THEN
+    IF (open_handles == 0 .AND. errhandler_handle /= MPI_ERRHANDLER_NULL) THEN
       CALL MPI_ERRHANDLER_FREE(errhandler_handle, errcode)
       errhandler_handle = MPI_ERRHANDLER_NULL
     ENDIF
