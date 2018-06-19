@@ -191,7 +191,7 @@ FC  = $(MPIF90)
 RANLIB = ranlib
 
 FC_INFO := $(shell ${FC} --version 2>/dev/null \
-    || ${FC} -V 2>&1 | grep '[a-zA-Z]' | head -n 1)
+    || ${FC} -V 2>/dev/null | grep '[a-zA-Z]' | head -n 1)
 
 # objectlist file
 include Makefile-objs
