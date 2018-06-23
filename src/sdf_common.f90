@@ -352,13 +352,13 @@ CONTAINS
         CALL initialise_block_type(h%current_block%next_block)
         next => h%current_block%next_block
         next%block_start = h%current_block%next_block_location
-      ENDIF
+      END IF
     ELSE
       ALLOCATE(h%blocklist)
       CALL initialise_block_type(h%blocklist)
       next => h%blocklist
       next%block_start = h%summary_location
-    ENDIF
+    END IF
 
     h%first = .FALSE.
     next%done_header = .FALSE.
@@ -399,9 +399,9 @@ CONTAINS
       IF (sdf_string_equal(block_id, b%id)) RETURN
       IF (use_truncated .AND. b%truncated_id) THEN
         IF (sdf_string_equal(block_id, b%long_id)) RETURN
-      ENDIF
+      END IF
       b => b%next_block
-    ENDDO
+    END DO
 
     found = .FALSE.
     NULLIFY(b)
@@ -437,7 +437,7 @@ CONTAINS
       CALL sdf_safe_copy_string(b%id, block_id)
     ELSE
       CALL sdf_safe_copy_string(long_id, block_id)
-    ENDIF
+    END IF
 
   END FUNCTION sdf_get_block_id
 
@@ -490,15 +490,15 @@ CONTAINS
 
     IF (len1 > 0) THEN
       IF (IACHAR(str1(len1:len1)) == 0) len1 = len1 - 1
-    ENDIF
+    END IF
     IF (len2 > 0) THEN
       IF (IACHAR(str2(len2:len2)) == 0) len2 = len2 - 1
-    ENDIF
+    END IF
 
     IF (len1 /= len2) THEN
       equal = .FALSE.
       RETURN
-    ENDIF
+    END IF
 
     equal = (str1(1:len1) == str2(1:len1))
 
@@ -519,12 +519,12 @@ CONTAINS
       s2(1:olen) = s1(1:olen)
       DO i = olen+1,len2
         s2(i:i) = ' '
-      ENDDO
+      END DO
     ELSE
       DO i = 1,len2
         s2(i:i) = ' '
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
   END SUBROUTINE sdf_safe_copy_string
 
@@ -540,8 +540,8 @@ CONTAINS
       IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*, '*** WARNING ***'
         PRINT*, 'SDF ID string "' // TRIM(id) // '" was truncated.'
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     CALL sdf_safe_copy_string(id, new_id)
 
@@ -566,9 +566,9 @@ CONTAINS
         IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
           PRINT*, '*** WARNING ***'
           PRINT*, 'SDF ID string "' // TRIM(id) // '" was truncated.'
-        ENDIF
-      ENDIF
-    ENDIF
+        END IF
+      END IF
+    END IF
 
     CALL sdf_safe_copy_string(id, b%id)
     old_len = LEN_TRIM(b%id)
@@ -585,7 +585,7 @@ CONTAINS
         pos = pos + 1
         n = MOD(num,10)
         num = num / 10
-      ENDDO
+      END DO
 
       num = i
 
@@ -599,11 +599,11 @@ CONTAINS
         n = MOD(num,10)
         b%id(pos:pos) = numbers(n+1:n+1)
         num = num / 10
-      ENDDO
+      END DO
 
       found = sdf_find_block(h, tmp, b%id)
       i = i + 1
-    ENDDO
+    END DO
 
   END SUBROUTINE sdf_safe_copy_unique_id
 
@@ -727,16 +727,16 @@ CONTAINS
       set_err_handler = set_handler
     ELSE
       set_err_handler = .TRUE.
-    ENDIF
+    END IF
 
     IF (set_err_handler) THEN
       CALL MPI_FILE_GET_ERRHANDLER(MPI_FILE_NULL, var%old_errhandler, ierr)
       IF (errhandler_handle == MPI_ERRHANDLER_NULL) THEN
         CALL MPI_FILE_CREATE_ERRHANDLER(error_handler, errhandler_handle, ierr)
-      ENDIF
+      END IF
       var%errhandler = errhandler_handle
       CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, var%errhandler, ierr)
-    ENDIF
+    END IF
 
   END SUBROUTINE initialise_file_handle
 
@@ -755,7 +755,7 @@ CONTAINS
     IF (var%old_errhandler /= MPI_ERRHANDLER_NULL) THEN
       CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, var%old_errhandler, errcode)
       var%old_errhandler = MPI_ERRHANDLER_NULL
-    ENDIF
+    END IF
 
     IF (var%comm /= 0) CALL MPI_COMM_FREE(var%comm, errcode)
 
@@ -764,15 +764,15 @@ CONTAINS
         sdf_handles(i)%filehandle = 0
         open_handles = open_handles - 1
         EXIT
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     CALL initialise_file_handle(var, set_handler=.FALSE.)
 
     IF (open_handles == 0 .AND. errhandler_handle /= MPI_ERRHANDLER_NULL) THEN
       CALL MPI_ERRHANDLER_FREE(errhandler_handle, errcode)
       errhandler_handle = MPI_ERRHANDLER_NULL
-    ENDIF
+    END IF
 
   END SUBROUTINE deallocate_file_handle
 
@@ -788,8 +788,8 @@ CONTAINS
       IF (error_code == mpi_error_codes(i)) THEN
         errcode = i + c_mpi_error_start - 1
         RETURN
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
   END FUNCTION map_error_code
 
@@ -814,9 +814,9 @@ CONTAINS
           h => sdf_handles(i)%handle
           found = .TRUE.
           EXIT
-        ENDIF
-      ENDDO
-    ENDIF
+        END IF
+      END DO
+    END IF
 
     sdf_error = map_error_code(error_code)
 
@@ -831,9 +831,9 @@ CONTAINS
           h%error_code = sdf_error + 64 * h%nblocks
           h%handled_error = .TRUE.
           print_error = h%print_errors
-        ENDIF
-      ENDIF
-    ENDIF
+        END IF
+      END IF
+    END IF
 
     IF (print_error) THEN
       CALL MPI_ERROR_STRING(error_code, message, message_len, ierr)
@@ -842,7 +842,7 @@ CONTAINS
       IF (found) THEN
         WRITE(0,*) 'Process:     ', h%rank
         WRITE(0,*) 'Filename:    ' // TRIM(h%filename)
-      ENDIF
+      END IF
       WRITE(0,*) 'File handle: ', filehandle
       WRITE(0,*) 'Error code:  ', error_code
       WRITE(0,*) 'SDF error:   ' // TRIM(c_errcodes_char(sdf_error))
@@ -850,7 +850,7 @@ CONTAINS
       IF (filehandle > 0) THEN
         CALL MPI_FILE_GET_POSITION(filehandle, filepos, ierr)
         WRITE(0,*) 'Position:    ', filepos
-      ENDIF
+      END IF
 
       IF (filehandle > 0) THEN
         CALL MPI_FILE_GET_INFO(filehandle, info, ierr)
@@ -862,11 +862,11 @@ CONTAINS
             CALL MPI_INFO_GET(info, key, MPI_MAX_INFO_VAL, info_value, &
                               found, ierr)
             WRITE(0,'(10X,A,": ",A)') TRIM(key), TRIM(info_value)
-          ENDDO
-        ENDIF
+          END DO
+        END IF
         CALL MPI_INFO_FREE(info, ierr)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     IF (do_abort) THEN
       ! First try to generate a floating-point error.
@@ -875,7 +875,7 @@ CONTAINS
       zz = 1.0 / zz
       CALL MPI_ABORT(MPI_COMM_WORLD, 10, ierr)
       STOP
-    ENDIF
+    END IF
 
   END SUBROUTINE error_handler
 

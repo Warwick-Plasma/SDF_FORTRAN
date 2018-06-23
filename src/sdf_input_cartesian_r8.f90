@@ -37,14 +37,14 @@ CONTAINS
       DO i = 1,b%ndims
         clen = MIN(LEN(dim_labels(i)),INT(c_id_length))
         dim_labels(i)(1:clen) = b%dim_labels(i)(1:clen)
-      ENDDO
-    ENDIF
+      END DO
+    END IF
     IF (PRESENT(dim_units)) THEN
       DO i = 1,b%ndims
         clen = MIN(LEN(dim_units(i)),INT(c_id_length))
         dim_units(i)(1:clen) = b%dim_units(i)(1:clen)
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
   END SUBROUTINE read_plain_mesh_info_r8
 
@@ -70,7 +70,7 @@ CONTAINS
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, intn, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(x, intn, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -102,7 +102,7 @@ CONTAINS
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, intn, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(x, intn, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -110,7 +110,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, y, intn, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(y, intn, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -142,7 +142,7 @@ CONTAINS
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, intn, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(x, intn, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -150,7 +150,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, y, intn, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(y, intn, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -158,7 +158,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, z, intn, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(z, intn, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -197,7 +197,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_READ_ALL(h%filehandle, x, SIZE(x), b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -237,7 +237,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_READ_ALL(h%filehandle, x, SIZE(x), b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + b%dims(1) * b%type_size
 
@@ -250,7 +250,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_READ_ALL(h%filehandle, y, SIZE(y), b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -290,7 +290,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_READ_ALL(h%filehandle, x, SIZE(x), b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + b%dims(1) * b%type_size
 
@@ -303,7 +303,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_READ_ALL(h%filehandle, y, SIZE(y), b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + b%dims(2) * b%type_size
 
@@ -316,7 +316,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_READ_ALL(h%filehandle, z, SIZE(z), b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -356,7 +356,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_READ_ALL(h%filehandle, x, SIZE(x), b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -402,7 +402,7 @@ CONTAINS
 
       CALL MPI_FILE_READ_ALL(h%filehandle, y, SIZE(y), b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -454,7 +454,7 @@ CONTAINS
 
       CALL MPI_FILE_READ_ALL(h%filehandle, z, SIZE(z), b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -680,14 +680,14 @@ CONTAINS
       last = last_in
     ELSE
       last = .FALSE.
-    ENDIF
+    END IF
 
     cur => h%current_block
     nm = cur%ndims
     nsub = 0
     DO i = 1,nm
       IF (cur%variable_ids(i) /= '') nsub = nsub + 1
-    ENDDO
+    END DO
 
     j = 0
     IF (last) THEN
@@ -699,7 +699,7 @@ CONTAINS
         j = j + 1
         CALL read_1d_var_last_r8(h, nsub, b%dims, variable, j, distribution, &
             subarray)
-      ENDDO
+      END DO
     ELSE
       DO i = 1,nm
         IF (cur%variable_ids(i) == '') CYCLE
@@ -709,8 +709,8 @@ CONTAINS
         j = j + 1
         CALL read_1d_var_first_r8(h, nsub, b%dims, variable, j, distribution, &
             subarray)
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     h%current_block => cur
 
@@ -737,14 +737,14 @@ CONTAINS
       last = last_in
     ELSE
       last = .FALSE.
-    ENDIF
+    END IF
 
     cur => h%current_block
     nm = cur%ndims
     nsub = 0
     DO i = 1,nm
       IF (cur%variable_ids(i) /= '') nsub = nsub + 1
-    ENDDO
+    END DO
 
     j = 0
     IF (last) THEN
@@ -756,7 +756,7 @@ CONTAINS
         j = j + 1
         CALL read_2d_var_last_r8(h, nsub, b%dims, variable, j, distribution, &
             subarray)
-      ENDDO
+      END DO
     ELSE
       DO i = 1,nm
         IF (cur%variable_ids(i) == '') CYCLE
@@ -766,8 +766,8 @@ CONTAINS
         j = j + 1
         CALL read_2d_var_first_r8(h, nsub, b%dims, variable, j, distribution, &
             subarray)
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     h%current_block => cur
 
@@ -794,14 +794,14 @@ CONTAINS
       last = last_in
     ELSE
       last = .FALSE.
-    ENDIF
+    END IF
 
     cur => h%current_block
     nm = cur%ndims
     nsub = 0
     DO i = 1,nm
       IF (cur%variable_ids(i) /= '') nsub = nsub + 1
-    ENDDO
+    END DO
 
     j = 0
     IF (last) THEN
@@ -813,7 +813,7 @@ CONTAINS
         j = j + 1
         CALL read_3d_var_last_r8(h, nsub, b%dims, variable, j, distribution, &
             subarray)
-      ENDDO
+      END DO
     ELSE
       DO i = 1,nm
         IF (cur%variable_ids(i) == '') CYCLE
@@ -823,8 +823,8 @@ CONTAINS
         j = j + 1
         CALL read_3d_var_first_r8(h, nsub, b%dims, variable, j, distribution, &
             subarray)
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     h%current_block => cur
 
@@ -850,7 +850,7 @@ CONTAINS
       CALL read_nd_float_r8(h, variable(1,1), distribution, subarray)
     ELSE
       CALL read_1d_material_r8(h, variable, distribution, subarray, last_in)
-    ENDIF
+    END IF
 
   END SUBROUTINE read_2d_variable_r8
 
@@ -874,7 +874,7 @@ CONTAINS
       CALL read_nd_float_r8(h, variable(1,1,1), distribution, subarray)
     ELSE
       CALL read_2d_material_r8(h, variable, distribution, subarray, last_in)
-    ENDIF
+    END IF
 
   END SUBROUTINE read_3d_variable_r8
 

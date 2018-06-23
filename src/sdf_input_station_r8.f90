@@ -41,8 +41,8 @@ CONTAINS
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
             errcode)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, time, 1, mpitype_real, &
@@ -50,7 +50,7 @@ CONTAINS
       CALL MPI_FILE_READ(h%filehandle, array, b%nvariables-1, mpitype_real, &
           MPI_STATUS_IGNORE, errcode)
       h%current_location = h%current_location + b%type_size
-    ENDIF
+    END IF
 
     step = h%step
     b%done_data = .TRUE.

@@ -82,11 +82,11 @@ CONTAINS
         CALL MPI_FILE_WRITE(h%filehandle, x(idx), npoint_max, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
         idx = idx + npoint_max
-      ENDDO
+      END DO
 
       CALL MPI_FILE_WRITE(h%filehandle, x(idx), npoint_rem, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = b%data_location + b%data_length
     b%done_data = .TRUE.
@@ -161,7 +161,7 @@ CONTAINS
         CALL MPI_FILE_WRITE(h%filehandle, x(idx), npoint_max, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
         idx = idx + npoint_max
-      ENDDO
+      END DO
 
       CALL MPI_FILE_WRITE(h%filehandle, x(idx), npoint_rem, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
@@ -172,11 +172,11 @@ CONTAINS
         CALL MPI_FILE_WRITE(h%filehandle, y(idx), npoint_max, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
         idx = idx + npoint_max
-      ENDDO
+      END DO
 
       CALL MPI_FILE_WRITE(h%filehandle, y(idx), npoint_rem, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = b%data_location + b%data_length
     b%done_data = .TRUE.
@@ -253,7 +253,7 @@ CONTAINS
         CALL MPI_FILE_WRITE(h%filehandle, x(idx), npoint_max, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
         idx = idx + npoint_max
-      ENDDO
+      END DO
 
       CALL MPI_FILE_WRITE(h%filehandle, x(idx), npoint_rem, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
@@ -264,7 +264,7 @@ CONTAINS
         CALL MPI_FILE_WRITE(h%filehandle, y(idx), npoint_max, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
         idx = idx + npoint_max
-      ENDDO
+      END DO
 
       CALL MPI_FILE_WRITE(h%filehandle, y(idx), npoint_rem, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
@@ -275,11 +275,11 @@ CONTAINS
         CALL MPI_FILE_WRITE(h%filehandle, z(idx), npoint_max, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
         idx = idx + npoint_max
-      ENDDO
+      END DO
 
       CALL MPI_FILE_WRITE(h%filehandle, z(idx), npoint_rem, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = b%data_location + b%data_length
     b%done_data = .TRUE.
@@ -420,7 +420,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     ! Allocate buffer arrays
 
@@ -443,18 +443,18 @@ CONTAINS
         IF (h%print_errors .AND. h%rank == h%rank_master) THEN
           PRINT*, '*** ERROR ***'
           PRINT*, 'SDF library was unable to allocate memory for output buffer'
-        ENDIF
+        END IF
         h%error_code = c_err_sdf
         RETURN
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     IF (start) THEN
       IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*, '*** WARNING ***'
         PRINT*, 'SDF npoint_per_iteration reduced to ', npoint_per_iteration
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -467,7 +467,7 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
     b%geometry = c_geometry_cartesian
     b%ndims = ndims
     b%npoints = npoint_global
@@ -510,14 +510,14 @@ CONTAINS
         ELSE
           CALL MPI_FILE_WRITE_ALL(h%filehandle, array, npoint_this_cycle, &
               b%mpitype, MPI_STATUS_IGNORE, errcode)
-        ENDIF
+        END IF
 
         file_offset = file_offset + npoint_this_cycle * b%type_size
-      ENDDO
+      END DO
 
       h%current_location = h%current_location &
           + npoint_global * b%type_size
-    ENDDO
+    END DO
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -544,7 +544,7 @@ CONTAINS
 
       CALL MPI_FILE_WRITE(h%filehandle, b%extents, 2 * ndims, MPI_REAL8, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = b%data_location + b%data_length
     b%done_data = .TRUE.
@@ -601,11 +601,11 @@ CONTAINS
         CALL MPI_FILE_WRITE(h%filehandle, array(idx), npoint_max, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
         idx = idx + npoint_max
-      ENDDO
+      END DO
 
       CALL MPI_FILE_WRITE(h%filehandle, array(idx), npoint_rem, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = b%data_location + b%data_length
     b%done_data = .TRUE.
@@ -706,7 +706,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     ! Allocate buffer arrays
 
@@ -729,18 +729,18 @@ CONTAINS
         IF (h%print_errors .AND. h%rank == h%rank_master) THEN
           PRINT*, '*** ERROR ***'
           PRINT*, 'SDF library was unable to allocate memory for output buffer'
-        ENDIF
+        END IF
         h%error_code = c_err_sdf
         RETURN
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     IF (start) THEN
       IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*, '*** WARNING ***'
         PRINT*, 'SDF npoint_per_iteration reduced to ', npoint_per_iteration
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -753,7 +753,7 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
     b%blocktype = c_blocktype_point_variable
     b%ndims = 1
     b%npoints = npoint_global
@@ -787,10 +787,10 @@ CONTAINS
       ELSE
         CALL MPI_FILE_WRITE_ALL(h%filehandle, array, npoint_this_cycle, &
             b%mpitype, MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
 
       file_offset = file_offset + npoint_this_cycle * b%type_size
-    ENDDO
+    END DO
 
     DEALLOCATE(array)
     IF (convert) DEALLOCATE(r4array)

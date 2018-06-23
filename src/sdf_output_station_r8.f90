@@ -32,18 +32,18 @@ CONTAINS
       IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** WARNING ***'
         PRINT*,'SDF block cannot be found. Ignoring call.'
-      ENDIF
+      END IF
       RETURN
-    ENDIF
+    END IF
 
     b => h%current_block
     IF (b%blocktype /= c_blocktype_station) THEN
       IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** WARNING ***'
         PRINT*,'SDF unable to write station data. Ignoring call.'
-      ENDIF
+      END IF
       RETURN
-    ENDIF
+    END IF
 
     h%time = time
     h%step = step
@@ -58,7 +58,7 @@ CONTAINS
           MPI_STATUS_IGNORE, errcode)
       CALL MPI_FILE_WRITE(h%filehandle, array, b%nvariables-1, mpitype_real, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
     b%nelements = b%nelements + 1
     b%data_length = b%data_length + b%type_size
 

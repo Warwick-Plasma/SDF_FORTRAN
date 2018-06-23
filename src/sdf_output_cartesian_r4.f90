@@ -47,7 +47,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -57,13 +57,13 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
 
     IF (PRESENT(geometry)) THEN
       b%geometry = geometry
     ELSE
       b%geometry = c_geometry_cartesian
-    ENDIF
+    END IF
     b%ndims = ndims
 
     IF (PRESENT(rank_write)) h%rank_master = rank_write
@@ -73,7 +73,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       b%extents(1) = REAL(x(1),r8)
       b%extents(ndims+1) = REAL(x(b%dims(1)),r8)
-    ENDIF
+    END IF
 
     ! Write header
 
@@ -101,8 +101,8 @@ CONTAINS
         intn = b%dims(1)
         CALL MPI_FILE_WRITE(h%filehandle, x, intn, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -141,7 +141,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -151,13 +151,13 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
 
     IF (PRESENT(geometry)) THEN
       b%geometry = geometry
     ELSE
       b%geometry = c_geometry_cartesian
-    ENDIF
+    END IF
     b%ndims = ndims
 
     IF (PRESENT(rank_write)) h%rank_master = rank_write
@@ -170,7 +170,7 @@ CONTAINS
       b%extents(2) = REAL(y(1),r8)
       b%extents(ndims+1) = REAL(x(b%dims(1)),r8)
       b%extents(ndims+2) = REAL(y(b%dims(2)),r8)
-    ENDIF
+    END IF
 
     ! Write header
 
@@ -207,8 +207,8 @@ CONTAINS
         intn = b%dims(2)
         CALL MPI_FILE_WRITE(h%filehandle, y, intn, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -247,7 +247,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -257,13 +257,13 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
 
     IF (PRESENT(geometry)) THEN
       b%geometry = geometry
     ELSE
       b%geometry = c_geometry_cartesian
-    ENDIF
+    END IF
     b%ndims = ndims
 
     IF (PRESENT(rank_write)) h%rank_master = rank_write
@@ -279,7 +279,7 @@ CONTAINS
       b%extents(ndims+1) = REAL(x(b%dims(1)),r8)
       b%extents(ndims+2) = REAL(y(b%dims(2)),r8)
       b%extents(ndims+3) = REAL(z(b%dims(3)),r8)
-    ENDIF
+    END IF
 
     ! Write header
 
@@ -325,8 +325,8 @@ CONTAINS
         intn = b%dims(3)
         CALL MPI_FILE_WRITE(h%filehandle, z, intn, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -371,7 +371,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -384,18 +384,18 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
 
     IF (PRESENT(geometry)) THEN
       b%geometry = geometry
     ELSE
       b%geometry = c_geometry_cartesian
-    ENDIF
+    END IF
     b%ndims = ndims
 
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
-    ENDDO
+    END DO
 
     gmn(1) = xmin
     gmx(1) = xmax
@@ -421,7 +421,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -468,7 +468,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -484,18 +484,18 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
 
     IF (PRESENT(geometry)) THEN
       b%geometry = geometry
     ELSE
       b%geometry = c_geometry_cartesian
-    ENDIF
+    END IF
     b%ndims = ndims
 
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
-    ENDDO
+    END DO
 
     gmn(1) = xmin
     gmx(1) = xmax
@@ -523,7 +523,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + b%dims(1) * b%type_size
 
@@ -538,7 +538,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_WRITE_ALL(h%filehandle, y, 1, subarray(2), &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -585,7 +585,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -602,18 +602,18 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
 
     IF (PRESENT(geometry)) THEN
       b%geometry = geometry
     ELSE
       b%geometry = c_geometry_cartesian
-    ENDIF
+    END IF
     b%ndims = ndims
 
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
-    ENDDO
+    END DO
 
     gmn(1) = xmin
     gmx(1) = xmax
@@ -643,7 +643,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray(1), &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + b%dims(1) * b%type_size
 
@@ -657,7 +657,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_WRITE_ALL(h%filehandle, y, 1, subarray(2), &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + b%dims(2) * b%type_size
 
@@ -672,7 +672,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_WRITE_ALL(h%filehandle, z, 1, subarray(3), &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -713,13 +713,13 @@ CONTAINS
     DO i = 1,ndims
       b%dims(i) = INT(SIZE(x,i),i4)
       intn = intn * b%dims(i)
-    ENDDO
+    END DO
 
     IF (PRESENT(convert_in)) THEN
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -731,13 +731,13 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
 
     IF (PRESENT(geometry)) THEN
       b%geometry = geometry
     ELSE
       b%geometry = c_geometry_cartesian
-    ENDIF
+    END IF
     b%ndims = ndims
 
     IF (h%rank == h%rank_master) THEN
@@ -745,7 +745,7 @@ CONTAINS
       b%extents(2) = REAL(y(1,1),r8)
       b%extents(ndims+1) = REAL(x(b%dims(1),b%dims(2)),r8)
       b%extents(ndims+2) = REAL(y(b%dims(1),b%dims(2)),r8)
-    ENDIF
+    END IF
 
     ! Write header
 
@@ -776,8 +776,8 @@ CONTAINS
 
         CALL MPI_FILE_WRITE(h%filehandle, y, intn, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -816,13 +816,13 @@ CONTAINS
     DO i = 1,ndims
       b%dims(i) = INT(SIZE(x,i),i4)
       intn = intn * b%dims(i)
-    ENDDO
+    END DO
 
     IF (PRESENT(convert_in)) THEN
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -834,13 +834,13 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
 
     IF (PRESENT(geometry)) THEN
       b%geometry = geometry
     ELSE
       b%geometry = c_geometry_cartesian
-    ENDIF
+    END IF
     b%ndims = ndims
 
     IF (h%rank == h%rank_master) THEN
@@ -850,7 +850,7 @@ CONTAINS
       b%extents(ndims+1) = REAL(x(b%dims(1),b%dims(2),b%dims(3)),r8)
       b%extents(ndims+2) = REAL(y(b%dims(1),b%dims(2),b%dims(3)),r8)
       b%extents(ndims+3) = REAL(z(b%dims(1),b%dims(2),b%dims(3)),r8)
-    ENDIF
+    END IF
 
     ! Write header
 
@@ -888,8 +888,8 @@ CONTAINS
 
         CALL MPI_FILE_WRITE(h%filehandle, z, intn, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -934,7 +934,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -948,18 +948,18 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
 
     IF (PRESENT(geometry)) THEN
       b%geometry = geometry
     ELSE
       b%geometry = c_geometry_cartesian
-    ENDIF
+    END IF
     b%ndims = ndims
 
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
-    ENDDO
+    END DO
 
     gmn(1) = xmin
     gmx(1) = xmax
@@ -987,7 +987,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_WRITE_ALL(h%filehandle, x, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -1034,7 +1034,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -1049,18 +1049,18 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
 
     IF (PRESENT(geometry)) THEN
       b%geometry = geometry
     ELSE
       b%geometry = c_geometry_cartesian
-    ENDIF
+    END IF
     b%ndims = ndims
 
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
-    ENDDO
+    END DO
 
     gmn(1) = xmin
     gmx(1) = xmax
@@ -1097,7 +1097,7 @@ CONTAINS
 
       CALL MPI_FILE_WRITE_ALL(h%filehandle, y, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -1144,7 +1144,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -1160,18 +1160,18 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
 
     IF (PRESENT(geometry)) THEN
       b%geometry = geometry
     ELSE
       b%geometry = c_geometry_cartesian
-    ENDIF
+    END IF
     b%ndims = ndims
 
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
-    ENDDO
+    END DO
 
     gmn(1) = xmin
     gmx(1) = xmax
@@ -1217,7 +1217,7 @@ CONTAINS
 
       CALL MPI_FILE_WRITE_ALL(h%filehandle, z, 1, subarray, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -1261,7 +1261,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -1271,7 +1271,7 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
     b%ndims = ndims
     b%stagger = stagger
 
@@ -1279,11 +1279,11 @@ CONTAINS
     IF (nm > 1) THEN
       b%dims(nd) = nm
       nd = nd - 1
-    ENDIF
+    END IF
 
     DO i = 1,nd
       b%dims(i) = INT(dims(i),i4)
-    ENDDO
+    END DO
 
     ! Write header
 
@@ -1303,7 +1303,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -1347,7 +1347,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -1357,7 +1357,7 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
     b%ndims = ndims
     b%stagger = stagger
 
@@ -1365,11 +1365,11 @@ CONTAINS
     IF (nm > 1) THEN
       b%dims(nd) = nm
       nd = nd - 1
-    ENDIF
+    END IF
 
     DO i = 1,nd
       b%dims(i) = INT(dims(i),i4)
-    ENDDO
+    END DO
 
     ! Write header
 
@@ -1389,7 +1389,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -1433,7 +1433,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -1443,7 +1443,7 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
     b%ndims = ndims
     b%stagger = stagger
 
@@ -1451,11 +1451,11 @@ CONTAINS
     IF (nm > 1) THEN
       b%dims(nd) = nm
       nd = nd - 1
-    ENDIF
+    END IF
 
     DO i = 1,nd
       b%dims(i) = INT(dims(i),i4)
-    ENDDO
+    END DO
 
     ! Write header
 
@@ -1475,7 +1475,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -1519,7 +1519,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     IF (convert) THEN
       b%type_size = 4
@@ -1529,7 +1529,7 @@ CONTAINS
       b%type_size = sof
       b%datatype = datatype_real
       b%mpitype = mpitype_real
-    ENDIF
+    END IF
     b%ndims = ndims
     b%stagger = stagger
 
@@ -1537,11 +1537,11 @@ CONTAINS
     IF (nm > 1) THEN
       b%dims(nd) = nm
       nd = nd - 1
-    ENDIF
+    END IF
 
     DO i = 1,nd
       b%dims(i) = INT(dims(i),i4)
-    ENDDO
+    END DO
 
     ! Write header
 
@@ -1561,7 +1561,7 @@ CONTAINS
     ELSE
       CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -1597,7 +1597,7 @@ CONTAINS
 
     DO i = 1,ndims
       sz(i) = SIZE(variable,i)
-    ENDDO
+    END DO
 
     CALL write_1d_float_gen_r4(h, id, name, units, ndims, 1, dims, sz, &
         stagger, mesh_id, variable, distribution, subarray, convert, mult)
@@ -1630,7 +1630,7 @@ CONTAINS
 
     DO i = 1,ndims
       sz(i) = SIZE(variable,i)
-    ENDDO
+    END DO
 
     CALL write_2d_float_gen_r4(h, id, name, units, ndims, 1, dims, sz, &
         stagger, mesh_id, variable, distribution, subarray, convert, mult)
@@ -1663,7 +1663,7 @@ CONTAINS
 
     DO i = 1,ndims
       sz(i) = SIZE(variable,i)
-    ENDDO
+    END DO
 
     CALL write_3d_float_gen_r4(h, id, name, units, ndims, 1, dims, sz, &
         stagger, mesh_id, variable, distribution, subarray, convert, mult)
@@ -1697,7 +1697,7 @@ CONTAINS
 
     DO i = 1,ndims
       sz(i) = SIZE(variable,i)
-    ENDDO
+    END DO
 
     CALL write_1d_float_gen_r4(h, id, name, units, ndims, nm, dims, sz, &
         stagger, mesh_id, variable, distribution, subarray, convert, mult)
@@ -1731,7 +1731,7 @@ CONTAINS
 
     DO i = 1,ndims
       sz(i) = SIZE(variable,i)
-    ENDDO
+    END DO
 
     CALL write_2d_float_gen_r4(h, id, name, units, ndims, nm, dims, sz, &
         stagger, mesh_id, variable, distribution, subarray, convert, mult)
@@ -1765,7 +1765,7 @@ CONTAINS
 
     DO i = 1,ndims
       sz(i) = SIZE(variable,i)
-    ENDDO
+    END DO
 
     CALL write_3d_float_gen_r4(h, id, name, units, ndims, nm, dims, sz, &
         stagger, mesh_id, variable, distribution, subarray, convert, mult)
@@ -1799,7 +1799,7 @@ CONTAINS
 
     DO i = 1,ndims
       sz(i) = SIZE(variable,i)
-    ENDDO
+    END DO
 
     CALL write_4d_float_gen_r4(h, id, name, units, ndims, nm, dims, sz, &
         stagger, mesh_id, variable, distribution, subarray, convert, mult)
@@ -2024,18 +2024,18 @@ CONTAINS
       last = last_in
     ELSE
       last = .FALSE.
-    ENDIF
+    END IF
 
     DO i = 1,ndims+1
       sz(i) = INT(SIZE(variable,i),i4)
-    ENDDO
+    END DO
 
     ALLOCATE(variable_ids(nmat))
 
     nsize = 1
     DO i = 1,ndims
       nsize = nsize * dims(i)
-    ENDDO
+    END DO
     nsize = sof * nsize
 
     data_length = 0
@@ -2046,8 +2046,8 @@ CONTAINS
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(material_names(i)), variable_ids(i))
         data_length = data_length + nsize
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     h%datatype = datatype_real
 
@@ -2068,9 +2068,9 @@ CONTAINS
         CALL write_1d_var_first_r4(h, variable_ids(i), temp_name, units, dims, &
             sz, stagger, mesh_id, variable, idx, distribution, subarray, &
             convert, mult)
-      ENDIF
+      END IF
       h%data_location = h%data_location + nsize
-    ENDDO
+    END DO
 
     h%data_location = 0
 
@@ -2116,18 +2116,18 @@ CONTAINS
       last = last_in
     ELSE
       last = .FALSE.
-    ENDIF
+    END IF
 
     DO i = 1,ndims+1
       sz(i) = INT(SIZE(variable,i),i4)
-    ENDDO
+    END DO
 
     ALLOCATE(variable_ids(nmat))
 
     nsize = 1
     DO i = 1,ndims
       nsize = nsize * dims(i)
-    ENDDO
+    END DO
     nsize = sof * nsize
 
     data_length = 0
@@ -2138,8 +2138,8 @@ CONTAINS
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(material_names(i)), variable_ids(i))
         data_length = data_length + nsize
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     h%datatype = datatype_real
 
@@ -2160,9 +2160,9 @@ CONTAINS
         CALL write_2d_var_first_r4(h, variable_ids(i), temp_name, units, dims, &
             sz, stagger, mesh_id, variable, idx, distribution, subarray, &
             convert, mult)
-      ENDIF
+      END IF
       h%data_location = h%data_location + nsize
-    ENDDO
+    END DO
 
     h%data_location = 0
 
@@ -2208,18 +2208,18 @@ CONTAINS
       last = last_in
     ELSE
       last = .FALSE.
-    ENDIF
+    END IF
 
     DO i = 1,ndims+1
       sz(i) = INT(SIZE(variable,i),i4)
-    ENDDO
+    END DO
 
     ALLOCATE(variable_ids(nmat))
 
     nsize = 1
     DO i = 1,ndims
       nsize = nsize * dims(i)
-    ENDDO
+    END DO
     nsize = sof * nsize
 
     data_length = 0
@@ -2230,8 +2230,8 @@ CONTAINS
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(material_names(i)), variable_ids(i))
         data_length = data_length + nsize
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     h%datatype = datatype_real
 
@@ -2252,9 +2252,9 @@ CONTAINS
         CALL write_3d_var_first_r4(h, variable_ids(i), temp_name, units, dims, &
             sz, stagger, mesh_id, variable, idx, distribution, subarray, &
             convert, mult)
-      ENDIF
+      END IF
       h%data_location = h%data_location + nsize
-    ENDDO
+    END DO
 
     h%data_location = 0
 
@@ -2300,18 +2300,18 @@ CONTAINS
       last = last_in
     ELSE
       last = .FALSE.
-    ENDIF
+    END IF
 
     DO i = 1,ndims+1
       sz(i) = INT(SIZE(variable,i),i4)
-    ENDDO
+    END DO
 
     ALLOCATE(variable_ids(nmat))
 
     nsize = 1
     DO i = 1,ndims
       nsize = nsize * dims(i)
-    ENDDO
+    END DO
     nsize = sof * nsize
 
     data_length = 0
@@ -2322,8 +2322,8 @@ CONTAINS
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(material_names(i)), variable_ids(i))
         data_length = data_length + nsize
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     h%datatype = datatype_real
 
@@ -2344,9 +2344,9 @@ CONTAINS
         CALL write_1d_var_first_r4(h, variable_ids(i), temp_name, units, dims, &
             sz, stagger, mesh_id, variable, idx, distribution, subarray, &
             convert, mult)
-      ENDIF
+      END IF
       h%data_location = h%data_location + nsize
-    ENDDO
+    END DO
 
     h%data_location = 0
 
@@ -2392,18 +2392,18 @@ CONTAINS
       last = last_in
     ELSE
       last = .FALSE.
-    ENDIF
+    END IF
 
     DO i = 1,ndims+1
       sz(i) = INT(SIZE(variable,i),i4)
-    ENDDO
+    END DO
 
     ALLOCATE(variable_ids(nmat))
 
     nsize = 1
     DO i = 1,ndims
       nsize = nsize * dims(i)
-    ENDDO
+    END DO
     nsize = sof * nsize
 
     data_length = 0
@@ -2414,8 +2414,8 @@ CONTAINS
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(material_names(i)), variable_ids(i))
         data_length = data_length + nsize
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     h%datatype = datatype_real
 
@@ -2436,9 +2436,9 @@ CONTAINS
         CALL write_2d_var_first_r4(h, variable_ids(i), temp_name, units, dims, &
             sz, stagger, mesh_id, variable, idx, distribution, subarray, &
             convert, mult)
-      ENDIF
+      END IF
       h%data_location = h%data_location + nsize
-    ENDDO
+    END DO
 
     h%data_location = 0
 
@@ -2484,18 +2484,18 @@ CONTAINS
       last = last_in
     ELSE
       last = .FALSE.
-    ENDIF
+    END IF
 
     DO i = 1,ndims+1
       sz(i) = INT(SIZE(variable,i),i4)
-    ENDDO
+    END DO
 
     ALLOCATE(variable_ids(nmat))
 
     nsize = 1
     DO i = 1,ndims
       nsize = nsize * dims(i)
-    ENDDO
+    END DO
     nsize = sof * nsize
 
     data_length = 0
@@ -2506,8 +2506,8 @@ CONTAINS
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(material_names(i)), variable_ids(i))
         data_length = data_length + nsize
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     h%datatype = datatype_real
 
@@ -2528,9 +2528,9 @@ CONTAINS
         CALL write_3d_var_first_r4(h, variable_ids(i), temp_name, units, dims, &
             sz, stagger, mesh_id, variable, idx, distribution, subarray, &
             convert, mult)
-      ENDIF
+      END IF
       h%data_location = h%data_location + nsize
-    ENDDO
+    END DO
 
     h%data_location = 0
 
@@ -2577,18 +2577,18 @@ CONTAINS
       last = last_in
     ELSE
       last = .FALSE.
-    ENDIF
+    END IF
 
     DO i = 1,ndims+1
       sz(i) = INT(SIZE(variable,i),i4)
-    ENDDO
+    END DO
 
     ALLOCATE(variable_ids(nmat))
 
     nsize = 1
     DO i = 1,ndims
       nsize = nsize * dims(i)
-    ENDDO
+    END DO
     nsize = sof * nsize
 
     data_length = 0
@@ -2599,8 +2599,8 @@ CONTAINS
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(specnames(i)), variable_ids(i))
         data_length = data_length + nsize
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     h%datatype = datatype_real
 
@@ -2621,9 +2621,9 @@ CONTAINS
         CALL write_1d_var_first_r4(h, variable_ids(i), temp_name, units, dims, &
             sz, stagger, mesh_id, variable, idx, distribution, subarray, &
             convert, mult)
-      ENDIF
+      END IF
       h%data_location = h%data_location + nsize
-    ENDDO
+    END DO
 
     h%data_location = 0
 
@@ -2670,18 +2670,18 @@ CONTAINS
       last = last_in
     ELSE
       last = .FALSE.
-    ENDIF
+    END IF
 
     DO i = 1,ndims+1
       sz(i) = INT(SIZE(variable,i),i4)
-    ENDDO
+    END DO
 
     ALLOCATE(variable_ids(nmat))
 
     nsize = 1
     DO i = 1,ndims
       nsize = nsize * dims(i)
-    ENDDO
+    END DO
     nsize = sof * nsize
 
     data_length = 0
@@ -2692,8 +2692,8 @@ CONTAINS
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(specnames(i)), variable_ids(i))
         data_length = data_length + nsize
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     h%datatype = datatype_real
 
@@ -2714,9 +2714,9 @@ CONTAINS
         CALL write_2d_var_first_r4(h, variable_ids(i), temp_name, units, dims, &
             sz, stagger, mesh_id, variable, idx, distribution, subarray, &
             convert, mult)
-      ENDIF
+      END IF
       h%data_location = h%data_location + nsize
-    ENDDO
+    END DO
 
     h%data_location = 0
 
@@ -2763,18 +2763,18 @@ CONTAINS
       last = last_in
     ELSE
       last = .FALSE.
-    ENDIF
+    END IF
 
     DO i = 1,ndims+1
       sz(i) = INT(SIZE(variable,i),i4)
-    ENDDO
+    END DO
 
     ALLOCATE(variable_ids(nmat))
 
     nsize = 1
     DO i = 1,ndims
       nsize = nsize * dims(i)
-    ENDDO
+    END DO
     nsize = sof * nsize
 
     data_length = 0
@@ -2785,8 +2785,8 @@ CONTAINS
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(specnames(i)), variable_ids(i))
         data_length = data_length + nsize
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     h%datatype = datatype_real
 
@@ -2807,9 +2807,9 @@ CONTAINS
         CALL write_3d_var_first_r4(h, variable_ids(i), temp_name, units, dims, &
             sz, stagger, mesh_id, variable, idx, distribution, subarray, &
             convert, mult)
-      ENDIF
+      END IF
       h%data_location = h%data_location + nsize
-    ENDDO
+    END DO
 
     h%data_location = 0
 

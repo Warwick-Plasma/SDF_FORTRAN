@@ -35,7 +35,7 @@ CONTAINS
           'SDF source code', sdf_bytes, &
           sdf_bytes_padding, sdf_bytes_mimetype, &
           sdf_bytes_checksum_type, sdf_bytes_checksum)
-    ENDIF
+    END IF
 
     IF (SIZE(sdf_bytes) == 1 .AND. SIZE(sdf_diff_bytes) > 1) THEN
       n = n + 1
@@ -44,7 +44,7 @@ CONTAINS
           'SDF repository differences', sdf_diff_bytes, &
           sdf_diff_bytes_padding, sdf_diff_bytes_mimetype, &
           sdf_diff_bytes_checksum_type, sdf_diff_bytes_checksum)
-    ENDIF
+    END IF
 
     n = n + 1
     CALL sdf_safe_copy_id(h, 'sdf_source/info', stitched_ids(n))
@@ -60,7 +60,7 @@ CONTAINS
     ! Prevent truncation warning
     DO i = 1, 6
       string_array(i)(h%string_length:512) = ACHAR(0)
-    ENDDO
+    END DO
 
     CALL sdf_write_namevalue(h, stitched_ids(n), &
         'SDF repository information', &

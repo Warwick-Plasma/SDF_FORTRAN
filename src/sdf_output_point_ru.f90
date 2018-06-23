@@ -53,43 +53,43 @@ CONTAINS
       IF (PRESENT(dim_labels)) THEN
         DO i = 1,ndims
           CALL sdf_safe_copy_id(h, dim_labels(i), b%dim_labels(i))
-        ENDDO
+        END DO
       ELSE
         IF (ndims >= 1) CALL sdf_safe_copy_id(h, 'X', b%dim_labels(1))
         IF (ndims >= 2) CALL sdf_safe_copy_id(h, 'Y', b%dim_labels(2))
         IF (ndims >= 3) CALL sdf_safe_copy_id(h, 'Z', b%dim_labels(3))
-      ENDIF
+      END IF
 
       IF (PRESENT(dim_units)) THEN
         DO i = 1,ndims
           CALL sdf_safe_copy_id(h, dim_units(i), b%dim_units(i))
-        ENDDO
+        END DO
       ELSE
         DO i = 1,ndims
           CALL sdf_safe_copy_id(h, 'm', b%dim_units(i))
-        ENDDO
-      ENDIF
+        END DO
+      END IF
 
       IF (PRESENT(dim_mults)) THEN
         DO i = 1,ndims
           b%dim_mults(i) = REAL(dim_mults(i),r8)
-        ENDDO
+        END DO
       ELSE
         DO i = 1,ndims
           b%dim_mults(i) = 1.d0
-        ENDDO
-      ENDIF
+        END DO
+      END IF
 
       IF (PRESENT(species_id)) THEN
         CALL sdf_safe_copy_id(h, species_id, b%species_id)
       ELSE
         CALL sdf_safe_copy_id(h, '__unknown__', b%species_id)
-      ENDIF
+      END IF
 
       CALL sdf_write_block_header(h, id, name)
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_WRITE(h%filehandle, b%dim_mults, ndims, MPI_REAL8, &
@@ -97,11 +97,11 @@ CONTAINS
 
       DO i = 1,ndims
         CALL sdf_safe_write_id(h, b%dim_labels(i))
-      ENDDO
+      END DO
 
       DO i = 1,ndims
         CALL sdf_safe_write_id(h, b%dim_units(i))
-      ENDDO
+      END DO
 
       CALL MPI_FILE_WRITE(h%filehandle, b%geometry, 1, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
@@ -113,7 +113,7 @@ CONTAINS
           MPI_STATUS_IGNORE, errcode)
 
       CALL sdf_safe_write_id(h, b%species_id)
-    ENDIF
+    END IF
 
     h%current_location = b%block_start + b%info_length
     b%done_info = .TRUE.
@@ -137,13 +137,13 @@ CONTAINS
       b => h%current_block
       DO i = 1,b%ndims
         dim_mults8(i) = REAL(dim_mults(i),r8)
-      ENDDO
+      END DO
       CALL write_point_mesh_meta_r8(h, id, name, species_id, dim_labels, &
           dim_units, dim_mults8)
     ELSE
       CALL write_point_mesh_meta_r8(h, id, name, species_id, dim_labels, &
           dim_units)
-    ENDIF
+    END IF
 
   END SUBROUTINE write_point_mesh_meta_r4
 
@@ -187,12 +187,12 @@ CONTAINS
         b%mult = REAL(mult,r8)
       ELSE
         b%mult = 1.d0
-      ENDIF
+      END IF
 
       CALL sdf_write_block_header(h, id, name)
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_WRITE(h%filehandle, b%mult, 1, MPI_REAL8, &
@@ -206,7 +206,7 @@ CONTAINS
           MPI_STATUS_IGNORE, errcode)
 
       CALL sdf_safe_write_id(h, b%species_id)
-    ENDIF
+    END IF
 
     h%current_location = b%block_start + b%info_length
     b%done_info = .TRUE.
@@ -229,7 +229,7 @@ CONTAINS
     ELSE
       CALL write_point_variable_meta_r8(h, id, name, species_id, units, &
           mesh_id)
-    ENDIF
+    END IF
 
   END SUBROUTINE write_point_variable_meta_r4
 
@@ -284,7 +284,7 @@ CONTAINS
         ALLOCATE(cvalues(npoint_max))
       ELSE
         ALLOCATE(cvalues(npoint_global))
-      ENDIF
+      END IF
 
       idx = 1
       DO i = 1, npoint_global / npoint_max
@@ -294,13 +294,13 @@ CONTAINS
             cvalues(j) = ACHAR(1)
           ELSE
             cvalues(j) = ACHAR(0)
-          ENDIF
+          END IF
           n = n + 1
-        ENDDO
+        END DO
         CALL MPI_FILE_WRITE(h%filehandle, cvalues, npoint_max, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
         idx = idx + npoint_max
-      ENDDO
+      END DO
 
       n = idx
       DO j = 1, npoint_rem
@@ -308,14 +308,14 @@ CONTAINS
           cvalues(j) = ACHAR(1)
         ELSE
           cvalues(j) = ACHAR(0)
-        ENDIF
+        END IF
         n = n + 1
-      ENDDO
+      END DO
       CALL MPI_FILE_WRITE(h%filehandle, cvalues, npoint_rem, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
 
       DEALLOCATE(cvalues)
-    ENDIF
+    END IF
 
     h%current_location = b%data_location + b%data_length
     b%done_data = .TRUE.
@@ -424,11 +424,11 @@ CONTAINS
         CALL MPI_FILE_WRITE(h%filehandle, array(idx), npoint_max, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
         idx = idx + npoint_max
-      ENDDO
+      END DO
 
       CALL MPI_FILE_WRITE(h%filehandle, array(idx), npoint_rem, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = b%data_location + b%data_length
     b%done_data = .TRUE.
@@ -576,18 +576,18 @@ CONTAINS
         IF (h%print_errors .AND. h%rank == h%rank_master) THEN
           PRINT*, '*** ERROR ***'
           PRINT*, 'SDF library was unable to allocate memory for output buffer'
-        ENDIF
+        END IF
         h%error_code = c_err_sdf
         RETURN
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     IF (start) THEN
       IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*, '*** WARNING ***'
         PRINT*, 'SDF npoint_per_iteration reduced to ', npoint_per_iteration
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -627,7 +627,7 @@ CONTAINS
           b%mpitype, MPI_STATUS_IGNORE, errcode)
 
       file_offset = file_offset + npoint_this_cycle * b%type_size
-    ENDDO
+    END DO
 
     DEALLOCATE(array)
 
@@ -716,7 +716,7 @@ CONTAINS
       convert = convert_in
     ELSE
       convert = .FALSE.
-    ENDIF
+    END IF
 
     ! Allocate buffer arrays
 
@@ -739,18 +739,18 @@ CONTAINS
         IF (h%print_errors .AND. h%rank == h%rank_master) THEN
           PRINT*, '*** ERROR ***'
           PRINT*, 'SDF library was unable to allocate memory for output buffer'
-        ENDIF
+        END IF
         h%error_code = c_err_sdf
         RETURN
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     IF (start) THEN
       IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*, '*** WARNING ***'
         PRINT*, 'SDF npoint_per_iteration reduced to ', npoint_per_iteration
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -763,7 +763,7 @@ CONTAINS
       b%type_size = 8
       b%datatype = c_datatype_integer8
       b%mpitype = MPI_INTEGER8
-    ENDIF
+    END IF
     b%blocktype = c_blocktype_point_variable
     b%ndims = 1
     b%dims = 0
@@ -798,10 +798,10 @@ CONTAINS
       ELSE
         CALL MPI_FILE_WRITE_ALL(h%filehandle, array, npoint_this_cycle, &
             b%mpitype, MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
 
       file_offset = file_offset + npoint_this_cycle * b%type_size
-    ENDDO
+    END DO
 
     DEALLOCATE(array)
     IF (convert) DEALLOCATE(i4array)

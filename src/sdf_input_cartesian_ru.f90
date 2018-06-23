@@ -46,18 +46,18 @@ CONTAINS
 
       DO i = 1,b%ndims
         CALL read_entry_id(h, b%dim_labels(i))
-      ENDDO
+      END DO
 
       DO i = 1,b%ndims
         CALL read_entry_id(h, b%dim_units(i))
-      ENDDO
+      END DO
 
       CALL read_entry_int4(h, b%geometry)
 
       CALL read_entry_array_real8(h, b%extents, 2*INT(b%ndims))
 
       CALL read_entry_array_int4(h, b%dims, INT(b%ndims))
-    ENDIF
+    END IF
 
     IF (PRESENT(geometry)) geometry = b%geometry
     IF (PRESENT(dims)) dims(1:b%ndims) = b%dims(1:b%ndims)
@@ -100,18 +100,18 @@ CONTAINS
       CALL read_entry_array_int4(h, b%dims, INT(b%ndims))
 
       CALL read_entry_int4(h, b%stagger)
-    ENDIF
+    END IF
 
     IF (PRESENT(dims)) dims(1:b%ndims) = b%dims(1:b%ndims)
     IF (PRESENT(stagger)) stagger = b%stagger
     IF (PRESENT(units)) THEN
       clen = MIN(LEN(units),INT(c_id_length))
       units(1:clen) = b%units(1:clen)
-    ENDIF
+    END IF
     IF (PRESENT(mesh_id)) THEN
       clen = MIN(LEN(mesh_id),INT(c_id_length))
       mesh_id(1:clen) = b%mesh_id(1:clen)
-    ENDIF
+    END IF
 
     h%current_location = b%block_start + h%block_header_length
     b%done_info = .TRUE.
@@ -478,7 +478,7 @@ CONTAINS
 
     DO iloop = 1, b%ndims
       CALL sdf_safe_copy_string(b%material_names(iloop), material_names(iloop))
-    ENDDO
+    END DO
 
   END SUBROUTINE sdf_read_material_info
 
