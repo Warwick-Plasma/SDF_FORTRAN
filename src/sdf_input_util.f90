@@ -36,16 +36,16 @@ CONTAINS
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, h%buffer, &
             buflen, MPI_CHARACTER, MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
 
       CALL MPI_BCAST(h%buffer, buflen, MPI_CHARACTER, h%rank_master, &
           h%comm, errcode)
-    ENDIF
+    END IF
 
     h%start_location = h%summary_location
     DO i = 1,h%nblocks
       CALL sdf_read_next_block_info(h)
-    ENDDO
+    END DO
 
     IF (ASSOCIATED(h%buffer)) DEALLOCATE(h%buffer)
     NULLIFY(h%current_block)
@@ -108,7 +108,7 @@ CONTAINS
       CALL sdf_read_station_info(h)
     ELSE IF (b%blocktype == c_blocktype_namevalue) THEN
       CALL sdf_read_namevalue(h)
-    ENDIF
+    END IF
 
   END SUBROUTINE sdf_read_block_info
 
@@ -128,7 +128,7 @@ CONTAINS
 
     DO iloop = 1, b%ndims
       CALL sdf_safe_copy_string(b%variable_ids(iloop), variable_ids(iloop))
-    ENDDO
+    END DO
 
   END SUBROUTINE sdf_read_stitched_info
 
@@ -161,9 +161,9 @@ CONTAINS
       IF (b%blocktype == c_blocktype_station) THEN
         station_block => b
         found = .TRUE.
-      ENDIF
+      END IF
       b => b%next_block
-    ENDDO
+    END DO
 
     h%station_file = found
 
@@ -177,7 +177,7 @@ CONTAINS
       ns = INT(b%nelements-1)
     ELSE IF (ns < 0) THEN
       ns = 0
-    ENDIF
+    END IF
     nstep = ns
 
     offset = b%data_location + ns * b%type_size
@@ -197,7 +197,7 @@ CONTAINS
         IF (mpireal == MPI_REAL4) time8 = REAL(TRANSFER(time8, real4), r8)
         nstep = i
         IF (time8 <= time) EXIT
-      ENDDO
+      END DO
     ELSE IF (time8 < time) THEN
       DO i = ns+1, INT(b%nelements)
         offset = offset + b%type_size
@@ -206,8 +206,8 @@ CONTAINS
         IF (mpireal == MPI_REAL4) time8 = REAL(TRANSFER(time8, real4), r8)
         IF (time8 > time) EXIT
         nstep = i
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     h%current_block => b
     overwrite = .TRUE.
@@ -222,7 +222,7 @@ CONTAINS
     ELSE
        CALL MPI_FILE_SEEK(h%filehandle, offset, MPI_SEEK_SET, errcode)
        h%current_location = offset
-    ENDIF
+    END IF
 
 
   END FUNCTION sdf_station_seek_time
@@ -262,7 +262,7 @@ CONTAINS
           nstat_max = b%nstations * 11 / 10 + 2
           DEALLOCATE(extra_id)
           ALLOCATE(extra_id(nstat_max))
-        ENDIF
+        END IF
 
         ALLOCATE(b%station_index(b%nstations))
         found_id = .FALSE.
@@ -276,13 +276,13 @@ CONTAINS
             found = .TRUE.
             found_id(m) = .TRUE.
             EXIT
-          ENDDO
+          END DO
           IF (.NOT.found) THEN
             nextra = nextra + 1
             extra_id(nextra) = n
             b%station_index(n) = nstat_list_max + n
-          ENDIF
-        ENDDO
+          END IF
+        END DO
 
         IF (nextra == 0) CYCLE
 
@@ -295,7 +295,7 @@ CONTAINS
           ALLOCATE(h%station_ids(nstat_list_max+nextra))
           h%station_ids(1:nstat_list_max) = ctmp(1:nstat_list_max)
           DEALLOCATE(ctmp)
-        ENDIF
+        END IF
 
         DEALLOCATE(found_id)
         ALLOCATE(found_id(nstat_list_max+nextra))
@@ -304,15 +304,15 @@ CONTAINS
         DO n = 1,nextra
           m = m + 1
           h%station_ids(m) = b%station_ids(extra_id(n))
-        ENDDO
+        END DO
 
         nstat_list_max = nstat_list_max + nextra
-      ENDDO
+      END DO
 
       h%nstations = nstat_list_max
 
       DEALLOCATE(extra_id, found_id)
-    ENDIF
+    END IF
 
     IF (PRESENT(nstations)) nstations = nstat_list_max
 
@@ -320,8 +320,8 @@ CONTAINS
       ALLOCATE(station_ids(h%nstations))
       DO n = 1,h%nstations
         station_ids(n) = h%station_ids(n)
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
   END SUBROUTINE sdf_get_all_stations
 

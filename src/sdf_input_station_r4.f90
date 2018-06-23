@@ -42,8 +42,8 @@ CONTAINS
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
             errcode)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       IF (b%variable_types(1) == c_datatype_real4) THEN
@@ -58,9 +58,9 @@ CONTAINS
          time = REAL(r8array(1), r4)
          array = REAL(r8array(2:), r4)
          DEALLOCATE(r8array)
-      ENDIF
+      END IF
       h%current_location = h%current_location + b%type_size
-    ENDIF
+    END IF
 
     step = h%step
     b%done_data = .TRUE.

@@ -32,7 +32,7 @@ CONTAINS
       h%error_code = c_err_unsupported_file + 64 * h%nblocks
       h%handled_error = .TRUE.
       RETURN
-    ENDIF
+    END IF
 
     CALL read_entry_int4(h, h%endianness)
 
@@ -43,7 +43,7 @@ CONTAINS
       h%error_code = c_err_unsupported_file + 64 * h%nblocks
       h%handled_error = .TRUE.
       RETURN
-    ENDIF
+    END IF
 
     CALL read_entry_int4(h, h%file_revision)
 
@@ -91,9 +91,9 @@ CONTAINS
       IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** WARNING ***'
         PRINT*,'SDF header already read. Ignoring extra call.'
-      ENDIF
+      END IF
       RETURN
-    ENDIF
+    END IF
 
     ALLOCATE(h%buffer(c_header_length))
 
@@ -102,7 +102,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, h%buffer, c_header_length, &
           MPI_CHARACTER, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(h%buffer, c_header_length, MPI_CHARACTER, h%rank_master, &
         h%comm, errcode)
@@ -118,7 +118,7 @@ CONTAINS
       IF (h%rank == h%rank_master) &
           PRINT *, 'Revision number of file is too high. Writing disabled'
       h%writing = .FALSE.
-    ENDIF
+    END IF
 
     h%current_location = h%first_block_location
     h%done_header = .TRUE.
@@ -140,22 +140,22 @@ CONTAINS
       IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** WARNING ***'
         PRINT*,'SDF block not initialised. Ignoring call.'
-      ENDIF
+      END IF
       RETURN
-    ENDIF
+    END IF
 
     b => h%current_block
 
     IF (b%done_header) THEN
       h%current_location = b%block_start + h%block_header_length
       RETURN
-    ENDIF
+    END IF
 
     h%current_location = b%block_start
     IF (.NOT. ASSOCIATED(h%buffer)) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
-    ENDIF
+    END IF
 
     CALL read_entry_int8(h, b%next_block_location)
 
@@ -209,7 +209,7 @@ CONTAINS
       IF (PRESENT(id)) THEN
         CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
             errcode)
-      ENDIF
+      END IF
 
       CALL read_block_header(h)
 
@@ -231,10 +231,10 @@ CONTAINS
       ELSE IF (b%datatype == c_datatype_logical) THEN
         b%type_size = 1
         b%mpitype = MPI_CHARACTER
-      ENDIF
+      END IF
 
       b%done_header = .TRUE.
-    ENDIF
+    END IF
 
     IF (PRESENT(id)) CALL sdf_safe_copy_string(b%id, id)
     IF (PRESENT(name)) CALL sdf_safe_copy_string(b%name, name)
@@ -320,8 +320,8 @@ CONTAINS
         b%run%minor_rev = 0
       ELSE
         CALL read_entry_int4(h, b%run%minor_rev)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     version = b%run%version
     revision = b%run%revision
@@ -400,7 +400,7 @@ CONTAINS
     IF (.NOT. ASSOCIATED(h%buffer)) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
-    ENDIF
+    END IF
 
     IF (b%datatype == c_datatype_integer4) THEN
       CALL read_entry_int4(h, int4)
@@ -417,7 +417,7 @@ CONTAINS
     ELSE IF (b%datatype == c_datatype_logical) THEN
       CALL read_entry_logical(h, logic)
       b%const_value(1:sol) = TRANSFER(logic, b%const_value(1:sol))
-    ENDIF
+    END IF
 
     b%done_info = .TRUE.
     b%done_data = .TRUE.
@@ -444,7 +444,7 @@ CONTAINS
     ELSE IF (b%datatype == c_datatype_integer8) THEN
       integer8 = TRANSFER(b%const_value, integer8)
       value = INT(integer8)
-    ENDIF
+    END IF
 
   END SUBROUTINE read_constant_integer
 
@@ -481,7 +481,7 @@ CONTAINS
     IF (b%done_info) THEN
       IF (PRESENT(dims)) dims(1:b%ndims) = b%dims(1:b%ndims)
       RETURN
-    ENDIF
+    END IF
 
     ! Size of array
     CALL read_entry_array_int4(h, b%dims, INT(b%ndims))
@@ -514,7 +514,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, values, n1, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(values, n1, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -545,7 +545,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, values, n1, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(values, n1, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -576,7 +576,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, values, n1, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(values, n1, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -610,7 +610,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, cvalues, n1, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(cvalues, n1, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -619,8 +619,8 @@ CONTAINS
         values(i) = .FALSE.
       ELSE
         values(i) = .TRUE.
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     DEALLOCATE(cvalues)
 
@@ -656,12 +656,12 @@ CONTAINS
       DO i = 1,n2
         CALL MPI_FILE_READ(h%filehandle, values(i), n1, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     DO i = 1,n2
       CALL MPI_BCAST(values(i), n1, b%mpitype, h%rank_master, h%comm, errcode)
-    ENDDO
+    END DO
 
     h%current_location = b%next_block_location
     b%done_data = .TRUE.
@@ -682,7 +682,7 @@ CONTAINS
     IF (.NOT.b%done_info) THEN
       CALL read_entry_int4(h, b%geometry)
       CALL read_entry_array_int4(h, b%dims, INT(b%ndims))
-    ENDIF
+    END IF
 
     IF (PRESENT(dims)) dims(1:b%ndims) = b%dims(1:b%ndims)
     IF (PRESENT(geometry)) geometry = b%geometry
@@ -712,7 +712,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, part, n1, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(part, n1, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -745,7 +745,7 @@ CONTAINS
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, n1, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(x, n1, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -755,10 +755,10 @@ CONTAINS
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, y, n1, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
 
       CALL MPI_BCAST(y, n1, b%mpitype, h%rank_master, h%comm, errcode)
-    ENDIF
+    END IF
 
     IF (PRESENT(z)) THEN
       n1 = b%dims(3)
@@ -766,10 +766,10 @@ CONTAINS
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, z, n1, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
 
       CALL MPI_BCAST(z, n1, b%mpitype, h%rank_master, h%comm, errcode)
-    ENDIF
+    END IF
 
     h%current_location = b%next_block_location
     b%done_data = .TRUE.
@@ -794,7 +794,7 @@ CONTAINS
     IF (.NOT. ASSOCIATED(h%buffer)) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
-    ENDIF
+    END IF
 
     ! Metadata is
     ! - stagger   INTEGER(i4)
@@ -808,7 +808,7 @@ CONTAINS
     ALLOCATE(b%variable_ids(b%ndims))
     DO iloop = 1, b%ndims
       CALL read_entry_id(h, b%variable_ids(iloop))
-    ENDDO
+    END DO
 
     b%done_info = .TRUE.
     b%done_data = .TRUE.
@@ -833,7 +833,7 @@ CONTAINS
     IF (.NOT. ASSOCIATED(h%buffer)) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
-    ENDIF
+    END IF
 
     ! Metadata is
     ! - stagger   INTEGER(i4)
@@ -848,12 +848,12 @@ CONTAINS
     ALLOCATE(b%material_names(b%ndims))
     DO iloop = 1, b%ndims
       CALL read_entry_string(h, b%material_names(iloop))
-    ENDDO
+    END DO
 
     ALLOCATE(b%variable_ids(b%ndims))
     DO iloop = 1, b%ndims
       CALL read_entry_id(h, b%variable_ids(iloop))
-    ENDDO
+    END DO
 
     b%done_info = .TRUE.
     b%done_data = .TRUE.
@@ -878,7 +878,7 @@ CONTAINS
     IF (.NOT. ASSOCIATED(h%buffer)) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
-    ENDIF
+    END IF
 
     ! Metadata is
     ! - stagger   INTEGER(i4)
@@ -895,7 +895,7 @@ CONTAINS
     ALLOCATE(b%variable_ids(b%ndims))
     DO iloop = 1, b%ndims
       CALL read_entry_id(h, b%variable_ids(iloop))
-    ENDDO
+    END DO
 
     b%done_info = .TRUE.
     b%done_data = .TRUE.
@@ -920,7 +920,7 @@ CONTAINS
     IF (.NOT. ASSOCIATED(h%buffer)) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
-    ENDIF
+    END IF
 
     ! Metadata is
     ! - stagger   INTEGER(i4)
@@ -941,12 +941,12 @@ CONTAINS
     ALLOCATE(b%material_names(b%ndims))
     DO iloop = 1, b%ndims
       CALL read_entry_string(h, b%material_names(iloop))
-    ENDDO
+    END DO
 
     ALLOCATE(b%variable_ids(b%ndims))
     DO iloop = 1, b%ndims
       CALL read_entry_id(h, b%variable_ids(iloop))
-    ENDDO
+    END DO
 
     b%done_info = .TRUE.
     b%done_data = .TRUE.
@@ -981,7 +981,7 @@ CONTAINS
     ALLOCATE(b%material_names(b%ndims))
     DO iloop = 1, b%ndims
       CALL read_entry_string(h, b%material_names(iloop))
-    ENDDO
+    END DO
 
     b%done_info = .TRUE.
     b%done_data = .TRUE.
@@ -1004,7 +1004,7 @@ CONTAINS
 
     DO iloop = 1, b%ndims
       CALL sdf_safe_copy_string(b%material_names(iloop), material_names(iloop))
-    ENDDO
+    END DO
 
   END SUBROUTINE sdf_read_obstacle_group_info
 
@@ -1024,15 +1024,15 @@ CONTAINS
       DO j = 1,n
         buf(j:j) = h%buffer(i)
         i = i + 1
-      ENDDO
+      END DO
       value = TRANSFER(buf, value)
     ELSE
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, value, 1, mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
       CALL MPI_BCAST(value, 1, mpitype, h%rank_master, h%comm, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + n
 
@@ -1054,15 +1054,15 @@ CONTAINS
       DO j = 1,n
         buf(j:j) = h%buffer(i)
         i = i + 1
-      ENDDO
+      END DO
       value = TRANSFER(buf, value)
     ELSE
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, value, 1, mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
       CALL MPI_BCAST(value, 1, mpitype, h%rank_master, h%comm, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + n
 
@@ -1084,15 +1084,15 @@ CONTAINS
       DO j = 1,n
         buf(j:j) = h%buffer(i)
         i = i + 1
-      ENDDO
+      END DO
       value = TRANSFER(buf, value)
     ELSE
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, value, 1, mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
       CALL MPI_BCAST(value, 1, mpitype, h%rank_master, h%comm, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + n
 
@@ -1114,15 +1114,15 @@ CONTAINS
       DO j = 1,n
         buf(j:j) = h%buffer(i)
         i = i + 1
-      ENDDO
+      END DO
       value = TRANSFER(buf, value)
     ELSE
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, value, 1, mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
       CALL MPI_BCAST(value, 1, mpitype, h%rank_master, h%comm, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + n
 
@@ -1146,15 +1146,15 @@ CONTAINS
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, value, 1, mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
       CALL MPI_BCAST(value, 1, mpitype, h%rank_master, h%comm, errcode)
-    ENDIF
+    END IF
 
     IF (value(1:1) == ACHAR(1)) THEN
       ovalue = .TRUE.
     ELSE
       ovalue = .FALSE.
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + n
 
@@ -1178,22 +1178,22 @@ CONTAINS
         value(j:j) = h%buffer(i+j-1)
         IF (value(j:j) == ACHAR(0)) EXIT
         idx = idx + 1
-      ENDDO
+      END DO
     ELSE
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, value, n, mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
       CALL MPI_BCAST(value, n, mpitype, h%rank_master, h%comm, errcode)
       DO j = 1,n
         IF (value(j:j) == ACHAR(0)) EXIT
         idx = idx + 1
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     DO j = idx,n
       value(j:j) = ' '
-    ENDDO
+    END DO
 
     h%current_location = h%current_location + n
 
@@ -1239,16 +1239,16 @@ CONTAINS
         DO k = 1,n
           buf(k:k) = h%buffer(i)
           i = i + 1
-        ENDDO
+        END DO
         value(j) = TRANSFER(buf, value(1))
-      ENDDO
+      END DO
     ELSE
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, value, nentries, mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
       CALL MPI_BCAST(value, nentries, mpitype, h%rank_master, h%comm, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + n * nentries
 
@@ -1272,16 +1272,16 @@ CONTAINS
         DO k = 1,n
           buf(k:k) = h%buffer(i)
           i = i + 1
-        ENDDO
+        END DO
         value(j) = TRANSFER(buf, value(1))
-      ENDDO
+      END DO
     ELSE
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, value, nentries, mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
       CALL MPI_BCAST(value, nentries, mpitype, h%rank_master, h%comm, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + n * nentries
 
@@ -1305,16 +1305,16 @@ CONTAINS
         DO k = 1,n
           buf(k:k) = h%buffer(i)
           i = i + 1
-        ENDDO
+        END DO
         value(j) = TRANSFER(buf, value(1))
-      ENDDO
+      END DO
     ELSE
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, value, nentries, mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
       CALL MPI_BCAST(value, nentries, mpitype, h%rank_master, h%comm, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + n * nentries
 
@@ -1338,16 +1338,16 @@ CONTAINS
         DO k = 1,n
           buf(k:k) = h%buffer(i)
           i = i + 1
-        ENDDO
+        END DO
         value(j) = TRANSFER(buf, value(1))
-      ENDDO
+      END DO
     ELSE
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, value, nentries, mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
       CALL MPI_BCAST(value, nentries, mpitype, h%rank_master, h%comm, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + n * nentries
 
@@ -1369,14 +1369,14 @@ CONTAINS
       DO j = 1, nentries
         value(j) = h%buffer(i)
         i = i + 1
-      ENDDO
+      END DO
     ELSE
       IF (h%rank == h%rank_master) THEN
         CALL MPI_FILE_READ(h%filehandle, value, nentries, mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
       CALL MPI_BCAST(value, nentries, mpitype, h%rank_master, h%comm, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%current_location + n * nentries
 
@@ -1447,7 +1447,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, string_l, length, mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
     CALL MPI_BCAST(string_l, length, mpitype, h%rank_master, h%comm, errcode)
 
     string = ' '
@@ -1466,11 +1466,11 @@ CONTAINS
       IF (h%print_errors .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** ERROR ***'
         PRINT*,'SDF header has not been read. Unable to read block.'
-      ENDIF
+      END IF
       h%error_code = c_err_sdf
       error = .TRUE.
       RETURN
-    ENDIF
+    END IF
 
     error = .FALSE.
 
@@ -1487,11 +1487,11 @@ CONTAINS
       IF (h%print_errors .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** ERROR ***'
         PRINT*,'SDF block header has not been read. Ignoring call.'
-      ENDIF
+      END IF
       h%error_code = c_err_sdf
       error = .TRUE.
       RETURN
-    ENDIF
+    END IF
 
     error = .FALSE.
 
@@ -1517,7 +1517,7 @@ CONTAINS
     IF (.NOT. ASSOCIATED(h%buffer)) THEN
       CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
           errcode)
-    ENDIF
+    END IF
 
   END FUNCTION sdf_info_init
 
@@ -1538,7 +1538,7 @@ CONTAINS
 
       DO i = 1,b%ndims
         CALL read_entry_string(h, b%material_names(i))
-      ENDDO
+      END DO
 
       IF (b%datatype == c_datatype_integer4) THEN
         ALLOCATE(b%i4_array(b%ndims))
@@ -1564,14 +1564,14 @@ CONTAINS
         ALLOCATE(b%string_array(b%ndims))
         CALL read_entry_array_string(h, b%string_array, INT(b%ndims))
 
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     IF (PRESENT(names)) THEN
       DO i = 1,b%ndims
         CALL sdf_safe_copy_string(b%material_names(i), names(i))
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     h%current_location = b%data_location + b%data_length
     b%done_info = .TRUE.
@@ -1595,7 +1595,7 @@ CONTAINS
 
     DO i = 1,b%ndims
       values(i) = b%i4_array(i)
-    ENDDO
+    END DO
 
   END SUBROUTINE read_namevalue_i4
 
@@ -1615,7 +1615,7 @@ CONTAINS
 
     DO i = 1,b%ndims
       values(i) = b%i8_array(i)
-    ENDDO
+    END DO
 
   END SUBROUTINE read_namevalue_i8
 
@@ -1635,7 +1635,7 @@ CONTAINS
 
     DO i = 1,b%ndims
       values(i) = b%r4_array(i)
-    ENDDO
+    END DO
 
   END SUBROUTINE read_namevalue_r4
 
@@ -1655,7 +1655,7 @@ CONTAINS
 
     DO i = 1,b%ndims
       values(i) = b%r8_array(i)
-    ENDDO
+    END DO
 
   END SUBROUTINE read_namevalue_r8
 
@@ -1678,8 +1678,8 @@ CONTAINS
         values(i) = .FALSE.
       ELSE
         values(i) = .TRUE.
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
   END SUBROUTINE read_namevalue_logical
 
@@ -1699,7 +1699,7 @@ CONTAINS
 
     DO i = 1,b%ndims
       CALL sdf_safe_copy_string(b%string_array(i), values(i))
-    ENDDO
+    END DO
 
   END SUBROUTINE read_namevalue_string
 

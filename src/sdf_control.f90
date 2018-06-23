@@ -45,13 +45,13 @@ CONTAINS
       h%error_code = c_err_unsupported_datarep + 64 * h%nblocks
       h%handled_error = .TRUE.
       RETURN
-    ENDIF
+    END IF
 
     IF (PRESENT(mode)) THEN
       file_mode = mode
     ELSE
       file_mode = c_sdf_write
-    ENDIF
+    END IF
 
     IF (file_mode == c_sdf_write) THEN
       h%writing = .TRUE.
@@ -62,7 +62,7 @@ CONTAINS
         INQUIRE(file=TRIM(filename), exist=exists)
         IF (exists) &
             CALL MPI_FILE_DELETE(TRIM(filename), MPI_INFO_NULL, errcode)
-      ENDIF
+      END IF
     ELSE IF (file_mode == c_sdf_append) THEN
       h%writing = .TRUE.
       h%mode = MPI_MODE_CREATE + MPI_MODE_RDWR
@@ -70,7 +70,7 @@ CONTAINS
       ! We're opening a file which already exists, so don't damage it
       h%writing = .FALSE.
       h%mode = MPI_MODE_RDONLY
-    ENDIF
+    END IF
 
     CALL MPI_INFO_CREATE(info, errcode)
     CALL MPI_INFO_SET(info, 'romio_cb_write', 'enable', errcode)
@@ -85,11 +85,11 @@ CONTAINS
         CALL MPI_FILE_GET_ERRHANDLER(MPI_FILE_NULL, errcode, ierr)
         IF (errcode /= h%old_errhandler) THEN
           CALL MPI_FILE_SET_ERRHANDLER(MPI_FILE_NULL, h%old_errhandler, errcode)
-        ENDIF
+        END IF
         h%old_errhandler = MPI_ERRHANDLER_NULL
 
         CALL MPI_FILE_SET_ERRHANDLER(h%filehandle, h%errhandler, errcode)
-      ENDIF
+      END IF
 
       DO i = 1, max_handles
         IF (sdf_handles(i)%filehandle == 0) THEN
@@ -97,9 +97,9 @@ CONTAINS
           sdf_handles(i)%handle => h
           open_handles = open_handles + 1
           EXIT
-        ENDIF
-      ENDDO
-    ENDIF
+        END IF
+      END DO
+    END IF
 
   END SUBROUTINE sdf_open
 
@@ -118,7 +118,7 @@ CONTAINS
       IF (.NOT.h%station_file) CALL sdf_write_summary(h)
 
       CALL sdf_flush(h)
-    ENDIF
+    END IF
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -161,7 +161,7 @@ CONTAINS
       next => b%next_block
       CALL sdf_destroy_block(b)
       b => next
-    ENDDO
+    END DO
 
     NULLIFY(h%blocklist)
     NULLIFY(h%current_block)
@@ -245,7 +245,7 @@ CONTAINS
       sdf_errorcode = h%error_code
     ELSE
       sdf_errorcode = c_err_success
-    ENDIF
+    END IF
 
   END FUNCTION sdf_errorcode
 

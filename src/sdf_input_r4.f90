@@ -55,7 +55,7 @@ CONTAINS
     ELSE IF (b%datatype == c_datatype_real8) THEN
       real8 = TRANSFER(b%const_value, real8)
       value = REAL(real8,r4)
-    ENDIF
+    END IF
 
   END SUBROUTINE read_constant_real_r4
 
@@ -81,7 +81,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, values, n1, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(values, n1, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -112,7 +112,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, values, n1, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(values, n1, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -143,7 +143,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, values, n1, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(values, n1, b%mpitype, h%rank_master, h%comm, errcode)
 

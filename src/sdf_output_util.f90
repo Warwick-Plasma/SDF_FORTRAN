@@ -48,7 +48,7 @@ CONTAINS
       h%current_block => b
 
       CALL sdf_write_block_info(h)
-    ENDDO
+    END DO
 
     h%summary_size = INT(h%current_location - h%summary_location,i4)
 
@@ -104,7 +104,7 @@ CONTAINS
       CALL write_namevalue_meta(h)
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
   END SUBROUTINE sdf_write_block_info
 

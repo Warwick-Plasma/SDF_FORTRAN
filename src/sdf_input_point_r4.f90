@@ -37,14 +37,14 @@ CONTAINS
       DO i = 1,b%ndims
         clen = MIN(LEN(dim_labels(i)),INT(c_id_length))
         dim_labels(i)(1:clen) = b%dim_labels(i)(1:clen)
-      ENDDO
-    ENDIF
+      END DO
+    END IF
     IF (PRESENT(dim_units)) THEN
       DO i = 1,b%ndims
         clen = MIN(LEN(dim_units(i)),INT(c_id_length))
         dim_units(i)(1:clen) = b%dim_units(i)(1:clen)
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
   END SUBROUTINE read_point_mesh_info_r4
 
@@ -72,7 +72,7 @@ CONTAINS
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, npoints, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(x, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -105,14 +105,14 @@ CONTAINS
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, npoints, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(x, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, y, npoints, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(y, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -145,21 +145,21 @@ CONTAINS
           errcode)
       CALL MPI_FILE_READ(h%filehandle, x, npoints, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(x, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, y, npoints, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(y, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ(h%filehandle, z, npoints, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(z, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -224,10 +224,10 @@ CONTAINS
         start = .FALSE.
         npoint_this_it8 = MIN(npoint_remain, npoint_per_it8)
         npoint_this_it  = INT(npoint_this_it8)
-      ENDDO
+      END DO
 
       h%current_location = h%current_location + b%npoints * b%type_size
-    ENDDO
+    END DO
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -312,7 +312,7 @@ CONTAINS
       npoint_remain = npoint_remain - npoint_this_it8
       ret = iterator(array, npoint_this_it, start, param)
       start = .FALSE.
-    ENDDO
+    END DO
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -347,7 +347,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, array, npoints, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(array, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 

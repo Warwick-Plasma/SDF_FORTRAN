@@ -77,7 +77,7 @@ CONTAINS
         IF (b%ndims > 1) b%station_grid(i,2) = station_y(i)
         IF (b%ndims > 2) b%station_grid(i,3) = station_z(i)
         b%nvariables = b%nvariables + b%station_nvars(i)
-      ENDDO
+      END DO
 
       b%use_mult = .FALSE.
       IF (PRESENT(variable_mults)) b%use_mult = .TRUE.
@@ -96,8 +96,8 @@ CONTAINS
         b%variable_types(i) = variable_types(i)
         IF (b%use_mult) b%dim_mults(i) = variable_mults(i)
         b%type_size = b%type_size + c_type_sizes(b%variable_types(i))
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     use_mult = 0
     IF (b%use_mult) use_mult = 1
@@ -136,7 +136,7 @@ CONTAINS
         CALL sdf_write_block_header(h, id, name)
       ELSE
         CALL write_block_header(h)
-      ENDIF
+      END IF
 
       CALL MPI_FILE_WRITE(h%filehandle, b%nelements, 1, MPI_INTEGER8, &
           MPI_STATUS_IGNORE, errcode)
@@ -162,10 +162,10 @@ CONTAINS
           MPI_STATUS_IGNORE, errcode)
       DO i = 1,b%nstations
         CALL sdf_safe_write_id(h, b%station_ids(i))
-      ENDDO
+      END DO
       DO i = 1,b%nstations
         CALL sdf_safe_write_string(h, b%station_names(i))
-      ENDDO
+      END DO
       CALL MPI_FILE_WRITE(h%filehandle, b%station_nvars, nstations, &
           MPI_INTEGER, MPI_STATUS_IGNORE, errcode)
       CALL MPI_FILE_WRITE(h%filehandle, b%station_move, nstations, &
@@ -173,23 +173,23 @@ CONTAINS
       DO i = 1,b%ndims
         CALL MPI_FILE_WRITE(h%filehandle, b%station_grid(1,i), nstations, &
             MPI_REAL8, MPI_STATUS_IGNORE, errcode)
-      ENDDO
+      END DO
       DO i = 1,b%nvariables
         CALL sdf_safe_write_id(h, b%variable_ids(i))
-      ENDDO
+      END DO
       DO i = 1,b%nvariables
         CALL sdf_safe_write_string(h, b%material_names(i))
-      ENDDO
+      END DO
       CALL MPI_FILE_WRITE(h%filehandle, b%variable_types, b%nvariables, &
           MPI_INTEGER, MPI_STATUS_IGNORE, errcode)
       DO i = 1,b%nvariables
         CALL sdf_safe_write_id(h, b%dim_units(i))
-      ENDDO
+      END DO
       IF (b%use_mult) THEN
         CALL MPI_FILE_WRITE(h%filehandle, b%dim_mults, b%nvariables, &
             MPI_REAL8, MPI_STATUS_IGNORE, errcode)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     h%current_location = b%block_start + b%info_length
     b%done_info = .TRUE.
@@ -235,7 +235,7 @@ CONTAINS
           station_names, station_nvars, station_move, REAL(station_x,r8), &
           dummy, dummy, variable_ids, &
           variable_names, variable_types, variable_units)
-    ENDIF
+    END IF
 
   END SUBROUTINE write_station_header_1d_r4
 
@@ -278,7 +278,7 @@ CONTAINS
           station_names, station_nvars, station_move, REAL(station_x,r8), &
           REAL(station_y,r8), dummy, variable_ids, &
           variable_names, variable_types, variable_units)
-    ENDIF
+    END IF
 
   END SUBROUTINE write_station_header_2d_r4
 
@@ -320,7 +320,7 @@ CONTAINS
           station_names, station_nvars, station_move, REAL(station_x,r8), &
           REAL(station_y,r8), REAL(station_z,r8), variable_ids, &
           variable_names, variable_types, variable_units)
-    ENDIF
+    END IF
 
   END SUBROUTINE write_station_header_3d_r4
 
@@ -438,7 +438,7 @@ CONTAINS
       offset = b%block_start + h%block_header_length
       CALL MPI_FILE_WRITE_AT(h%filehandle, offset, b%nelements, 1, &
           MPI_INTEGER8, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL sdf_update(h)
 
@@ -467,8 +467,8 @@ CONTAINS
       ELSE
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(material_names(i)), variable_ids(i))
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     CALL sdf_write_stitched_material(h, id, name, mesh_id, stagger, &
         material_names, variable_ids, nmat)
@@ -502,8 +502,8 @@ CONTAINS
       ELSE
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(material_names(i)), variable_ids(i))
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     CALL sdf_write_stitched_matvar(h, id, name, mesh_id, stagger, &
         material_id, variable_ids, nmat)
@@ -538,8 +538,8 @@ CONTAINS
       ELSE
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(specnames(i)), variable_ids(i))
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     CALL sdf_write_stitched_species(h, id, name, mesh_id, stagger, &
         material_id, material_name, specnames, variable_ids, nmat)

@@ -32,16 +32,16 @@ CONTAINS
       IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** WARNING ***'
         PRINT*,'SDF header already written. Ignoring extra call.'
-      ENDIF
+      END IF
       RETURN
-    ENDIF
+    END IF
 
     IF (PRESENT(jobid)) THEN
       h%jobid = jobid
     ELSE
       h%jobid%start_seconds = 0
       h%jobid%start_milliseconds = 0
-    ENDIF
+    END IF
 
     ! header length - must be updated if sdf_write_header changes
     h%first_block_location = c_header_length
@@ -131,7 +131,7 @@ CONTAINS
         flag = ACHAR(1)
       ELSE
         flag = ACHAR(0)
-      ENDIF
+      END IF
 
       ! restart_flag
       ! c_summary_offset + 8 * soi4 + soi8 + sof8
@@ -148,7 +148,7 @@ CONTAINS
         flag = ACHAR(1)
       ELSE
         flag = ACHAR(0)
-      ENDIF
+      END IF
 
       ! station_file
       ! c_summary_offset + 8 * soi4 + soi8 + sof8 + 2
@@ -160,7 +160,7 @@ CONTAINS
       padding = ACHAR(0)
       CALL MPI_FILE_WRITE(h%filehandle, padding, 5, &
           MPI_CHARACTER, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = h%first_block_location
     h%done_header = .TRUE.
@@ -230,7 +230,7 @@ CONTAINS
       block_info_length = INT(b%info_length - h%block_header_length)
       CALL MPI_FILE_WRITE(h%filehandle, block_info_length, 1, &
           MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = b%block_start + h%block_header_length
     b%done_header = .TRUE.
@@ -263,17 +263,17 @@ CONTAINS
       IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** WARNING ***'
         PRINT*,'SDF header not yet written. Ignoring write call.'
-      ENDIF
+      END IF
       RETURN
-    ENDIF
+    END IF
 
     IF (b%done_header) THEN
       IF (h%print_warnings .AND. h%rank == h%rank_master) THEN
         PRINT*,'*** WARNING ***'
         PRINT*,'SDF block header already written. Ignoring extra call.'
-      ENDIF
+      END IF
       RETURN
-    ENDIF
+    END IF
 
     IF (h%data_location /= 0) THEN
       b%data_location = h%data_location
@@ -281,7 +281,7 @@ CONTAINS
     ELSE
       b%data_location = b%block_start + b%info_length
       b%next_block_location = b%data_location + b%data_length + b%padding
-    ENDIF
+    END IF
 
     CALL sdf_safe_copy_unique_id(h, b, id)
     CALL sdf_safe_copy_string(name, b%name)
@@ -308,7 +308,7 @@ CONTAINS
         .AND. h%rank == h%rank_master) THEN
       PRINT*, '*** WARNING ***'
       PRINT*, 'Output string "' // TRIM(string) // '" has been truncated'
-    ENDIF
+    END IF
 
     ! This subroutine expects that the record marker is in place and that
     ! the view is set correctly. Call it only on the node which is doing the
@@ -339,7 +339,7 @@ CONTAINS
       length = length_in
     ELSE
       length = h%string_length
-    ENDIF
+    END IF
 
     CALL sdf_safe_write_string_len(h, string, length)
 
@@ -371,7 +371,7 @@ CONTAINS
     DO i = 1, LEN(string_out)
       idx = INDEX(upr, string_out(i:i))
       IF (idx /= 0) string_out(i:i) = lwr(idx:idx)
-    ENDDO
+    END DO
 
   END FUNCTION sdf_string_lowercase
 
@@ -400,7 +400,7 @@ CONTAINS
       output_string(1:len1) = string1(1:len1)
       output_string(len1+1:len1+1) = '/'
       output_string(len1+2:len1+len2+1) = string2(1:len2)
-    ENDIF
+    END IF
 
   END SUBROUTINE sdf_safe_string_composite
 
@@ -441,7 +441,7 @@ CONTAINS
       CALL sdf_write_block_header(h, id, name)
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       ! Write metadata
@@ -473,7 +473,7 @@ CONTAINS
 
       CALL MPI_FILE_WRITE(h%filehandle, b%run%minor_rev, 1, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = b%block_start + b%info_length
     b%done_info = .TRUE.
@@ -561,8 +561,8 @@ CONTAINS
         b%ndims = ndims
       ELSE
         b%ndims = INT(SIZE(variable_ids),i4)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     IF (h%datatype > 0) b%datatype = h%datatype
 
@@ -581,10 +581,10 @@ CONTAINS
       ALLOCATE(b%variable_ids(b%ndims))
       DO i = 1, b%ndims
         CALL sdf_safe_copy_id(h, variable_ids(i), b%variable_ids(i))
-      ENDDO
+      END DO
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       ! Write metadata
@@ -595,15 +595,15 @@ CONTAINS
 
       DO i = 1, b%ndims
         CALL sdf_safe_write_id(h, b%variable_ids(i))
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     h%rank_master = h%default_rank
     IF (b%data_length > 0) THEN
       h%current_location = b%next_block_location
     ELSE
       h%current_location = b%block_start + b%info_length
-    ENDIF
+    END IF
     b%done_info = .TRUE.
     b%done_data = .TRUE.
 
@@ -631,8 +631,8 @@ CONTAINS
       ELSE
         b%data_length = 0
         b%blocktype = c_blocktype_stitched
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     CALL write_stitched(h, id, name, mesh_id, stagger, variable_ids, ndims, &
         data_length)
@@ -661,8 +661,8 @@ CONTAINS
       ELSE
         b%data_length = 0
         b%blocktype = c_blocktype_stitched_tensor
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     b%datatype = c_datatype_other
 
@@ -693,13 +693,13 @@ CONTAINS
       ndims = ndims_in
     ELSE
       ndims = INT(SIZE(variable_ids),i4)
-    ENDIF
+    END IF
 
     IF (PRESENT(nmat_in)) THEN
       nmat = nmat_in
     ELSE
       nmat = INT(SIZE(material_names),i4)
-    ENDIF
+    END IF
 
     ALLOCATE(ids(nmat))
 
@@ -709,8 +709,8 @@ CONTAINS
       ELSE
         CALL sdf_safe_string_composite(h, id, &
             sdf_string_lowercase(material_names(i)), ids(i))
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     ALLOCATE(new_variable_ids(ndims))
     DO i = 1,nmat
@@ -718,11 +718,11 @@ CONTAINS
       DO j = 1,ndims
         CALL sdf_safe_string_composite(h, variable_ids(j), &
             sdf_string_lowercase(material_names(i)), new_variable_ids(j))
-      ENDDO
+      END DO
       CALL sdf_safe_string_composite(h, name, material_names(i), temp_name)
       CALL sdf_write_stitched_tensor(h, ids(i), temp_name, mesh_id, &
           stagger, new_variable_ids, ndims, data_length)
-    ENDDO
+    END DO
 
     DEALLOCATE(ids)
     DEALLOCATE(new_variable_ids)
@@ -747,7 +747,7 @@ CONTAINS
       CALL sdf_write_stitched(h, id, name, mesh_id, stagger, &
           variable_ids, ndims, data_length)
       RETURN
-    ENDIF
+    END IF
 
     IF (PRESENT(id)) THEN
       CALL sdf_get_next_block(h)
@@ -756,8 +756,8 @@ CONTAINS
         b%ndims = ndims
       ELSE
         b%ndims = INT(SIZE(variable_ids),i4)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     b => h%current_block
 
@@ -781,7 +781,7 @@ CONTAINS
       ELSE
         b%data_length = 0
         b%blocktype = c_blocktype_stitched_material
-      ENDIF
+      END IF
       CALL sdf_safe_copy_id(h, mesh_id, b%mesh_id)
       CALL sdf_write_block_header(h, id, name)
       ALLOCATE(b%material_names(b%ndims))
@@ -789,10 +789,10 @@ CONTAINS
       DO i = 1, b%ndims
         CALL sdf_safe_copy_string(material_names(i), b%material_names(i))
         CALL sdf_safe_copy_id(h, variable_ids(i), b%variable_ids(i))
-      ENDDO
+      END DO
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       ! Write metadata
@@ -803,19 +803,19 @@ CONTAINS
 
       DO i = 1, b%ndims
         CALL sdf_safe_write_string(h, b%material_names(i))
-      ENDDO
+      END DO
 
       DO i = 1, b%ndims
         CALL sdf_safe_write_id(h, b%variable_ids(i))
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     h%rank_master = h%default_rank
     IF (b%data_length > 0) THEN
       h%current_location = b%next_block_location
     ELSE
       h%current_location = b%block_start + b%info_length
-    ENDIF
+    END IF
     b%done_info = .TRUE.
     b%done_data = .TRUE.
 
@@ -842,8 +842,8 @@ CONTAINS
         b%ndims = ndims
       ELSE
         b%ndims = INT(SIZE(variable_ids),i4)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     b => h%current_block
 
@@ -866,17 +866,17 @@ CONTAINS
       ELSE
         b%data_length = 0
         b%blocktype = c_blocktype_stitched_matvar
-      ENDIF
+      END IF
       CALL sdf_safe_copy_id(h, mesh_id, b%mesh_id)
       CALL sdf_safe_copy_id(h, material_id, b%material_id)
       CALL sdf_write_block_header(h, id, name)
       ALLOCATE(b%variable_ids(b%ndims))
       DO i = 1, b%ndims
         CALL sdf_safe_copy_id(h, variable_ids(i), b%variable_ids(i))
-      ENDDO
+      END DO
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       ! Write metadata
@@ -889,15 +889,15 @@ CONTAINS
 
       DO i = 1, b%ndims
         CALL sdf_safe_write_id(h, b%variable_ids(i))
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     h%rank_master = h%default_rank
     IF (b%data_length > 0) THEN
       h%current_location = b%next_block_location
     ELSE
       h%current_location = b%block_start + b%info_length
-    ENDIF
+    END IF
     b%done_info = .TRUE.
     b%done_data = .TRUE.
 
@@ -925,8 +925,8 @@ CONTAINS
         b%ndims = ndims
       ELSE
         b%ndims = INT(SIZE(variable_ids),i4)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     b => h%current_block
 
@@ -952,7 +952,7 @@ CONTAINS
       ELSE
         b%data_length = 0
         b%blocktype = c_blocktype_stitched_species
-      ENDIF
+      END IF
       CALL sdf_safe_copy_id(h, mesh_id, b%mesh_id)
       CALL sdf_safe_copy_id(h, material_id, b%material_id)
       CALL sdf_safe_copy_string(material_name, b%material_name)
@@ -961,11 +961,11 @@ CONTAINS
       DO i = 1, b%ndims
         CALL sdf_safe_copy_string(specnames(i), b%material_names(i))
         CALL sdf_safe_copy_id(h, variable_ids(i), b%variable_ids(i))
-      ENDDO
+      END DO
       CALL sdf_write_block_header(h, id, name)
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       ! Write metadata
@@ -980,19 +980,19 @@ CONTAINS
 
       DO i = 1, b%ndims
         CALL sdf_safe_write_string(h, b%material_names(i))
-      ENDDO
+      END DO
 
       DO i = 1, b%ndims
         CALL sdf_safe_write_id(h, b%variable_ids(i))
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     h%rank_master = h%default_rank
     IF (b%data_length > 0) THEN
       h%current_location = b%next_block_location
     ELSE
       h%current_location = b%block_start + b%info_length
-    ENDIF
+    END IF
     b%done_info = .TRUE.
     b%done_data = .TRUE.
 
@@ -1019,8 +1019,8 @@ CONTAINS
         b%ndims = ndims
       ELSE
         b%ndims = INT(SIZE(obstacle_names),i4)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     b => h%current_block
 
@@ -1048,10 +1048,10 @@ CONTAINS
       ALLOCATE(b%material_names(b%ndims))
       DO i = 1, b%ndims
         CALL sdf_safe_copy_string(obstacle_names(i), b%material_names(i))
-      ENDDO
+      END DO
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       ! Write metadata
@@ -1063,8 +1063,8 @@ CONTAINS
 
       DO i = 1, b%ndims
         CALL sdf_safe_write_string(h, b%material_names(i))
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%block_start + b%info_length
@@ -1097,13 +1097,13 @@ CONTAINS
       CALL sdf_write_block_header(h, id, name)
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       ! Write data (in metadata section)
       CALL MPI_FILE_WRITE(h%filehandle, b%const_value, var_len, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = b%block_start + b%info_length
     b%done_info = .TRUE.
@@ -1162,7 +1162,7 @@ CONTAINS
       cvalue = ACHAR(1)
     ELSE
       cvalue = ACHAR(0)
-    ENDIF
+    END IF
 
     b%const_value(1:1) = TRANSFER(cvalue, b%const_value(1:1))
 
@@ -1202,7 +1202,7 @@ CONTAINS
       len2 = LEN(last)
       b%info_length = h%block_header_length
       b%data_length = sz*len1 + len2
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(b%data_length, 1, MPI_INTEGER8, 0, h%comm, errcode)
 
@@ -1219,10 +1219,10 @@ CONTAINS
       DO i = 1, sz
         CALL MPI_FILE_WRITE(h%filehandle, array(i), len1, &
             b%mpitype, MPI_STATUS_IGNORE, errcode)
-      ENDDO
+      END DO
       CALL MPI_FILE_WRITE(h%filehandle, last, len2, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -1253,14 +1253,14 @@ CONTAINS
       CALL sdf_write_block_header(h, id, name)
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       ! Write metadata
       CALL sdf_safe_write_id(h, b%mimetype)
       CALL sdf_safe_write_id(h, b%checksum_type)
       CALL sdf_safe_write_string(h, b%checksum)
-    ENDIF
+    END IF
 
     h%current_location = b%block_start + b%info_length
     b%done_info = .TRUE.
@@ -1299,7 +1299,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       n1 = SIZE(array)
       b%data_length = n1 * soi8 - b%padding
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(b%data_length, 1, MPI_INTEGER8, 0, h%comm, errcode)
     b%nelements = b%data_length
@@ -1319,7 +1319,7 @@ CONTAINS
       ! Write data
       CALL MPI_FILE_WRITE(h%filehandle, array, n1, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length + b%padding
@@ -1363,7 +1363,7 @@ CONTAINS
       len1 = LEN(array)
       len2 = LEN(last)
       b%data_length = sz*len1 + len2
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(b%data_length, 1, MPI_INTEGER8, 0, h%comm, errcode)
     b%nelements = b%data_length
@@ -1384,10 +1384,10 @@ CONTAINS
       DO i = 1, sz
         CALL MPI_FILE_WRITE(h%filehandle, array(i), len1, &
             b%mpitype, MPI_STATUS_IGNORE, errcode)
-      ENDDO
+      END DO
       CALL MPI_FILE_WRITE(h%filehandle, last, len2, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -1421,13 +1421,13 @@ CONTAINS
       CALL sdf_write_block_header(h, id, name)
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       ! Write metadata
       DO i = 1, b%ndims
         CALL sdf_safe_write_string(h, b%material_names(i))
-      ENDDO
+      END DO
 
       IF (b%datatype == c_datatype_integer4) THEN
         CALL MPI_FILE_WRITE(h%filehandle, b%i4_array, b%ndims, &
@@ -1452,16 +1452,16 @@ CONTAINS
       ELSE IF (b%datatype == c_datatype_character) THEN
         DO i = 1, b%ndims
           CALL sdf_safe_write_string(h, b%string_array(i))
-        ENDDO
-      ENDIF
-    ENDIF
+        END DO
+      END IF
+    END IF
 
     h%rank_master = h%default_rank
     IF (b%data_length > 0) THEN
       h%current_location = b%next_block_location
     ELSE
       h%current_location = b%block_start + b%info_length
-    ENDIF
+    END IF
     b%done_info = .TRUE.
     b%done_data = .TRUE.
 
@@ -1484,7 +1484,7 @@ CONTAINS
       b%ndims = ndims
     ELSE
       b%ndims = INT(SIZE(names),i4)
-    ENDIF
+    END IF
 
     b => h%current_block
 
@@ -1497,7 +1497,7 @@ CONTAINS
     DO i = 1, b%ndims
       CALL sdf_safe_copy_string(names(i), b%material_names(i))
       b%i4_array(i) = values(i)
-    ENDDO
+    END DO
 
     CALL write_namevalue_meta(h, id, name)
 
@@ -1520,7 +1520,7 @@ CONTAINS
       b%ndims = ndims
     ELSE
       b%ndims = INT(SIZE(names),i4)
-    ENDIF
+    END IF
 
     b => h%current_block
 
@@ -1533,7 +1533,7 @@ CONTAINS
     DO i = 1, b%ndims
       CALL sdf_safe_copy_string(names(i), b%material_names(i))
       b%i8_array(i) = values(i)
-    ENDDO
+    END DO
 
     CALL write_namevalue_meta(h, id, name)
 
@@ -1556,7 +1556,7 @@ CONTAINS
       b%ndims = ndims
     ELSE
       b%ndims = INT(SIZE(names),i4)
-    ENDIF
+    END IF
 
     b => h%current_block
 
@@ -1569,7 +1569,7 @@ CONTAINS
     DO i = 1, b%ndims
       CALL sdf_safe_copy_string(names(i), b%material_names(i))
       b%r4_array(i) = values(i)
-    ENDDO
+    END DO
 
     CALL write_namevalue_meta(h, id, name)
 
@@ -1592,7 +1592,7 @@ CONTAINS
       b%ndims = ndims
     ELSE
       b%ndims = INT(SIZE(names),i4)
-    ENDIF
+    END IF
 
     b => h%current_block
 
@@ -1605,7 +1605,7 @@ CONTAINS
     DO i = 1, b%ndims
       CALL sdf_safe_copy_string(names(i), b%material_names(i))
       b%r8_array(i) = values(i)
-    ENDDO
+    END DO
 
     CALL write_namevalue_meta(h, id, name)
 
@@ -1628,7 +1628,7 @@ CONTAINS
       b%ndims = ndims
     ELSE
       b%ndims = INT(SIZE(names),i4)
-    ENDIF
+    END IF
 
     b => h%current_block
 
@@ -1644,8 +1644,8 @@ CONTAINS
         b%logical_array(i) = ACHAR(1)
       ELSE
         b%logical_array(i) = ACHAR(0)
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     CALL write_namevalue_meta(h, id, name)
 
@@ -1668,7 +1668,7 @@ CONTAINS
       b%ndims = ndims
     ELSE
       b%ndims = INT(SIZE(names),i4)
-    ENDIF
+    END IF
 
     b => h%current_block
 
@@ -1681,7 +1681,7 @@ CONTAINS
     DO i = 1, b%ndims
       CALL sdf_safe_copy_string(names(i), b%material_names(i))
       CALL sdf_safe_copy_string(values(i), b%string_array(i))
-    ENDDO
+    END DO
 
     CALL write_namevalue_meta(h, id, name)
 
@@ -1714,14 +1714,14 @@ CONTAINS
       CALL sdf_write_block_header(h, id, name)
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_WRITE(h%filehandle, b%geometry, 1, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
       CALL MPI_FILE_WRITE(h%filehandle, b%dims, ndims, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = b%block_start + b%info_length
     b%done_info = .TRUE.
@@ -1766,7 +1766,7 @@ CONTAINS
       ! Actual array
       CALL MPI_FILE_WRITE(h%filehandle, npart, b%dims(1), b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -1803,16 +1803,16 @@ CONTAINS
     IF (PRESENT(nmax2)) THEN
       b%dims(2) = ndim2 - 1
       b%ndims = 2
-    ENDIF
+    END IF
     IF (PRESENT(nmax3)) THEN
       b%dims(3) = ndim3 - 1
       b%ndims = 3
-    ENDIF
+    END IF
 
     b%nelements = 0
     DO i = 1,b%ndims
       b%nelements = b%nelements + b%dims(i)
-    ENDDO
+    END DO
 
     ! Write header
 
@@ -1830,12 +1830,12 @@ CONTAINS
       IF (b%ndims > 1) THEN
         CALL MPI_FILE_WRITE(h%filehandle, nmax2, b%dims(2), b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
+      END IF
       IF (b%ndims > 2) THEN
         CALL MPI_FILE_WRITE(h%filehandle, nmax3, b%dims(3), b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -1866,7 +1866,7 @@ CONTAINS
       CALL write_cpu_split_1d_spec(h, id, name, ndim1, nmax1, ndim2, nmax2)
     ELSE
       CALL write_cpu_split_1d_spec(h, id, name, ndim1, nmax1)
-    ENDIF
+    END IF
 
   END SUBROUTINE write_cpu_split_1d
 
@@ -1904,7 +1904,7 @@ CONTAINS
       b%dims(3) = n3
       b%ndims = 3
       b%nelements = b%nelements + n1 * n2 * n3
-    ENDIF
+    END IF
 
     ! Write header
 
@@ -1927,8 +1927,8 @@ CONTAINS
         npt = npt * n3
         CALL MPI_FILE_WRITE(h%filehandle, nmax3, npt, b%mpitype, &
             MPI_STATUS_IGNORE, errcode)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -1978,7 +1978,7 @@ CONTAINS
       ! Actual array
       CALL MPI_FILE_WRITE(h%filehandle, cpu_splits, npt, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -2004,7 +2004,7 @@ CONTAINS
     b%nelements = 1
     DO i = 1,ndims
       b%nelements = b%nelements * b%dims(i)
-    ENDDO
+    END DO
 
     ! Metadata is
     ! - dims      ndims*INTEGER(i4)
@@ -2018,12 +2018,12 @@ CONTAINS
       CALL sdf_write_block_header(h, id, name)
     ELSE
       CALL write_block_header(h)
-    ENDIF
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_WRITE(h%filehandle, b%dims, ndims, MPI_INTEGER4, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%current_location = b%block_start + b%info_length
     b%done_info = .TRUE.
@@ -2068,7 +2068,7 @@ CONTAINS
       ! Actual array
       CALL MPI_FILE_WRITE(h%filehandle, array, n1, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -2136,9 +2136,9 @@ CONTAINS
         DO i = 1,n2
           CALL MPI_FILE_WRITE(h%filehandle, array(1,i), n1, b%mpitype, &
               MPI_STATUS_IGNORE, errcode)
-        ENDDO
-      ENDIF
-    ENDIF
+        END DO
+      END IF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -2200,7 +2200,7 @@ CONTAINS
       ! Actual array
       CALL MPI_FILE_WRITE(h%filehandle, array, n1, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -2265,15 +2265,15 @@ CONTAINS
           carray(i) = ACHAR(1)
         ELSE
           carray(i) = ACHAR(0)
-        ENDIF
-      ENDDO
+        END IF
+      END DO
 
       ! Actual array
       CALL MPI_FILE_WRITE(h%filehandle, carray, n1, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
 
       DEALLOCATE(carray)
-    ENDIF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -2337,7 +2337,7 @@ CONTAINS
       var_len = INT(b%nelements)
       CALL MPI_FILE_WRITE(h%filehandle, array, var_len, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -2364,50 +2364,50 @@ CONTAINS
         h%nblocks = -h%error_code
         h%summary_location = 0
         h%summary_size = 0
-      ENDIF
+      END IF
       IF (h%summary_location /= h%summary_location_wrote) THEN
         offset = c_summary_offset
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, h%summary_location, 1, &
             MPI_INTEGER8, MPI_STATUS_IGNORE, errcode)
         h%summary_location_wrote = h%summary_location
-      ENDIF
+      END IF
       IF (h%summary_size /= h%summary_size_wrote) THEN
         offset = c_summary_offset + soi8
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, h%summary_size, 1, &
             MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
         h%summary_size_wrote = h%summary_size
-      ENDIF
+      END IF
       IF (h%nblocks /= h%nblocks_wrote) THEN
         offset = c_summary_offset + soi4 + soi8
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, h%nblocks, 1, &
             MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
         h%nblocks_wrote = h%nblocks
-      ENDIF
+      END IF
       IF (h%step /= h%step_wrote) THEN
         offset = c_summary_offset + 3 * soi4 + soi8
         int4 = INT(h%step,i4)
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, int4, 1, &
             MPI_INTEGER4, MPI_STATUS_IGNORE, errcode)
         h%step_wrote = h%step
-      ENDIF
+      END IF
       IF (ABS(h%time - h%time_wrote) > c_tiny) THEN
         offset = c_summary_offset + 4 * soi4 + soi8
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, h%time, 1, &
             MPI_REAL8, MPI_STATUS_IGNORE, errcode)
         h%time_wrote = h%time
-      ENDIF
+      END IF
       IF (h%station_file .NEQV. h%station_file_wrote) THEN
         offset = c_summary_offset + 8 * soi4 + soi8 + sof8 + 2
         IF (h%station_file) THEN
           flag = ACHAR(1)
         ELSE
           flag = ACHAR(0)
-        ENDIF
+        END IF
         CALL MPI_FILE_WRITE_AT(h%filehandle, offset, flag, 1, &
             MPI_CHARACTER, MPI_STATUS_IGNORE, errcode)
         h%station_file_wrote = h%station_file
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
   END SUBROUTINE sdf_update
 

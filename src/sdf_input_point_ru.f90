@@ -47,11 +47,11 @@ CONTAINS
 
       DO i = 1,b%ndims
         CALL read_entry_id(h, b%dim_labels(i))
-      ENDDO
+      END DO
 
       DO i = 1,b%ndims
         CALL read_entry_id(h, b%dim_units(i))
-      ENDDO
+      END DO
 
       CALL read_entry_int4(h, b%geometry)
 
@@ -64,15 +64,15 @@ CONTAINS
         CALL read_entry_id(h, b%species_id)
       ELSE
         CALL sdf_safe_copy_id(h, '__unknown__', b%species_id)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     IF (PRESENT(geometry)) geometry = b%geometry
     IF (PRESENT(npoints)) npoints = b%npoints
     IF (PRESENT(species_id)) THEN
       clen = MIN(LEN(species_id),INT(c_id_length))
       species_id(1:clen) = b%species_id(1:clen)
-    ENDIF
+    END IF
 
     h%current_location = b%block_start + h%block_header_length
     b%done_info = .TRUE.
@@ -130,22 +130,22 @@ CONTAINS
         CALL read_entry_id(h, b%species_id)
       ELSE
         CALL sdf_safe_copy_id(h, '__unknown__', b%species_id)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     IF (PRESENT(npoints)) npoints = b%npoints
     IF (PRESENT(units)) THEN
       clen = MIN(LEN(units),INT(c_id_length))
       units(1:clen) = b%units(1:clen)
-    ENDIF
+    END IF
     IF (PRESENT(mesh_id)) THEN
       clen = MIN(LEN(mesh_id),INT(c_id_length))
       mesh_id(1:clen) = b%mesh_id(1:clen)
-    ENDIF
+    END IF
     IF (PRESENT(species_id)) THEN
       clen = MIN(LEN(species_id),INT(c_id_length))
       species_id(1:clen) = b%species_id(1:clen)
-    ENDIF
+    END IF
 
     h%current_location = b%block_start + h%block_header_length
     b%done_info = .TRUE.
@@ -174,7 +174,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, array, npoints, &
           b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(array, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -208,7 +208,7 @@ CONTAINS
     IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_READ_AT(h%filehandle, h%current_location, cvalues, &
           npoints, b%mpitype, MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     CALL MPI_BCAST(cvalues, npoints, b%mpitype, h%rank_master, h%comm, errcode)
 
@@ -217,8 +217,8 @@ CONTAINS
         array(i) = .FALSE.
       ELSE
         array(i) = .TRUE.
-      ENDIF
-    ENDDO
+      END IF
+    END DO
 
     DEALLOCATE(cvalues)
 
@@ -281,7 +281,7 @@ CONTAINS
       npoint_remain = npoint_remain - npoint_this_it8
       ret = iterator(array, npoint_this_it, start, param)
       start = .FALSE.
-    ENDDO
+    END DO
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)
@@ -348,7 +348,7 @@ CONTAINS
       npoint_remain = npoint_remain - npoint_this_it8
       ret = iterator(array, npoint_this_it, start, param)
       start = .FALSE.
-    ENDDO
+    END DO
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
         MPI_INFO_NULL, errcode)

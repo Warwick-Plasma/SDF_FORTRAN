@@ -79,31 +79,31 @@ CONTAINS
 
       DO i = 1,b%nstations
         CALL read_entry_id(h, b%station_ids(i))
-      ENDDO
+      END DO
       DO i = 1,b%nstations
         CALL read_entry_string(h, b%station_names(i))
-      ENDDO
+      END DO
       CALL read_entry_array_int4(h, b%station_nvars, b%nstations)
       CALL read_entry_array_int4(h, b%station_move, b%nstations)
       DO i = 1,b%ndims
         CALL read_entry_array_real8(h, b%station_grid(:,i), b%nstations)
-      ENDDO
+      END DO
       DO i = 1,b%nvariables
         CALL read_entry_id(h, b%variable_ids(i))
-      ENDDO
+      END DO
       DO i = 1,b%nvariables
         CALL read_entry_string(h, b%material_names(i))
-      ENDDO
+      END DO
       CALL read_entry_array_int4(h, b%variable_types, b%nvariables)
       DO i = 1,b%nvariables
         CALL read_entry_id(h, b%dim_units(i))
-      ENDDO
+      END DO
 
       IF (b%use_mult) THEN
         ALLOCATE(b%dim_mults(b%nvariables))
         CALL read_entry_array_real8(h, b%dim_mults, b%nvariables)
-      ENDIF
-    ENDIF
+      END IF
+    END IF
 
     IF (PRESENT(nelements     )) nelements      = b%nelements
     IF (PRESENT(type_size     )) type_size      = b%type_size
@@ -117,15 +117,15 @@ CONTAINS
     IF (PRESENT(variable_ids)) THEN
        i = MIN(SIZE(variable_ids),b%nvariables)
        variable_ids(1:i) = b%variable_ids(1:i)
-    ENDIF
+    END IF
     IF (PRESENT(variable_names)) THEN
        i = MIN(SIZE(variable_names),b%nvariables)
        variable_names(1:i) = b%material_names(1:i)
-    ENDIF
+    END IF
     IF (PRESENT(station_ids)) THEN
        i = MIN(SIZE(station_ids),b%nvariables)
        station_ids(1:i) = b%station_ids(1:i)
-    ENDIF
+    END IF
 
     h%current_location = b%data_location
     b%done_info = .TRUE.
@@ -164,14 +164,14 @@ CONTAINS
       station_move = -1
       DO i = 1,b%nstations
         station_move(b%station_index(i)) = b%station_move(i)
-      ENDDO
-    ENDIF
+      END DO
+    END IF
     IF (PRESENT(station_nvars)) THEN
       station_nvars = 0
       DO i = 1,b%nstations
         station_nvars(b%station_index(i)) = b%station_nvars(i)
-      ENDDO
-    ENDIF
+      END DO
+    END IF
 
   END SUBROUTINE sdf_read_station_info_arrays_all
 

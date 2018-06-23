@@ -24,7 +24,7 @@ CONTAINS
     DO i = 1, LEN(string)
       c = ICHAR(string(i:i))
       IF (c > 64 .AND. c < 90) string(i:i) = CHAR(c+32)
-    ENDDO
+    END DO
 
   END SUBROUTINE lowercase
 
@@ -105,7 +105,7 @@ CONTAINS
       pad_string = .TRUE.
     ELSE
       pad_string = (new_len == 0 .OR. MOD(new_len, 64) /= 0)
-    ENDIF
+    END IF
 
     total_length = total_length + new_len
 
@@ -118,7 +118,7 @@ CONTAINS
         ! Pad with "0" until message length mod 512 bits equals 448 bits
         new_string(j:j) = CHAR(0)
         i = MOD(j, 64)
-      ENDDO
+      END DO
 
       int_len = total_length * 8
 
@@ -127,14 +127,14 @@ CONTAINS
         j = j + 1
         new_string(j:j) = CHAR(temp)
         int_len = ISHFT(int_len, -8)
-      ENDDO
+      END DO
 
       DO i = 1, 4
         j = j + 1
         new_string(j:j) = CHAR(0)
-      ENDDO
+      END DO
       new_len = j
-    ENDIF
+    END IF
 
     DO i = 1, INT(new_len/64)
       DO j = 1, 16
@@ -146,7 +146,7 @@ CONTAINS
 
         WRITE(wtmp,'(4(z2.2))') n1, n2, n3, n4
         READ(wtmp,'(z8)') w(j)
-      ENDDO
+      END DO
 
       a = h0
       b = h1
@@ -166,20 +166,20 @@ CONTAINS
         ELSE IF (j >= 49 .AND. j <= 64) THEN
           f = IEOR(c, IOR(b, NOT(d)))
           g = MOD(7*(j-1), 16) + 1
-        ENDIF
+        END IF
 
         temp = d
         d = c
         c = b
         b = b + leftrotate((a + f + k(j) + w(g)), r(j))
         a = temp
-      ENDDO
+      END DO
 
       h0 = h0 + a
       h1 = h1 + b
       h2 = h2 + c
       h3 = h3 + d
-    ENDDO
+    END DO
 
     a = to_bytes(h0)
     b = to_bytes(h1)
@@ -194,7 +194,7 @@ CONTAINS
       h1 = b
       h2 = c
       h3 = d
-    ENDIF
+    END IF
 
   END SUBROUTINE md5_calculate
 
@@ -224,7 +224,7 @@ CONTAINS
       tmp = IAND(shiftbytes, 255)
       to_bytes = to_bytes + tmp
       shiftbytes = ISHFT(shiftbytes, -8)
-    ENDDO
+    END DO
 
   END FUNCTION to_bytes
 

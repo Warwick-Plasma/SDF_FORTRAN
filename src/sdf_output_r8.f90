@@ -81,7 +81,7 @@ CONTAINS
       ! Actual array
       CALL MPI_FILE_WRITE(h%filehandle, array, n1, b%mpitype, &
           MPI_STATUS_IGNORE, errcode)
-    ENDIF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
@@ -149,9 +149,9 @@ CONTAINS
         DO i = 1,n2
           CALL MPI_FILE_WRITE(h%filehandle, array(1,i), n1, b%mpitype, &
               MPI_STATUS_IGNORE, errcode)
-        ENDDO
-      ENDIF
-    ENDIF
+        END DO
+      END IF
+    END IF
 
     h%rank_master = h%default_rank
     h%current_location = b%data_location + b%data_length
