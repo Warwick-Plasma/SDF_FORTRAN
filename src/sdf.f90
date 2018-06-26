@@ -168,6 +168,7 @@ MODULE sdf
   PUBLIC :: sdf_write_plain_variable
   PUBLIC :: sdf_write_point_mesh
   PUBLIC :: sdf_write_point_variable
+  PUBLIC :: sdf_write_srl_path_mesh
   PUBLIC :: sdf_write_srl_plain_mesh
   PUBLIC :: sdf_write_srl_point_mesh
   PUBLIC :: sdf_write_srl_point_variable

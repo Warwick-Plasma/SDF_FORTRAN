@@ -557,9 +557,10 @@ CONTAINS
     b => h%current_block
 
     IF (PRESENT(id)) THEN
+      b%ndims = 0
       IF (PRESENT(ndims)) THEN
         b%ndims = ndims
-      ELSE
+      ELSE IF (PRESENT(variable_ids)) THEN
         b%ndims = INT(SIZE(variable_ids),i4)
       END IF
     END IF
@@ -575,9 +576,10 @@ CONTAINS
 
     ! Write header
     IF (PRESENT(id)) THEN
-      b%stagger = stagger
-      CALL sdf_safe_copy_id(h, mesh_id, b%mesh_id)
-      CALL sdf_write_block_header(h, id, name)
+      b%stagger = c_stagger_cell_centre
+      IF (PRESENT(stagger)) b%stagger = stagger
+      IF (PRESENT(mesh_id)) CALL sdf_safe_copy_id(h, mesh_id, b%mesh_id)
+      IF (PRESENT(name)) CALL sdf_write_block_header(h, id, name)
       ALLOCATE(b%variable_ids(b%ndims))
       DO i = 1, b%ndims
         CALL sdf_safe_copy_id(h, variable_ids(i), b%variable_ids(i))

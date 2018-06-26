@@ -27,6 +27,16 @@ MODULE sdf_output_cartesian
         write_srl_3d_lag_mesh_r8
   END INTERFACE sdf_write_srl_plain_mesh
 
+  INTERFACE sdf_write_srl_path_mesh
+    MODULE PROCEDURE &
+        write_srl_1d_mesh_r4, &
+        write_srl_1d_mesh_r8, &
+        write_srl_2d_path_mesh_r4, &
+        write_srl_3d_path_mesh_r4, &
+        write_srl_2d_path_mesh_r8, &
+        write_srl_3d_path_mesh_r8
+  END INTERFACE sdf_write_srl_path_mesh
+
   INTERFACE sdf_write_plain_mesh
     MODULE PROCEDURE &
         write_1d_mesh_r4, &
