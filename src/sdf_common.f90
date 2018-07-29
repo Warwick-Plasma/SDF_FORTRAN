@@ -646,6 +646,8 @@ CONTAINS
     var%time = 0
     var%time_increment = 0
     var%padding = 0
+    var%id = ''
+    var%name = ''
 
   END SUBROUTINE initialise_block_type
 
