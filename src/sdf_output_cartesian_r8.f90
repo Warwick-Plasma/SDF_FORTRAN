@@ -917,7 +917,7 @@ CONTAINS
     REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
     INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
-    INTEGER :: i, errcode, intn
+    INTEGER :: errcode, intn
     TYPE(sdf_block_type), POINTER :: b
     LOGICAL :: convert
 
@@ -1018,7 +1018,7 @@ CONTAINS
     REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
     INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
-    INTEGER :: i, errcode, intn
+    INTEGER :: errcode, intn
     TYPE(sdf_block_type), POINTER :: b
     LOGICAL :: convert
 
