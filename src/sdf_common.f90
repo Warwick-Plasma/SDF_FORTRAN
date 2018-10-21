@@ -40,6 +40,11 @@ MODULE sdf_common
     CHARACTER(LEN=c_max_string_length) :: compile_machine, compile_flags
   END TYPE sdf_run_type
 
+  TYPE sdf_hash_list
+    TYPE(sdf_block_type), POINTER :: block
+    TYPE(sdf_hash_list), POINTER :: next
+  END TYPE sdf_hash_list
+
   TYPE sdf_block_type
     REAL(r4), POINTER :: r4_array(:)
     REAL(r8), DIMENSION(2*c_maxdims) :: extents
@@ -100,7 +105,7 @@ MODULE sdf_common
     CHARACTER(LEN=c_long_id_length) :: filename
     TYPE(jobid_type) :: jobid
     TYPE(sdf_block_type), POINTER :: blocklist, current_block
-    INTEGER :: hash_table(hash_size)
+    TYPE(sdf_hash_list) :: hash_table(hash_size)
   END TYPE sdf_file_handle
 
   TYPE sdf_handle_type
@@ -691,7 +696,7 @@ CONTAINS
     TYPE(sdf_file_handle) :: var
     LOGICAL, INTENT(IN), OPTIONAL :: set_handler
     LOGICAL :: set_err_handler
-    INTEGER :: ierr
+    INTEGER :: ierr, i
 
     NULLIFY(var%buffer)
     NULLIFY(var%blocklist)
@@ -721,7 +726,9 @@ CONTAINS
     var%summary_size = 0
     var%step = 0
     var%time = 0
-    var%hash_table = 0
+    DO i = 1, hash_size
+      NULLIFY(var%hash_table(i)%block)
+    END DO
 
     var%summary_location_wrote = var%summary_location
     var%summary_size_wrote = var%summary_size
@@ -753,9 +760,21 @@ CONTAINS
 
     TYPE(sdf_file_handle) :: var
     INTEGER :: errcode, i
+    TYPE(sdf_hash_list), POINTER :: hash_item, hash_item_next
 
     IF (ASSOCIATED(var%buffer)) DEALLOCATE(var%buffer)
     IF (ASSOCIATED(var%station_ids)) DEALLOCATE(var%station_ids)
+
+    DO i = 1, hash_size
+      hash_item => var%hash_table(i)%next
+      DO WHILE (ASSOCIATED(hash_item))
+        hash_item_next => hash_item%next
+        DEALLOCATE(hash_item)
+        hash_item => hash_item_next
+      END DO
+      NULLIFY(var%hash_table(i)%block)
+      NULLIFY(var%hash_table(i)%next)
+    END DO
 
     var%errhandler = MPI_ERRHANDLER_NULL
 
@@ -958,13 +977,27 @@ CONTAINS
 
     TYPE(sdf_file_handle), INTENT(INOUT) :: h
     TYPE(sdf_block_type), POINTER , INTENT(IN):: b
+    TYPE(sdf_hash_list), POINTER :: hash_item, new_hash_item
     INTEGER :: i
 
     IF (h%writing_summary) RETURN
 
     b%id_hash = sdf_hash_function(TRIM(b%id))
     i = INT(MOD(ABS(b%id_hash), hash_size)) + 1
-    h%hash_table(i) = h%hash_table(i) + 1
+
+    IF (ASSOCIATED(h%hash_table(i)%block)) THEN
+      hash_item => h%hash_table(i)%next
+      DO WHILE (ASSOCIATED(hash_item))
+        hash_item => hash_item%next
+      END DO
+      ALLOCATE(new_hash_item)
+      hash_item => new_hash_item
+      hash_item%block => b
+      NULLIFY(hash_item%next)
+    ELSE
+      h%hash_table(i)%block => b
+      NULLIFY(h%hash_table(i)%next)
+    END IF
 
   END SUBROUTINE add_to_hash_table
 
