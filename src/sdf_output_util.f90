@@ -26,6 +26,7 @@ CONTAINS
 
     b => h%current_block
 
+    h%writing_summary = .TRUE.
     h%summary_location = b%next_block_location
     h%current_location = h%summary_location
     CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
@@ -51,6 +52,7 @@ CONTAINS
     END DO
 
     h%summary_size = INT(h%current_location - h%summary_location,i4)
+    h%writing_summary = .FALSE.
 
   END SUBROUTINE sdf_write_summary
 

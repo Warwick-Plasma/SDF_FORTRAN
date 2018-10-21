@@ -162,6 +162,7 @@ CONTAINS
     CALL read_entry_int8(h, b%data_location)
 
     CALL read_entry_id(h, b%id)
+    CALL add_to_hash_table(h, b)
 
     CALL read_entry_int8(h, b%data_length)
 
