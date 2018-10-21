@@ -397,18 +397,42 @@ CONTAINS
     TYPE(sdf_block_type), POINTER :: b
     CHARACTER(LEN=*), INTENT(IN) :: block_id
     INTEGER :: i
+    INTEGER(i8) :: id_hash
     LOGICAL :: found, use_truncated
+    TYPE(sdf_hash_list), POINTER :: hash_item
+
+    id_hash = sdf_hash_function(TRIM(block_id))
+    i = INT(MOD(ABS(id_hash), hash_size)) + 1
+
+    b => h%hash_table(i)%block
+    IF (.NOT.ASSOCIATED(b)) THEN
+      found = .FALSE.
+      NULLIFY(b)
+      RETURN
+    END IF
 
     use_truncated = (LEN_TRIM(block_id) > c_id_length)
-
     found = .TRUE.
-    b => h%blocklist
-    DO i = 1,h%nblocks
-      IF (sdf_string_equal(block_id, b%id)) RETURN
+
+    IF (b%id_hash == id_hash) THEN
       IF (use_truncated .AND. b%truncated_id) THEN
         IF (sdf_string_equal(block_id, b%long_id)) RETURN
+      ELSE
+        IF (sdf_string_equal(block_id, b%id)) RETURN
       END IF
-      b => b%next_block
+    END IF
+
+    hash_item => h%hash_table(i)%next
+    DO WHILE (ASSOCIATED(hash_item))
+      b => hash_item%block
+      IF (b%id_hash == id_hash) THEN
+        IF (use_truncated .AND. b%truncated_id) THEN
+          IF (sdf_string_equal(block_id, b%long_id)) RETURN
+        ELSE
+          IF (sdf_string_equal(block_id, b%id)) RETURN
+        END IF
+      END IF
+      hash_item => hash_item%next
     END DO
 
     found = .FALSE.
