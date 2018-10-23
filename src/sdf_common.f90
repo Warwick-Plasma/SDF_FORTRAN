@@ -752,6 +752,7 @@ CONTAINS
     var%time = 0
     DO i = 1, hash_size
       NULLIFY(var%hash_table(i)%block)
+      NULLIFY(var%hash_table(i)%next)
     END DO
 
     var%summary_location_wrote = var%summary_location
@@ -1001,7 +1002,7 @@ CONTAINS
 
     TYPE(sdf_file_handle), INTENT(INOUT) :: h
     TYPE(sdf_block_type), POINTER , INTENT(IN):: b
-    TYPE(sdf_hash_list), POINTER :: hash_item, new_hash_item
+    TYPE(sdf_hash_list), POINTER :: hash_item
     INTEGER :: i
 
     IF (h%writing_summary) RETURN
@@ -1010,12 +1011,17 @@ CONTAINS
     i = INT(MOD(ABS(b%id_hash), hash_size)) + 1
 
     IF (ASSOCIATED(h%hash_table(i)%block)) THEN
-      hash_item => h%hash_table(i)%next
-      DO WHILE (ASSOCIATED(hash_item))
+      IF (ASSOCIATED(h%hash_table(i)%next)) THEN
+        hash_item => h%hash_table(i)%next
+        DO WHILE (ASSOCIATED(hash_item%next))
+          hash_item => hash_item%next
+        END DO
+        ALLOCATE(hash_item%next)
         hash_item => hash_item%next
-      END DO
-      ALLOCATE(new_hash_item)
-      hash_item => new_hash_item
+      ELSE
+        ALLOCATE(h%hash_table(i)%next)
+        hash_item => h%hash_table(i)%next
+      END IF
       hash_item%block => b
       NULLIFY(hash_item%next)
     ELSE
