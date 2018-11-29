@@ -20,6 +20,7 @@ MODULE sdf_common
   INTEGER, PARAMETER :: r8  = SELECTED_REAL_KIND(r=300)
   INTEGER, PARAMETER :: r16 = SELECTED_REAL_KIND(r=3000)
 
+  INTEGER(i8), PARAMETER :: hash_size = 2039_i8
   INTEGER, PARAMETER :: c_maxdims = 4
   INTEGER(i4), PARAMETER :: c_id_length = 32
   INTEGER(i4), PARAMETER :: c_long_id_length = 256
@@ -39,6 +40,11 @@ MODULE sdf_common
     CHARACTER(LEN=c_max_string_length) :: compile_machine, compile_flags
   END TYPE sdf_run_type
 
+  TYPE sdf_hash_list
+    TYPE(sdf_block_type), POINTER :: block
+    TYPE(sdf_hash_list), POINTER :: next
+  END TYPE sdf_hash_list
+
   TYPE sdf_block_type
     REAL(r4), POINTER :: r4_array(:)
     REAL(r8), DIMENSION(2*c_maxdims) :: extents
@@ -49,6 +55,7 @@ MODULE sdf_common
     INTEGER(KIND=MPI_OFFSET_KIND) :: block_start
     INTEGER(i8) :: next_block_location, data_location
     INTEGER(i8) :: nelements, npoints, data_length, info_length
+    INTEGER(i8) :: id_hash
     INTEGER(i8), POINTER :: i8_array(:)
     INTEGER(i4) :: ndims, geometry, datatype, blocktype
     INTEGER(i4) :: mpitype, type_size, stagger
@@ -91,13 +98,14 @@ MODULE sdf_common
     INTEGER :: errhandler, old_errhandler, nstations
     LOGICAL :: done_header, restart_flag, other_domains, writing, handled_error
     LOGICAL :: station_file, first, print_errors, print_warnings, exit_on_error
-    LOGICAL :: station_file_wrote
+    LOGICAL :: station_file_wrote, writing_summary
     CHARACTER(LEN=1), POINTER :: buffer(:)
     CHARACTER(LEN=c_id_length) :: code_name
     CHARACTER(LEN=c_id_length), POINTER :: station_ids(:)
     CHARACTER(LEN=c_long_id_length) :: filename
     TYPE(jobid_type) :: jobid
     TYPE(sdf_block_type), POINTER :: blocklist, current_block
+    TYPE(sdf_hash_list) :: hash_table(hash_size)
   END TYPE sdf_file_handle
 
   TYPE sdf_handle_type
@@ -389,18 +397,42 @@ CONTAINS
     TYPE(sdf_block_type), POINTER :: b
     CHARACTER(LEN=*), INTENT(IN) :: block_id
     INTEGER :: i
+    INTEGER(i8) :: id_hash
     LOGICAL :: found, use_truncated
+    TYPE(sdf_hash_list), POINTER :: hash_item
+
+    id_hash = sdf_hash_function(TRIM(block_id))
+    i = INT(MOD(ABS(id_hash), hash_size)) + 1
+
+    b => h%hash_table(i)%block
+    IF (.NOT.ASSOCIATED(b)) THEN
+      found = .FALSE.
+      NULLIFY(b)
+      RETURN
+    END IF
 
     use_truncated = (LEN_TRIM(block_id) > c_id_length)
-
     found = .TRUE.
-    b => h%blocklist
-    DO i = 1,h%nblocks
-      IF (sdf_string_equal(block_id, b%id)) RETURN
+
+    IF (b%id_hash == id_hash) THEN
       IF (use_truncated .AND. b%truncated_id) THEN
         IF (sdf_string_equal(block_id, b%long_id)) RETURN
+      ELSE
+        IF (sdf_string_equal(block_id, b%id)) RETURN
       END IF
-      b => b%next_block
+    END IF
+
+    hash_item => h%hash_table(i)%next
+    DO WHILE (ASSOCIATED(hash_item))
+      b => hash_item%block
+      IF (b%id_hash == id_hash) THEN
+        IF (use_truncated .AND. b%truncated_id) THEN
+          IF (sdf_string_equal(block_id, b%long_id)) RETURN
+        ELSE
+          IF (sdf_string_equal(block_id, b%id)) RETURN
+        END IF
+      END IF
+      hash_item => hash_item%next
     END DO
 
     found = .FALSE.
@@ -688,7 +720,7 @@ CONTAINS
     TYPE(sdf_file_handle) :: var
     LOGICAL, INTENT(IN), OPTIONAL :: set_handler
     LOGICAL :: set_err_handler
-    INTEGER :: ierr
+    INTEGER :: ierr, i
 
     NULLIFY(var%buffer)
     NULLIFY(var%blocklist)
@@ -704,6 +736,7 @@ CONTAINS
     var%handled_error = .FALSE.
     var%station_file = .FALSE.
     var%first = .TRUE.
+    var%writing_summary = .FALSE.
     var%print_errors = print_errors
     var%print_warnings = print_warnings
     var%exit_on_error = exit_on_error
@@ -717,6 +750,10 @@ CONTAINS
     var%summary_size = 0
     var%step = 0
     var%time = 0
+    DO i = 1, hash_size
+      NULLIFY(var%hash_table(i)%block)
+      NULLIFY(var%hash_table(i)%next)
+    END DO
 
     var%summary_location_wrote = var%summary_location
     var%summary_size_wrote = var%summary_size
@@ -748,9 +785,21 @@ CONTAINS
 
     TYPE(sdf_file_handle) :: var
     INTEGER :: errcode, i
+    TYPE(sdf_hash_list), POINTER :: hash_item, hash_item_next
 
     IF (ASSOCIATED(var%buffer)) DEALLOCATE(var%buffer)
     IF (ASSOCIATED(var%station_ids)) DEALLOCATE(var%station_ids)
+
+    DO i = 1, hash_size
+      hash_item => var%hash_table(i)%next
+      DO WHILE (ASSOCIATED(hash_item))
+        hash_item_next => hash_item%next
+        DEALLOCATE(hash_item)
+        hash_item => hash_item_next
+      END DO
+      NULLIFY(var%hash_table(i)%block)
+      NULLIFY(var%hash_table(i)%next)
+    END DO
 
     var%errhandler = MPI_ERRHANDLER_NULL
 
@@ -930,5 +979,56 @@ CONTAINS
     sdf_get_exit_on_error = exit_on_error
 
   END FUNCTION sdf_get_exit_on_error
+
+
+
+  FUNCTION sdf_hash_function(str) RESULT(hash)
+
+    CHARACTER(LEN=*), INTENT(IN) :: str
+    INTEGER(i8) :: hash
+    INTEGER :: i
+
+    hash = 5381
+
+    DO i = 1, LEN(str)
+      hash = (ISHFT(hash,5) + hash) + ICHAR(str(i:i))
+    END DO
+
+  END FUNCTION sdf_hash_function
+
+
+
+  SUBROUTINE add_to_hash_table(h, b)
+
+    TYPE(sdf_file_handle), INTENT(INOUT) :: h
+    TYPE(sdf_block_type), POINTER , INTENT(IN):: b
+    TYPE(sdf_hash_list), POINTER :: hash_item
+    INTEGER :: i
+
+    IF (h%writing_summary) RETURN
+
+    b%id_hash = sdf_hash_function(TRIM(b%id))
+    i = INT(MOD(ABS(b%id_hash), hash_size)) + 1
+
+    IF (ASSOCIATED(h%hash_table(i)%block)) THEN
+      IF (ASSOCIATED(h%hash_table(i)%next)) THEN
+        hash_item => h%hash_table(i)%next
+        DO WHILE (ASSOCIATED(hash_item%next))
+          hash_item => hash_item%next
+        END DO
+        ALLOCATE(hash_item%next)
+        hash_item => hash_item%next
+      ELSE
+        ALLOCATE(h%hash_table(i)%next)
+        hash_item => h%hash_table(i)%next
+      END IF
+      hash_item%block => b
+      NULLIFY(hash_item%next)
+    ELSE
+      h%hash_table(i)%block => b
+      NULLIFY(h%hash_table(i)%next)
+    END IF
+
+  END SUBROUTINE add_to_hash_table
 
 END MODULE sdf_common

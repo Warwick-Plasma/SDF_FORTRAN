@@ -212,6 +212,7 @@ CONTAINS
           MPI_INTEGER8, MPI_STATUS_IGNORE, errcode)
 
       CALL sdf_safe_write_id(h, b%id)
+      CALL add_to_hash_table(h, b)
 
       CALL MPI_FILE_WRITE(h%filehandle, b%data_length, 1, &
           MPI_INTEGER8, MPI_STATUS_IGNORE, errcode)
