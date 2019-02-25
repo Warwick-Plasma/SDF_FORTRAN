@@ -175,4 +175,328 @@ CONTAINS
 
   END SUBROUTINE write_2d_array_real_r4
 
+
+
+  SUBROUTINE write_1d_array_real_spec_r4_par (h, id, name, sz, array, &
+      distribution, subarray)
+
+    INTEGER, PARAMETER :: ndims = 1
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name
+    INTEGER, DIMENSION(1), INTENT(IN) :: sz
+    REAL(r4), DIMENSION(:), INTENT(IN) :: array
+    INTEGER, INTENT(IN) :: distribution, subarray
+    INTEGER :: errcode
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = sof
+    b%datatype = datatype_real
+    b%mpitype = mpitype_real
+    b%ndims = ndims
+
+    b%dims(1:1) = sz
+
+    ! Write header
+
+    CALL write_array_meta(h, id, name)
+
+    ! Write data
+    h%current_location = b%data_location
+    CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
+        distribution, 'native', MPI_INFO_NULL, errcode)
+    CALL MPI_FILE_WRITE_ALL(h%filehandle, array, 1, subarray, &
+        MPI_STATUS_IGNORE, errcode)
+    CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
+        MPI_INFO_NULL, errcode)
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_1d_array_real_spec_r4_par
+
+
+
+  SUBROUTINE write_1d_array_real_r4_par (h, id, name, array, &
+      n_global, local_starts, local_ghosts, null_proc)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name
+    REAL(r4), DIMENSION(:), INTENT(IN) :: array
+    INTEGER, DIMENSION(1), INTENT(IN) :: n_global, local_starts
+    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: local_ghosts
+    LOGICAL, INTENT(IN), OPTIONAL :: null_proc
+    INTEGER, DIMENSION(2) :: ghosts
+    INTEGER, DIMENSION(1) :: starts, sizes, subsizes
+    INTEGER :: distribution, subarray, errcode
+    LOGICAL :: not_this_processor
+
+    not_this_processor = .FALSE.
+    IF (PRESENT(null_proc)) THEN
+      not_this_processor = null_proc
+    ELSE IF (ANY(local_starts < 0)) THEN
+      not_this_processor = .TRUE.
+    END IF
+
+    IF (.NOT. not_this_processor) THEN
+      ghosts = 0
+      IF (PRESENT(local_ghosts)) THEN
+        IF (SIZE(local_ghosts) == SIZE(ghosts)) THEN
+          ghosts = local_ghosts
+        ELSE IF (SIZE(local_ghosts) == SIZE(ghosts)/2) THEN
+          ghosts(1:1) = local_ghosts
+          ghosts(2:2) = local_ghosts
+        ELSE
+          RETURN
+        END IF
+      END IF
+
+      starts = local_starts - 1
+      sizes = n_global
+      subsizes = SHAPE(array) - ghosts(1:1) - ghosts(2:2)
+
+      CALL MPI_TYPE_CREATE_SUBARRAY(1, sizes, subsizes, starts, &
+          MPI_ORDER_FORTRAN, mpitype_real, distribution, errcode)
+      CALL MPI_TYPE_COMMIT(distribution, errcode)
+
+      starts = ghosts(1:1)
+      sizes = SHAPE(array)
+      subsizes = SHAPE(array) - ghosts(1:1) - ghosts(2:2)
+
+      CALL MPI_TYPE_CREATE_SUBARRAY(1, sizes, subsizes, starts, &
+          MPI_ORDER_FORTRAN, mpitype_real, subarray, errcode)
+      CALL MPI_TYPE_COMMIT(subarray, errcode)
+    ELSE
+      CALL MPI_TYPE_CONTIGUOUS(0, mpitype_real, distribution, errcode)
+      CALL MPI_TYPE_COMMIT(distribution, errcode)
+      CALL MPI_TYPE_CONTIGUOUS(0, mpitype_real, subarray, errcode)
+      CALL MPI_TYPE_COMMIT(subarray, errcode)
+    END IF
+
+    CALL write_1d_array_real_spec_r4_par(h, id, name, &
+        n_global, array, distribution, subarray)
+
+    CALL MPI_TYPE_FREE(distribution, errcode)
+    CALL MPI_TYPE_FREE(subarray, errcode)
+
+  END SUBROUTINE write_1d_array_real_r4_par
+
+
+
+  SUBROUTINE write_2d_array_real_spec_r4_par (h, id, name, sz, array, &
+      distribution, subarray)
+
+    INTEGER, PARAMETER :: ndims = 2
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name
+    INTEGER, DIMENSION(2), INTENT(IN) :: sz
+    REAL(r4), DIMENSION(:,:), INTENT(IN) :: array
+    INTEGER, INTENT(IN) :: distribution, subarray
+    INTEGER :: errcode
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = sof
+    b%datatype = datatype_real
+    b%mpitype = mpitype_real
+    b%ndims = ndims
+
+    b%dims(1:2) = sz
+
+    ! Write header
+
+    CALL write_array_meta(h, id, name)
+
+    ! Write data
+    h%current_location = b%data_location
+    CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
+        distribution, 'native', MPI_INFO_NULL, errcode)
+    CALL MPI_FILE_WRITE_ALL(h%filehandle, array, 1, subarray, &
+        MPI_STATUS_IGNORE, errcode)
+    CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
+        MPI_INFO_NULL, errcode)
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_2d_array_real_spec_r4_par
+
+
+
+  SUBROUTINE write_2d_array_real_r4_par (h, id, name, array, &
+      n_global, local_starts, local_ghosts, null_proc)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name
+    REAL(r4), DIMENSION(:,:), INTENT(IN) :: array
+    INTEGER, DIMENSION(2), INTENT(IN) :: n_global, local_starts
+    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: local_ghosts
+    LOGICAL, INTENT(IN), OPTIONAL :: null_proc
+    INTEGER, DIMENSION(4) :: ghosts
+    INTEGER, DIMENSION(2) :: starts, sizes, subsizes
+    INTEGER :: distribution, subarray, errcode
+    LOGICAL :: not_this_processor
+
+    not_this_processor = .FALSE.
+    IF (PRESENT(null_proc)) THEN
+      not_this_processor = null_proc
+    ELSE IF (ANY(local_starts < 0)) THEN
+      not_this_processor = .TRUE.
+    END IF
+
+    IF (.NOT. not_this_processor) THEN
+      ghosts = 0
+      IF (PRESENT(local_ghosts)) THEN
+        IF (SIZE(local_ghosts) == SIZE(ghosts)) THEN
+          ghosts = local_ghosts
+        ELSE IF (SIZE(local_ghosts) == SIZE(ghosts)/2) THEN
+          ghosts(1:2) = local_ghosts
+          ghosts(3:4) = local_ghosts
+        ELSE
+          RETURN
+        END IF
+      END IF
+
+      starts = local_starts - 1
+      sizes = n_global
+      subsizes = SHAPE(array) - ghosts(1:2) - ghosts(3:4)
+
+      CALL MPI_TYPE_CREATE_SUBARRAY(2, sizes, subsizes, starts, &
+          MPI_ORDER_FORTRAN, mpitype_real, distribution, errcode)
+      CALL MPI_TYPE_COMMIT(distribution, errcode)
+
+      starts = ghosts(1:2)
+      sizes = SHAPE(array)
+      subsizes = SHAPE(array) - ghosts(1:2) - ghosts(3:4)
+
+      CALL MPI_TYPE_CREATE_SUBARRAY(2, sizes, subsizes, starts, &
+          MPI_ORDER_FORTRAN, mpitype_real, subarray, errcode)
+      CALL MPI_TYPE_COMMIT(subarray, errcode)
+    ELSE
+      CALL MPI_TYPE_CONTIGUOUS(0, mpitype_real, distribution, errcode)
+      CALL MPI_TYPE_COMMIT(distribution, errcode)
+      CALL MPI_TYPE_CONTIGUOUS(0, mpitype_real, subarray, errcode)
+      CALL MPI_TYPE_COMMIT(subarray, errcode)
+    END IF
+
+    CALL write_2d_array_real_spec_r4_par(h, id, name, &
+        n_global, array, distribution, subarray)
+
+    CALL MPI_TYPE_FREE(distribution, errcode)
+    CALL MPI_TYPE_FREE(subarray, errcode)
+
+  END SUBROUTINE write_2d_array_real_r4_par
+
+
+
+  SUBROUTINE write_3d_array_real_spec_r4_par (h, id, name, sz, array, &
+      distribution, subarray)
+
+    INTEGER, PARAMETER :: ndims = 3
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name
+    INTEGER, DIMENSION(3), INTENT(IN) :: sz
+    REAL(r4), DIMENSION(:,:,:), INTENT(IN) :: array
+    INTEGER, INTENT(IN) :: distribution, subarray
+    INTEGER :: errcode
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = sof
+    b%datatype = datatype_real
+    b%mpitype = mpitype_real
+    b%ndims = ndims
+
+    b%dims(1:3) = sz
+
+    ! Write header
+
+    CALL write_array_meta(h, id, name)
+
+    ! Write data
+    h%current_location = b%data_location
+    CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
+        distribution, 'native', MPI_INFO_NULL, errcode)
+    CALL MPI_FILE_WRITE_ALL(h%filehandle, array, 1, subarray, &
+        MPI_STATUS_IGNORE, errcode)
+    CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
+        MPI_INFO_NULL, errcode)
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_3d_array_real_spec_r4_par
+
+
+
+  SUBROUTINE write_3d_array_real_r4_par (h, id, name, array, &
+      n_global, local_starts, local_ghosts, null_proc)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name
+    REAL(r4), DIMENSION(:,:,:), INTENT(IN) :: array
+    INTEGER, DIMENSION(3), INTENT(IN) :: n_global, local_starts
+    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: local_ghosts
+    LOGICAL, INTENT(IN), OPTIONAL :: null_proc
+    INTEGER, DIMENSION(6) :: ghosts
+    INTEGER, DIMENSION(3) :: starts, sizes, subsizes
+    INTEGER :: distribution, subarray, errcode
+    LOGICAL :: not_this_processor
+
+    not_this_processor = .FALSE.
+    IF (PRESENT(null_proc)) THEN
+      not_this_processor = null_proc
+    ELSE IF (ANY(local_starts < 0)) THEN
+      not_this_processor = .TRUE.
+    END IF
+
+    IF (.NOT. not_this_processor) THEN
+      ghosts = 0
+      IF (PRESENT(local_ghosts)) THEN
+        IF (SIZE(local_ghosts) == SIZE(ghosts)) THEN
+          ghosts = local_ghosts
+        ELSE IF (SIZE(local_ghosts) == SIZE(ghosts)/2) THEN
+          ghosts(1:3) = local_ghosts
+          ghosts(4:6) = local_ghosts
+        ELSE
+          RETURN
+        END IF
+      END IF
+
+      starts = local_starts - 1
+      sizes = n_global
+      subsizes = SHAPE(array) - ghosts(1:3) - ghosts(4:6)
+
+      CALL MPI_TYPE_CREATE_SUBARRAY(3, sizes, subsizes, starts, &
+          MPI_ORDER_FORTRAN, mpitype_real, distribution, errcode)
+      CALL MPI_TYPE_COMMIT(distribution, errcode)
+
+      starts = ghosts(1:3)
+      sizes = SHAPE(array)
+      subsizes = SHAPE(array) - ghosts(1:3) - ghosts(4:6)
+
+      CALL MPI_TYPE_CREATE_SUBARRAY(3, sizes, subsizes, starts, &
+          MPI_ORDER_FORTRAN, mpitype_real, subarray, errcode)
+      CALL MPI_TYPE_COMMIT(subarray, errcode)
+    ELSE
+      CALL MPI_TYPE_CONTIGUOUS(0, mpitype_real, distribution, errcode)
+      CALL MPI_TYPE_COMMIT(distribution, errcode)
+      CALL MPI_TYPE_CONTIGUOUS(0, mpitype_real, subarray, errcode)
+      CALL MPI_TYPE_COMMIT(subarray, errcode)
+    END IF
+
+    CALL write_3d_array_real_spec_r4_par(h, id, name, &
+        n_global, array, distribution, subarray)
+
+    CALL MPI_TYPE_FREE(distribution, errcode)
+    CALL MPI_TYPE_FREE(subarray, errcode)
+
+  END SUBROUTINE write_3d_array_real_r4_par
+
 END MODULE sdf_output_r4

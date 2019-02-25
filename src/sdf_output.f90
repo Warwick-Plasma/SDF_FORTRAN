@@ -45,6 +45,21 @@ MODULE sdf_output
         write_2d_array_character
   END INTERFACE sdf_write_srl
 
+  INTERFACE sdf_write_par
+    MODULE PROCEDURE write_1d_array_real_spec_r8_par
+    MODULE PROCEDURE write_2d_array_real_spec_r8_par
+    MODULE PROCEDURE write_3d_array_real_spec_r8_par
+    MODULE PROCEDURE write_1d_array_real_spec_r4_par
+    MODULE PROCEDURE write_2d_array_real_spec_r4_par
+    MODULE PROCEDURE write_3d_array_real_spec_r4_par
+    MODULE PROCEDURE write_1d_array_real_r8_par
+    MODULE PROCEDURE write_2d_array_real_r8_par
+    MODULE PROCEDURE write_3d_array_real_r8_par
+    MODULE PROCEDURE write_1d_array_real_r4_par
+    MODULE PROCEDURE write_2d_array_real_r4_par
+    MODULE PROCEDURE write_3d_array_real_r4_par
+  END INTERFACE sdf_write_par
+
   INTERFACE sdf_write_cpu_split
     MODULE PROCEDURE &
         write_cpu_split_1d, &
