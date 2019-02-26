@@ -177,13 +177,13 @@ CONTAINS
 
 
 
-  SUBROUTINE write_1d_array_real_spec_r8_par (h, id, name, sz, array, &
+  SUBROUTINE write_1d_array_real_spec_r8_par(h, id, name, sz, array, &
       distribution, subarray)
 
     INTEGER, PARAMETER :: ndims = 1
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name
-    INTEGER, DIMENSION(1), INTENT(IN) :: sz
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: sz
     REAL(r8), DIMENSION(:), INTENT(IN) :: array
     INTEGER, INTENT(IN) :: distribution, subarray
     INTEGER :: errcode
@@ -197,7 +197,7 @@ CONTAINS
     b%mpitype = mpitype_real
     b%ndims = ndims
 
-    b%dims(1:1) = sz
+    b%dims(1:ndims) = sz
 
     ! Write header
 
@@ -219,17 +219,18 @@ CONTAINS
 
 
 
-  SUBROUTINE write_1d_array_real_r8_par (h, id, name, array, &
+  SUBROUTINE write_1d_array_real_r8_par(h, id, name, array, &
       sz, local_starts, local_ghosts, null_proc)
 
+    INTEGER, PARAMETER :: ndims = 1
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name
     REAL(r8), DIMENSION(:), INTENT(IN) :: array
-    INTEGER, DIMENSION(1), INTENT(IN) :: sz, local_starts
-    INTEGER, DIMENSION(2), INTENT(IN), OPTIONAL :: local_ghosts
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: sz, local_starts
+    INTEGER, DIMENSION(2*ndims), INTENT(IN), OPTIONAL :: local_ghosts
     LOGICAL, INTENT(IN), OPTIONAL :: null_proc
-    INTEGER, DIMENSION(2) :: ghosts
-    INTEGER, DIMENSION(1) :: starts, sizes, subsizes
+    INTEGER, DIMENSION(2*ndims) :: ghosts
+    INTEGER, DIMENSION(ndims) :: starts, sizes, subsizes
     INTEGER :: distribution, subarray, errcode
     LOGICAL :: not_this_processor
 
@@ -246,43 +247,42 @@ CONTAINS
 
       starts = local_starts - 1
       sizes = sz
-      subsizes = SHAPE(array) - ghosts(1:1) - ghosts(2:2)
+      subsizes = SHAPE(array) - ghosts(:)
 
-      CALL MPI_TYPE_CREATE_SUBARRAY(1, sizes, subsizes, starts, &
+      CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, distribution, errcode)
       CALL MPI_TYPE_COMMIT(distribution, errcode)
 
-      !Subsizes are unchanged
-      starts = ghosts(1:1)
+      ! Subsizes are unchanged
+      starts = ghosts(1:ndims)
       sizes = SHAPE(array)
 
-      CALL MPI_TYPE_CREATE_SUBARRAY(1, sizes, subsizes, starts, &
+      CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, subarray, errcode)
       CALL MPI_TYPE_COMMIT(subarray, errcode)
     ELSE
       CALL MPI_TYPE_CONTIGUOUS(0, mpitype_real, distribution, errcode)
       CALL MPI_TYPE_COMMIT(distribution, errcode)
-      CALL MPI_TYPE_CONTIGUOUS(0, mpitype_real, subarray, errcode)
-      CALL MPI_TYPE_COMMIT(subarray, errcode)
+      subarray = distribution
     END IF
 
     CALL write_1d_array_real_spec_r8_par(h, id, name, &
         sz, array, distribution, subarray)
 
+    IF (subarray /= distribution) CALL MPI_TYPE_FREE(subarray, errcode)
     CALL MPI_TYPE_FREE(distribution, errcode)
-    CALL MPI_TYPE_FREE(subarray, errcode)
 
   END SUBROUTINE write_1d_array_real_r8_par
 
 
 
-  SUBROUTINE write_2d_array_real_spec_r8_par (h, id, name, sz, array, &
+  SUBROUTINE write_2d_array_real_spec_r8_par(h, id, name, sz, array, &
       distribution, subarray)
 
     INTEGER, PARAMETER :: ndims = 2
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name
-    INTEGER, DIMENSION(2), INTENT(IN) :: sz
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: sz
     REAL(r8), DIMENSION(:,:), INTENT(IN) :: array
     INTEGER, INTENT(IN) :: distribution, subarray
     INTEGER :: errcode
@@ -296,7 +296,7 @@ CONTAINS
     b%mpitype = mpitype_real
     b%ndims = ndims
 
-    b%dims(1:2) = sz
+    b%dims(1:ndims) = sz
 
     ! Write header
 
@@ -318,17 +318,18 @@ CONTAINS
 
 
 
-  SUBROUTINE write_2d_array_real_r8_par (h, id, name, array, &
+  SUBROUTINE write_2d_array_real_r8_par(h, id, name, array, &
       sz, local_starts, local_ghosts, null_proc)
 
+    INTEGER, PARAMETER :: ndims = 2
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name
     REAL(r8), DIMENSION(:,:), INTENT(IN) :: array
-    INTEGER, DIMENSION(2), INTENT(IN) :: sz, local_starts
-    INTEGER, DIMENSION(4), INTENT(IN), OPTIONAL :: local_ghosts
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: sz, local_starts
+    INTEGER, DIMENSION(2*ndims), INTENT(IN), OPTIONAL :: local_ghosts
     LOGICAL, INTENT(IN), OPTIONAL :: null_proc
-    INTEGER, DIMENSION(4) :: ghosts
-    INTEGER, DIMENSION(2) :: starts, sizes, subsizes
+    INTEGER, DIMENSION(2*ndims) :: ghosts
+    INTEGER, DIMENSION(ndims) :: starts, sizes, subsizes
     INTEGER :: distribution, subarray, errcode
     LOGICAL :: not_this_processor
 
@@ -345,43 +346,42 @@ CONTAINS
 
       starts = local_starts - 1
       sizes = sz
-      subsizes = SHAPE(array) - ghosts(1:2) - ghosts(3:4)
+      subsizes = SHAPE(array) - ghosts(:)
 
-      CALL MPI_TYPE_CREATE_SUBARRAY(2, sizes, subsizes, starts, &
+      CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, distribution, errcode)
       CALL MPI_TYPE_COMMIT(distribution, errcode)
 
-      !Subsizes are unchanged
-      starts = ghosts(1:2)
+      ! Subsizes are unchanged
+      starts = ghosts(1:ndims)
       sizes = SHAPE(array)
 
-      CALL MPI_TYPE_CREATE_SUBARRAY(2, sizes, subsizes, starts, &
+      CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, subarray, errcode)
       CALL MPI_TYPE_COMMIT(subarray, errcode)
     ELSE
       CALL MPI_TYPE_CONTIGUOUS(0, mpitype_real, distribution, errcode)
       CALL MPI_TYPE_COMMIT(distribution, errcode)
-      CALL MPI_TYPE_CONTIGUOUS(0, mpitype_real, subarray, errcode)
-      CALL MPI_TYPE_COMMIT(subarray, errcode)
+      subarray = distribution
     END IF
 
     CALL write_2d_array_real_spec_r8_par(h, id, name, &
         sz, array, distribution, subarray)
 
+    IF (subarray /= distribution) CALL MPI_TYPE_FREE(subarray, errcode)
     CALL MPI_TYPE_FREE(distribution, errcode)
-    CALL MPI_TYPE_FREE(subarray, errcode)
 
   END SUBROUTINE write_2d_array_real_r8_par
 
 
 
-  SUBROUTINE write_3d_array_real_spec_r8_par (h, id, name, sz, array, &
+  SUBROUTINE write_3d_array_real_spec_r8_par(h, id, name, sz, array, &
       distribution, subarray)
 
     INTEGER, PARAMETER :: ndims = 3
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name
-    INTEGER, DIMENSION(3), INTENT(IN) :: sz
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: sz
     REAL(r8), DIMENSION(:,:,:), INTENT(IN) :: array
     INTEGER, INTENT(IN) :: distribution, subarray
     INTEGER :: errcode
@@ -395,7 +395,7 @@ CONTAINS
     b%mpitype = mpitype_real
     b%ndims = ndims
 
-    b%dims(1:3) = sz
+    b%dims(1:ndims) = sz
 
     ! Write header
 
@@ -417,17 +417,18 @@ CONTAINS
 
 
 
-  SUBROUTINE write_3d_array_real_r8_par (h, id, name, array, &
+  SUBROUTINE write_3d_array_real_r8_par(h, id, name, array, &
       sz, local_starts, local_ghosts, null_proc)
 
+    INTEGER, PARAMETER :: ndims = 3
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name
     REAL(r8), DIMENSION(:,:,:), INTENT(IN) :: array
-    INTEGER, DIMENSION(3), INTENT(IN) :: sz, local_starts
-    INTEGER, DIMENSION(6), INTENT(IN), OPTIONAL :: local_ghosts
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: sz, local_starts
+    INTEGER, DIMENSION(2*ndims), INTENT(IN), OPTIONAL :: local_ghosts
     LOGICAL, INTENT(IN), OPTIONAL :: null_proc
-    INTEGER, DIMENSION(6) :: ghosts
-    INTEGER, DIMENSION(3) :: starts, sizes, subsizes
+    INTEGER, DIMENSION(2*ndims) :: ghosts
+    INTEGER, DIMENSION(ndims) :: starts, sizes, subsizes
     INTEGER :: distribution, subarray, errcode
     LOGICAL :: not_this_processor
 
@@ -444,31 +445,30 @@ CONTAINS
 
       starts = local_starts - 1
       sizes = sz
-      subsizes = SHAPE(array) - ghosts(1:3) - ghosts(4:6)
+      subsizes = SHAPE(array) - ghosts(:)
 
-      CALL MPI_TYPE_CREATE_SUBARRAY(3, sizes, subsizes, starts, &
+      CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, distribution, errcode)
       CALL MPI_TYPE_COMMIT(distribution, errcode)
 
-      !Subsizes are unchanged
-      starts = ghosts(1:3)
+      ! Subsizes are unchanged
+      starts = ghosts(1:ndims)
       sizes = SHAPE(array)
 
-      CALL MPI_TYPE_CREATE_SUBARRAY(3, sizes, subsizes, starts, &
+      CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, subarray, errcode)
       CALL MPI_TYPE_COMMIT(subarray, errcode)
     ELSE
       CALL MPI_TYPE_CONTIGUOUS(0, mpitype_real, distribution, errcode)
       CALL MPI_TYPE_COMMIT(distribution, errcode)
-      CALL MPI_TYPE_CONTIGUOUS(0, mpitype_real, subarray, errcode)
-      CALL MPI_TYPE_COMMIT(subarray, errcode)
+      subarray = distribution
     END IF
 
     CALL write_3d_array_real_spec_r8_par(h, id, name, &
         sz, array, distribution, subarray)
 
+    IF (subarray /= distribution) CALL MPI_TYPE_FREE(subarray, errcode)
     CALL MPI_TYPE_FREE(distribution, errcode)
-    CALL MPI_TYPE_FREE(subarray, errcode)
 
   END SUBROUTINE write_3d_array_real_r8_par
 
