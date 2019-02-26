@@ -247,7 +247,7 @@ CONTAINS
 
       starts = local_starts - 1
       sizes = sz
-      subsizes = SHAPE(array) - ghosts(:)
+      subsizes = SHAPE(array) - ghosts(1:ndims) - ghosts(ndims+1:)
 
       CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, distribution, errcode)
@@ -346,7 +346,7 @@ CONTAINS
 
       starts = local_starts - 1
       sizes = sz
-      subsizes = SHAPE(array) - ghosts(:)
+      subsizes = SHAPE(array) - ghosts(1:ndims) - ghosts(ndims+1:)
 
       CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, distribution, errcode)
@@ -445,7 +445,7 @@ CONTAINS
 
       starts = local_starts - 1
       sizes = sz
-      subsizes = SHAPE(array) - ghosts(:)
+      subsizes = SHAPE(array) - ghosts(1:ndims) - ghosts(ndims+1:)
 
       CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, distribution, errcode)
