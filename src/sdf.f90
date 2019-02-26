@@ -164,7 +164,7 @@ MODULE sdf
   PUBLIC :: sdf_write_matvar
   PUBLIC :: sdf_write_species
   PUBLIC :: sdf_write_srl
-  PUBLIC :: sdf_write_par
+  PUBLIC :: sdf_write_array
   PUBLIC :: sdf_write_plain_mesh
   PUBLIC :: sdf_write_plain_variable
   PUBLIC :: sdf_write_point_mesh

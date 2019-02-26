@@ -220,13 +220,13 @@ CONTAINS
 
 
   SUBROUTINE write_1d_array_real_r4_par (h, id, name, array, &
-      n_global, local_starts, local_ghosts, null_proc)
+      sz, local_starts, local_ghosts, null_proc)
 
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name
     REAL(r4), DIMENSION(:), INTENT(IN) :: array
-    INTEGER, DIMENSION(1), INTENT(IN) :: n_global, local_starts
-    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: local_ghosts
+    INTEGER, DIMENSION(1), INTENT(IN) :: sz, local_starts
+    INTEGER, DIMENSION(2), INTENT(IN), OPTIONAL :: local_ghosts
     LOGICAL, INTENT(IN), OPTIONAL :: null_proc
     INTEGER, DIMENSION(2) :: ghosts
     INTEGER, DIMENSION(1) :: starts, sizes, subsizes
@@ -242,28 +242,19 @@ CONTAINS
 
     IF (.NOT. not_this_processor) THEN
       ghosts = 0
-      IF (PRESENT(local_ghosts)) THEN
-        IF (SIZE(local_ghosts) == SIZE(ghosts)) THEN
-          ghosts = local_ghosts
-        ELSE IF (SIZE(local_ghosts) == SIZE(ghosts)/2) THEN
-          ghosts(1:1) = local_ghosts
-          ghosts(2:2) = local_ghosts
-        ELSE
-          RETURN
-        END IF
-      END IF
+      IF (PRESENT(local_ghosts)) ghosts = local_ghosts
 
       starts = local_starts - 1
-      sizes = n_global
+      sizes = sz
       subsizes = SHAPE(array) - ghosts(1:1) - ghosts(2:2)
 
       CALL MPI_TYPE_CREATE_SUBARRAY(1, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, distribution, errcode)
       CALL MPI_TYPE_COMMIT(distribution, errcode)
 
+      !Subsizes are unchanged
       starts = ghosts(1:1)
       sizes = SHAPE(array)
-      subsizes = SHAPE(array) - ghosts(1:1) - ghosts(2:2)
 
       CALL MPI_TYPE_CREATE_SUBARRAY(1, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, subarray, errcode)
@@ -276,7 +267,7 @@ CONTAINS
     END IF
 
     CALL write_1d_array_real_spec_r4_par(h, id, name, &
-        n_global, array, distribution, subarray)
+        sz, array, distribution, subarray)
 
     CALL MPI_TYPE_FREE(distribution, errcode)
     CALL MPI_TYPE_FREE(subarray, errcode)
@@ -328,13 +319,13 @@ CONTAINS
 
 
   SUBROUTINE write_2d_array_real_r4_par (h, id, name, array, &
-      n_global, local_starts, local_ghosts, null_proc)
+      sz, local_starts, local_ghosts, null_proc)
 
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name
     REAL(r4), DIMENSION(:,:), INTENT(IN) :: array
-    INTEGER, DIMENSION(2), INTENT(IN) :: n_global, local_starts
-    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: local_ghosts
+    INTEGER, DIMENSION(2), INTENT(IN) :: sz, local_starts
+    INTEGER, DIMENSION(4), INTENT(IN), OPTIONAL :: local_ghosts
     LOGICAL, INTENT(IN), OPTIONAL :: null_proc
     INTEGER, DIMENSION(4) :: ghosts
     INTEGER, DIMENSION(2) :: starts, sizes, subsizes
@@ -350,28 +341,19 @@ CONTAINS
 
     IF (.NOT. not_this_processor) THEN
       ghosts = 0
-      IF (PRESENT(local_ghosts)) THEN
-        IF (SIZE(local_ghosts) == SIZE(ghosts)) THEN
-          ghosts = local_ghosts
-        ELSE IF (SIZE(local_ghosts) == SIZE(ghosts)/2) THEN
-          ghosts(1:2) = local_ghosts
-          ghosts(3:4) = local_ghosts
-        ELSE
-          RETURN
-        END IF
-      END IF
+      IF (PRESENT(local_ghosts)) ghosts = local_ghosts
 
       starts = local_starts - 1
-      sizes = n_global
+      sizes = sz
       subsizes = SHAPE(array) - ghosts(1:2) - ghosts(3:4)
 
       CALL MPI_TYPE_CREATE_SUBARRAY(2, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, distribution, errcode)
       CALL MPI_TYPE_COMMIT(distribution, errcode)
 
+      !Subsizes are unchanged
       starts = ghosts(1:2)
       sizes = SHAPE(array)
-      subsizes = SHAPE(array) - ghosts(1:2) - ghosts(3:4)
 
       CALL MPI_TYPE_CREATE_SUBARRAY(2, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, subarray, errcode)
@@ -384,7 +366,7 @@ CONTAINS
     END IF
 
     CALL write_2d_array_real_spec_r4_par(h, id, name, &
-        n_global, array, distribution, subarray)
+        sz, array, distribution, subarray)
 
     CALL MPI_TYPE_FREE(distribution, errcode)
     CALL MPI_TYPE_FREE(subarray, errcode)
@@ -434,15 +416,14 @@ CONTAINS
   END SUBROUTINE write_3d_array_real_spec_r4_par
 
 
-
   SUBROUTINE write_3d_array_real_r4_par (h, id, name, array, &
-      n_global, local_starts, local_ghosts, null_proc)
+      sz, local_starts, local_ghosts, null_proc)
 
     TYPE(sdf_file_handle) :: h
     CHARACTER(LEN=*), INTENT(IN) :: id, name
     REAL(r4), DIMENSION(:,:,:), INTENT(IN) :: array
-    INTEGER, DIMENSION(3), INTENT(IN) :: n_global, local_starts
-    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: local_ghosts
+    INTEGER, DIMENSION(3), INTENT(IN) :: sz, local_starts
+    INTEGER, DIMENSION(6), INTENT(IN), OPTIONAL :: local_ghosts
     LOGICAL, INTENT(IN), OPTIONAL :: null_proc
     INTEGER, DIMENSION(6) :: ghosts
     INTEGER, DIMENSION(3) :: starts, sizes, subsizes
@@ -458,28 +439,19 @@ CONTAINS
 
     IF (.NOT. not_this_processor) THEN
       ghosts = 0
-      IF (PRESENT(local_ghosts)) THEN
-        IF (SIZE(local_ghosts) == SIZE(ghosts)) THEN
-          ghosts = local_ghosts
-        ELSE IF (SIZE(local_ghosts) == SIZE(ghosts)/2) THEN
-          ghosts(1:3) = local_ghosts
-          ghosts(4:6) = local_ghosts
-        ELSE
-          RETURN
-        END IF
-      END IF
+      IF (PRESENT(local_ghosts)) ghosts = local_ghosts
 
       starts = local_starts - 1
-      sizes = n_global
+      sizes = sz
       subsizes = SHAPE(array) - ghosts(1:3) - ghosts(4:6)
 
       CALL MPI_TYPE_CREATE_SUBARRAY(3, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, distribution, errcode)
       CALL MPI_TYPE_COMMIT(distribution, errcode)
 
+      !Subsizes are unchanged
       starts = ghosts(1:3)
       sizes = SHAPE(array)
-      subsizes = SHAPE(array) - ghosts(1:3) - ghosts(4:6)
 
       CALL MPI_TYPE_CREATE_SUBARRAY(3, sizes, subsizes, starts, &
           MPI_ORDER_FORTRAN, mpitype_real, subarray, errcode)
@@ -492,7 +464,7 @@ CONTAINS
     END IF
 
     CALL write_3d_array_real_spec_r4_par(h, id, name, &
-        n_global, array, distribution, subarray)
+        sz, array, distribution, subarray)
 
     CALL MPI_TYPE_FREE(distribution, errcode)
     CALL MPI_TYPE_FREE(subarray, errcode)
