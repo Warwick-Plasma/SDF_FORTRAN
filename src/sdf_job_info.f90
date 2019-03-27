@@ -45,11 +45,7 @@ CONTAINS
     m = values(6) - values(4)
     s = values(7)
 
-    days = (year - 1970)*365 &            ! 365 days per year
-          + (year - 1969)/4 &             ! and an extra day for each leap year
-          - (year - 1601)/100 &           ! but century years are not leap years
-          + (year - 1601)/400 &           ! unless divisible by 400
-          + days_since_new_year(month)
+    days = (year - 1970)*365 + (year - 1969)/4 + days_since_new_year(month)
 
     IF ((MOD(year,400) == 0 &
         .OR.  (MOD(year,4) == 0 .AND. MOD(year,100) /= 0)) &
