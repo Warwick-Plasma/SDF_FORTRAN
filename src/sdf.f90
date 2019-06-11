@@ -134,6 +134,7 @@ MODULE sdf
   PUBLIC :: sdf_read_block_header
   PUBLIC :: sdf_read_next_block_header
   PUBLIC :: sdf_read_srl
+  PUBLIC :: sdf_read_array
   PUBLIC :: sdf_read_array_info
   PUBLIC :: sdf_read_material_info
   PUBLIC :: sdf_read_stitched_info
