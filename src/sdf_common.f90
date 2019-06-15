@@ -905,17 +905,19 @@ CONTAINS
 
       IF (filehandle > 0) THEN
         CALL MPI_FILE_GET_INFO(filehandle, info, ierr)
-        CALL MPI_INFO_GET_NKEYS(info, nkeys, ierr)
-        IF (nkeys > 0) THEN
-          WRITE(0,*) 'Info:'
-          DO i = 0,nkeys-1
-            CALL MPI_INFO_GET_NTHKEY(info, i, key, ierr)
-            CALL MPI_INFO_GET(info, key, MPI_MAX_INFO_VAL, info_value, &
-                              found, ierr)
-            WRITE(0,'(10X,A,": ",A)') TRIM(key), TRIM(info_value)
-          END DO
+        IF (ierr == 0) THEN
+          CALL MPI_INFO_GET_NKEYS(info, nkeys, ierr)
+          IF (nkeys > 0) THEN
+            WRITE(0,*) 'Info:'
+            DO i = 0,nkeys-1
+              CALL MPI_INFO_GET_NTHKEY(info, i, key, ierr)
+              CALL MPI_INFO_GET(info, key, MPI_MAX_INFO_VAL, info_value, &
+                                found, ierr)
+              WRITE(0,'(10X,A,": ",A)') TRIM(key), TRIM(info_value)
+            END DO
+          END IF
+          CALL MPI_INFO_FREE(info, ierr)
         END IF
-        CALL MPI_INFO_FREE(info, ierr)
       END IF
     END IF
 
