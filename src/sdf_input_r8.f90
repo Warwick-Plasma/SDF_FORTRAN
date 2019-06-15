@@ -101,7 +101,6 @@ CONTAINS
     INTEGER :: errcode
     TYPE(sdf_block_type), POINTER :: b
 
-
     IF (sdf_check_block_header(h)) RETURN
 
     b => h%current_block
@@ -130,7 +129,7 @@ CONTAINS
     REAL(r8), DIMENSION(:), INTENT(INOUT) :: values
     INTEGER, DIMENSION(ndims), INTENT(IN) :: sz
     INTEGER, DIMENSION(ndims), INTENT(IN) :: local_starts
-    INTEGER, DIMENSION(2 * ndims), INTENT(IN), OPTIONAL :: local_ghosts
+    INTEGER, DIMENSION(2*ndims), INTENT(IN), OPTIONAL :: local_ghosts
     LOGICAL, INTENT(IN), OPTIONAL :: null_proc
     INTEGER, DIMENSION(2*ndims) :: ghosts
     INTEGER, DIMENSION(c_maxdims) :: dims
@@ -221,7 +220,6 @@ CONTAINS
     INTEGER :: errcode
     TYPE(sdf_block_type), POINTER :: b
 
-
     IF (sdf_check_block_header(h)) RETURN
 
     b => h%current_block
@@ -250,7 +248,7 @@ CONTAINS
     REAL(r8), DIMENSION(:,:), INTENT(INOUT) :: values
     INTEGER, DIMENSION(ndims), INTENT(IN) :: sz
     INTEGER, DIMENSION(ndims), INTENT(IN) :: local_starts
-    INTEGER, DIMENSION(2 * ndims), INTENT(IN), OPTIONAL :: local_ghosts
+    INTEGER, DIMENSION(2*ndims), INTENT(IN), OPTIONAL :: local_ghosts
     LOGICAL, INTENT(IN), OPTIONAL :: null_proc
     INTEGER, DIMENSION(2*ndims) :: ghosts
     INTEGER, DIMENSION(c_maxdims) :: dims
@@ -341,7 +339,6 @@ CONTAINS
     INTEGER :: errcode
     TYPE(sdf_block_type), POINTER :: b
 
-
     IF (sdf_check_block_header(h)) RETURN
 
     b => h%current_block
@@ -370,7 +367,7 @@ CONTAINS
     REAL(r8), DIMENSION(:,:,:), INTENT(INOUT) :: values
     INTEGER, DIMENSION(ndims), INTENT(IN) :: sz
     INTEGER, DIMENSION(ndims), INTENT(IN) :: local_starts
-    INTEGER, DIMENSION(2 * ndims), INTENT(IN), OPTIONAL :: local_ghosts
+    INTEGER, DIMENSION(2*ndims), INTENT(IN), OPTIONAL :: local_ghosts
     LOGICAL, INTENT(IN), OPTIONAL :: null_proc
     INTEGER, DIMENSION(2*ndims) :: ghosts
     INTEGER, DIMENSION(c_maxdims) :: dims
