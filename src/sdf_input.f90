@@ -39,6 +39,22 @@ MODULE sdf_input
         read_2d_array_character
   END INTERFACE sdf_read_srl
 
+  INTERFACE sdf_read_array
+    MODULE PROCEDURE &
+        read_1d_array_par_real_spec_r8, &
+        read_1d_array_par_real_r8,      &
+        read_2d_array_par_real_spec_r8, &
+        read_2d_array_par_real_r8,      &
+        read_3d_array_par_real_spec_r8, &
+        read_3d_array_par_real_r8,      &
+        read_1d_array_par_real_spec_r4, &
+        read_1d_array_par_real_r4,      &
+        read_2d_array_par_real_spec_r4, &
+        read_2d_array_par_real_r4,      &
+        read_3d_array_par_real_spec_r4, &
+        read_3d_array_par_real_r4
+  END INTERFACE sdf_read_array
+
   INTERFACE sdf_read_srl_cpu_split
     MODULE PROCEDURE &
         read_srl_cpu_split, &

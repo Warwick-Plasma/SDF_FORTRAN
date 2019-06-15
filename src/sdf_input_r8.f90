@@ -92,6 +92,94 @@ CONTAINS
 
 
 
+  SUBROUTINE read_1d_array_par_real_spec_r8(h, values, subarray, distribution)
+
+    TYPE(sdf_file_handle), INTENT(INOUT) :: h
+    REAL(r8), DIMENSION(:), INTENT(INOUT) :: values
+    INTEGER, INTENT(IN) :: subarray, distribution
+    INTEGER, DIMENSION(c_maxdims) :: dims
+    INTEGER :: errcode
+    TYPE(sdf_block_type), POINTER :: b
+
+    IF (sdf_check_block_header(h)) RETURN
+
+    b => h%current_block
+    IF (.NOT. b%done_info) CALL sdf_read_array_info(h, dims)
+
+    h%current_location = b%data_location
+    CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
+        distribution, 'native', MPI_INFO_NULL, errcode)
+    CALL MPI_FILE_READ_ALL(h%filehandle, values, 1, subarray, &
+        MPI_STATUS_IGNORE, errcode)
+    CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
+        MPI_INFO_NULL, errcode)
+
+    h%current_location = b%next_block_location
+    b%done_data = .TRUE.
+
+  END SUBROUTINE read_1d_array_par_real_spec_r8
+
+
+
+  SUBROUTINE read_1d_array_par_real_r8(h, values, sz, local_starts, &
+      local_ghosts, null_proc)
+
+    INTEGER, PARAMETER :: ndims = 1
+    TYPE(sdf_file_handle), INTENT(INOUT) :: h
+    REAL(r8), DIMENSION(:), INTENT(INOUT) :: values
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: sz
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: local_starts
+    INTEGER, DIMENSION(2*ndims), INTENT(IN), OPTIONAL :: local_ghosts
+    LOGICAL, INTENT(IN), OPTIONAL :: null_proc
+    INTEGER, DIMENSION(2*ndims) :: ghosts
+    INTEGER, DIMENSION(c_maxdims) :: dims
+    INTEGER :: distribution, subarray, errcode
+    INTEGER, DIMENSION(ndims) :: starts, sizes, subsizes
+    LOGICAL :: not_this_processor
+
+    IF (sdf_check_block_header(h)) RETURN
+
+    not_this_processor = .FALSE.
+    IF (PRESENT(null_proc)) THEN
+      not_this_processor = null_proc
+    ELSE IF (ANY(local_starts < 0)) THEN
+      not_this_processor = .TRUE.
+    END IF
+
+    IF (.NOT. not_this_processor) THEN
+      ghosts = 0
+      IF (PRESENT(local_ghosts)) ghosts = local_ghosts
+
+      starts = local_starts - 1
+      sizes = sz
+      subsizes = SHAPE(values) - ghosts(1:ndims) - ghosts(ndims+1:)
+
+      CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
+          MPI_ORDER_FORTRAN, MPI_REAL8, distribution, errcode)
+      CALL MPI_TYPE_COMMIT(distribution, errcode)
+
+      ! Subsizes are unchanged
+      starts = ghosts(1:ndims)
+      sizes = SHAPE(values)
+
+      CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
+          MPI_ORDER_FORTRAN, MPI_REAL8, subarray, errcode)
+      CALL MPI_TYPE_COMMIT(subarray, errcode)
+    ELSE
+      CALL MPI_TYPE_CONTIGUOUS(0, MPI_REAL8, distribution, errcode)
+      CALL MPI_TYPE_COMMIT(distribution, errcode)
+      subarray = distribution
+    END IF
+
+    CALL read_1d_array_par_real_spec_r8(h, values, subarray, distribution)
+
+    IF (subarray /= distribution) CALL MPI_TYPE_FREE(subarray, errcode)
+    CALL MPI_TYPE_FREE(distribution, errcode)
+
+  END SUBROUTINE read_1d_array_par_real_r8
+
+
+
   SUBROUTINE read_2d_array_real_r8(h, values)
 
     TYPE(sdf_file_handle) :: h
@@ -123,6 +211,94 @@ CONTAINS
 
 
 
+  SUBROUTINE read_2d_array_par_real_spec_r8(h, values, subarray, distribution)
+
+    TYPE(sdf_file_handle), INTENT(INOUT) :: h
+    REAL(r8), DIMENSION(:,:), INTENT(INOUT) :: values
+    INTEGER, INTENT(IN) :: subarray, distribution
+    INTEGER, DIMENSION(c_maxdims) :: dims
+    INTEGER :: errcode
+    TYPE(sdf_block_type), POINTER :: b
+
+    IF (sdf_check_block_header(h)) RETURN
+
+    b => h%current_block
+    IF (.NOT. b%done_info) CALL sdf_read_array_info(h, dims)
+
+    h%current_location = b%data_location
+    CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
+        distribution, 'native', MPI_INFO_NULL, errcode)
+    CALL MPI_FILE_READ_ALL(h%filehandle, values, 1, subarray, &
+        MPI_STATUS_IGNORE, errcode)
+    CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
+        MPI_INFO_NULL, errcode)
+
+    h%current_location = b%next_block_location
+    b%done_data = .TRUE.
+
+  END SUBROUTINE read_2d_array_par_real_spec_r8
+
+
+
+  SUBROUTINE read_2d_array_par_real_r8(h, values, sz, local_starts, &
+      local_ghosts, null_proc)
+
+    INTEGER, PARAMETER :: ndims = 2
+    TYPE(sdf_file_handle), INTENT(INOUT) :: h
+    REAL(r8), DIMENSION(:,:), INTENT(INOUT) :: values
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: sz
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: local_starts
+    INTEGER, DIMENSION(2*ndims), INTENT(IN), OPTIONAL :: local_ghosts
+    LOGICAL, INTENT(IN), OPTIONAL :: null_proc
+    INTEGER, DIMENSION(2*ndims) :: ghosts
+    INTEGER, DIMENSION(c_maxdims) :: dims
+    INTEGER :: distribution, subarray, errcode
+    INTEGER, DIMENSION(ndims) :: starts, sizes, subsizes
+    LOGICAL :: not_this_processor
+
+    IF (sdf_check_block_header(h)) RETURN
+
+    not_this_processor = .FALSE.
+    IF (PRESENT(null_proc)) THEN
+      not_this_processor = null_proc
+    ELSE IF (ANY(local_starts < 0)) THEN
+      not_this_processor = .TRUE.
+    END IF
+
+    IF (.NOT. not_this_processor) THEN
+      ghosts = 0
+      IF (PRESENT(local_ghosts)) ghosts = local_ghosts
+
+      starts = local_starts - 1
+      sizes = sz
+      subsizes = SHAPE(values) - ghosts(1:ndims) - ghosts(ndims+1:)
+
+      CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
+          MPI_ORDER_FORTRAN, MPI_REAL8, distribution, errcode)
+      CALL MPI_TYPE_COMMIT(distribution, errcode)
+
+      ! Subsizes are unchanged
+      starts = ghosts(1:ndims)
+      sizes = SHAPE(values)
+
+      CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
+          MPI_ORDER_FORTRAN, MPI_REAL8, subarray, errcode)
+      CALL MPI_TYPE_COMMIT(subarray, errcode)
+    ELSE
+      CALL MPI_TYPE_CONTIGUOUS(0, MPI_REAL8, distribution, errcode)
+      CALL MPI_TYPE_COMMIT(distribution, errcode)
+      subarray = distribution
+    END IF
+
+    CALL read_2d_array_par_real_spec_r8(h, values, subarray, distribution)
+
+    IF (subarray /= distribution) CALL MPI_TYPE_FREE(subarray, errcode)
+    CALL MPI_TYPE_FREE(distribution, errcode)
+
+  END SUBROUTINE read_2d_array_par_real_r8
+
+
+
   SUBROUTINE read_3d_array_real_r8(h, values)
 
     TYPE(sdf_file_handle) :: h
@@ -151,5 +327,93 @@ CONTAINS
     b%done_data = .TRUE.
 
   END SUBROUTINE read_3d_array_real_r8
+
+
+
+  SUBROUTINE read_3d_array_par_real_spec_r8(h, values, subarray, distribution)
+
+    TYPE(sdf_file_handle), INTENT(INOUT) :: h
+    REAL(r8), DIMENSION(:,:,:), INTENT(INOUT) :: values
+    INTEGER, INTENT(IN) :: subarray, distribution
+    INTEGER, DIMENSION(c_maxdims) :: dims
+    INTEGER :: errcode
+    TYPE(sdf_block_type), POINTER :: b
+
+    IF (sdf_check_block_header(h)) RETURN
+
+    b => h%current_block
+    IF (.NOT. b%done_info) CALL sdf_read_array_info(h, dims)
+
+    h%current_location = b%data_location
+    CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
+        distribution, 'native', MPI_INFO_NULL, errcode)
+    CALL MPI_FILE_READ_ALL(h%filehandle, values, 1, subarray, &
+        MPI_STATUS_IGNORE, errcode)
+    CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
+        MPI_INFO_NULL, errcode)
+
+    h%current_location = b%next_block_location
+    b%done_data = .TRUE.
+
+  END SUBROUTINE read_3d_array_par_real_spec_r8
+
+
+
+  SUBROUTINE read_3d_array_par_real_r8(h, values, sz, local_starts, &
+      local_ghosts, null_proc)
+
+    INTEGER, PARAMETER :: ndims = 3
+    TYPE(sdf_file_handle), INTENT(INOUT) :: h
+    REAL(r8), DIMENSION(:,:,:), INTENT(INOUT) :: values
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: sz
+    INTEGER, DIMENSION(ndims), INTENT(IN) :: local_starts
+    INTEGER, DIMENSION(2*ndims), INTENT(IN), OPTIONAL :: local_ghosts
+    LOGICAL, INTENT(IN), OPTIONAL :: null_proc
+    INTEGER, DIMENSION(2*ndims) :: ghosts
+    INTEGER, DIMENSION(c_maxdims) :: dims
+    INTEGER :: distribution, subarray, errcode
+    INTEGER, DIMENSION(ndims) :: starts, sizes, subsizes
+    LOGICAL :: not_this_processor
+
+    IF (sdf_check_block_header(h)) RETURN
+
+    not_this_processor = .FALSE.
+    IF (PRESENT(null_proc)) THEN
+      not_this_processor = null_proc
+    ELSE IF (ANY(local_starts < 0)) THEN
+      not_this_processor = .TRUE.
+    END IF
+
+    IF (.NOT. not_this_processor) THEN
+      ghosts = 0
+      IF (PRESENT(local_ghosts)) ghosts = local_ghosts
+
+      starts = local_starts - 1
+      sizes = sz
+      subsizes = SHAPE(values) - ghosts(1:ndims) - ghosts(ndims+1:)
+
+      CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
+          MPI_ORDER_FORTRAN, MPI_REAL8, distribution, errcode)
+      CALL MPI_TYPE_COMMIT(distribution, errcode)
+
+      ! Subsizes are unchanged
+      starts = ghosts(1:ndims)
+      sizes = SHAPE(values)
+
+      CALL MPI_TYPE_CREATE_SUBARRAY(ndims, sizes, subsizes, starts, &
+          MPI_ORDER_FORTRAN, MPI_REAL8, subarray, errcode)
+      CALL MPI_TYPE_COMMIT(subarray, errcode)
+    ELSE
+      CALL MPI_TYPE_CONTIGUOUS(0, MPI_REAL8, distribution, errcode)
+      CALL MPI_TYPE_COMMIT(distribution, errcode)
+      subarray = distribution
+    END IF
+
+    CALL read_3d_array_par_real_spec_r8(h, values, subarray, distribution)
+
+    IF (subarray /= distribution) CALL MPI_TYPE_FREE(subarray, errcode)
+    CALL MPI_TYPE_FREE(distribution, errcode)
+
+  END SUBROUTINE read_3d_array_par_real_r8
 
 END MODULE sdf_input_r8
