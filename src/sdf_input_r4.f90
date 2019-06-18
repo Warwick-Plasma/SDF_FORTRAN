@@ -65,14 +65,13 @@ CONTAINS
 
     TYPE(sdf_file_handle) :: h
     REAL(r4), DIMENSION(:), INTENT(OUT) :: values
-    INTEGER, DIMENSION(c_maxdims) :: dims
     INTEGER :: errcode, n1
     TYPE(sdf_block_type), POINTER :: b
 
     IF (sdf_check_block_header(h)) RETURN
 
     b => h%current_block
-    IF (.NOT. b%done_info) CALL sdf_read_array_info(h, dims)
+    IF (.NOT. b%done_info) CALL sdf_read_array_info(h)
 
     n1 = b%dims(1)
 
@@ -95,16 +94,15 @@ CONTAINS
   SUBROUTINE read_1d_array_par_real_spec_r4(h, values, subarray, distribution)
 
     TYPE(sdf_file_handle), INTENT(INOUT) :: h
-    REAL(r4), DIMENSION(:), INTENT(INOUT) :: values
+    REAL(r4), DIMENSION(:), INTENT(OUT) :: values
     INTEGER, INTENT(IN) :: subarray, distribution
-    INTEGER, DIMENSION(c_maxdims) :: dims
     INTEGER :: errcode
     TYPE(sdf_block_type), POINTER :: b
 
     IF (sdf_check_block_header(h)) RETURN
 
     b => h%current_block
-    IF (.NOT. b%done_info) CALL sdf_read_array_info(h, dims)
+    IF (.NOT. b%done_info) CALL sdf_read_array_info(h)
 
     h%current_location = b%data_location
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
@@ -126,13 +124,12 @@ CONTAINS
 
     INTEGER, PARAMETER :: ndims = 1
     TYPE(sdf_file_handle), INTENT(INOUT) :: h
-    REAL(r4), DIMENSION(:), INTENT(INOUT) :: values
+    REAL(r4), DIMENSION(:), INTENT(OUT) :: values
     INTEGER, DIMENSION(ndims), INTENT(IN) :: sz
     INTEGER, DIMENSION(ndims), INTENT(IN) :: local_starts
     INTEGER, DIMENSION(2*ndims), INTENT(IN), OPTIONAL :: local_ghosts
     LOGICAL, INTENT(IN), OPTIONAL :: null_proc
     INTEGER, DIMENSION(2*ndims) :: ghosts
-    INTEGER, DIMENSION(c_maxdims) :: dims
     INTEGER :: distribution, subarray, errcode
     INTEGER, DIMENSION(ndims) :: starts, sizes, subsizes
     LOGICAL :: not_this_processor
@@ -184,14 +181,13 @@ CONTAINS
 
     TYPE(sdf_file_handle) :: h
     REAL(r4), DIMENSION(:,:), INTENT(OUT) :: values
-    INTEGER, DIMENSION(c_maxdims) :: dims
     INTEGER :: errcode, n1
     TYPE(sdf_block_type), POINTER :: b
 
     IF (sdf_check_block_header(h)) RETURN
 
     b => h%current_block
-    IF (.NOT. b%done_info) CALL sdf_read_array_info(h, dims)
+    IF (.NOT. b%done_info) CALL sdf_read_array_info(h)
 
     n1 = b%dims(1) * b%dims(2)
 
@@ -214,16 +210,15 @@ CONTAINS
   SUBROUTINE read_2d_array_par_real_spec_r4(h, values, subarray, distribution)
 
     TYPE(sdf_file_handle), INTENT(INOUT) :: h
-    REAL(r4), DIMENSION(:,:), INTENT(INOUT) :: values
+    REAL(r4), DIMENSION(:,:), INTENT(OUT) :: values
     INTEGER, INTENT(IN) :: subarray, distribution
-    INTEGER, DIMENSION(c_maxdims) :: dims
     INTEGER :: errcode
     TYPE(sdf_block_type), POINTER :: b
 
     IF (sdf_check_block_header(h)) RETURN
 
     b => h%current_block
-    IF (.NOT. b%done_info) CALL sdf_read_array_info(h, dims)
+    IF (.NOT. b%done_info) CALL sdf_read_array_info(h)
 
     h%current_location = b%data_location
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
@@ -245,13 +240,12 @@ CONTAINS
 
     INTEGER, PARAMETER :: ndims = 2
     TYPE(sdf_file_handle), INTENT(INOUT) :: h
-    REAL(r4), DIMENSION(:,:), INTENT(INOUT) :: values
+    REAL(r4), DIMENSION(:,:), INTENT(OUT) :: values
     INTEGER, DIMENSION(ndims), INTENT(IN) :: sz
     INTEGER, DIMENSION(ndims), INTENT(IN) :: local_starts
     INTEGER, DIMENSION(2*ndims), INTENT(IN), OPTIONAL :: local_ghosts
     LOGICAL, INTENT(IN), OPTIONAL :: null_proc
     INTEGER, DIMENSION(2*ndims) :: ghosts
-    INTEGER, DIMENSION(c_maxdims) :: dims
     INTEGER :: distribution, subarray, errcode
     INTEGER, DIMENSION(ndims) :: starts, sizes, subsizes
     LOGICAL :: not_this_processor
@@ -303,14 +297,13 @@ CONTAINS
 
     TYPE(sdf_file_handle) :: h
     REAL(r4), DIMENSION(:,:,:), INTENT(OUT) :: values
-    INTEGER, DIMENSION(c_maxdims) :: dims
     INTEGER :: errcode, n1
     TYPE(sdf_block_type), POINTER :: b
 
     IF (sdf_check_block_header(h)) RETURN
 
     b => h%current_block
-    IF (.NOT. b%done_info) CALL sdf_read_array_info(h, dims)
+    IF (.NOT. b%done_info) CALL sdf_read_array_info(h)
 
     n1 = b%dims(1) * b%dims(2) * b%dims(3)
 
@@ -333,16 +326,15 @@ CONTAINS
   SUBROUTINE read_3d_array_par_real_spec_r4(h, values, subarray, distribution)
 
     TYPE(sdf_file_handle), INTENT(INOUT) :: h
-    REAL(r4), DIMENSION(:,:,:), INTENT(INOUT) :: values
+    REAL(r4), DIMENSION(:,:,:), INTENT(OUT) :: values
     INTEGER, INTENT(IN) :: subarray, distribution
-    INTEGER, DIMENSION(c_maxdims) :: dims
     INTEGER :: errcode
     TYPE(sdf_block_type), POINTER :: b
 
     IF (sdf_check_block_header(h)) RETURN
 
     b => h%current_block
-    IF (.NOT. b%done_info) CALL sdf_read_array_info(h, dims)
+    IF (.NOT. b%done_info) CALL sdf_read_array_info(h)
 
     h%current_location = b%data_location
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
@@ -364,13 +356,12 @@ CONTAINS
 
     INTEGER, PARAMETER :: ndims = 3
     TYPE(sdf_file_handle), INTENT(INOUT) :: h
-    REAL(r4), DIMENSION(:,:,:), INTENT(INOUT) :: values
+    REAL(r4), DIMENSION(:,:,:), INTENT(OUT) :: values
     INTEGER, DIMENSION(ndims), INTENT(IN) :: sz
     INTEGER, DIMENSION(ndims), INTENT(IN) :: local_starts
     INTEGER, DIMENSION(2*ndims), INTENT(IN), OPTIONAL :: local_ghosts
     LOGICAL, INTENT(IN), OPTIONAL :: null_proc
     INTEGER, DIMENSION(2*ndims) :: ghosts
-    INTEGER, DIMENSION(c_maxdims) :: dims
     INTEGER :: distribution, subarray, errcode
     INTEGER, DIMENSION(ndims) :: starts, sizes, subsizes
     LOGICAL :: not_this_processor
