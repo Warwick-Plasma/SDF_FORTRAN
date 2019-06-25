@@ -1003,7 +1003,7 @@ CONTAINS
   SUBROUTINE add_to_hash_table(h, b)
 
     TYPE(sdf_file_handle), INTENT(INOUT) :: h
-    TYPE(sdf_block_type), POINTER , INTENT(IN):: b
+    TYPE(sdf_block_type), POINTER , INTENT(INOUT):: b
     TYPE(sdf_hash_list), POINTER :: hash_item
     INTEGER :: i
 
