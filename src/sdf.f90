@@ -174,6 +174,7 @@ MODULE sdf
   PUBLIC :: sdf_write_srl_plain_mesh
   PUBLIC :: sdf_write_srl_point_mesh
   PUBLIC :: sdf_write_srl_point_variable
+  PUBLIC :: sdf_write_srl_plain_variable
   PUBLIC :: sdf_write_station_header
   PUBLIC :: sdf_write_station_array
   PUBLIC :: sdf_write_station_material

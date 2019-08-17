@@ -234,6 +234,576 @@ CONTAINS
 
 
   !----------------------------------------------------------------------------
+  ! Code to write a 1D cartesian integer variable in serial from the node
+  ! with rank {rank_write}
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_srl_1d_integer_i4_r8(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    INTEGER, PARAMETER :: ndims = 1
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER(i4), DIMENSION(:), INTENT(IN) :: variable
+    INTEGER, OPTIONAL, INTENT(IN) :: subarray
+    REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+    INTEGER :: i, errcode, mpitype, nitems, nelements
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = 4
+    b%datatype = c_datatype_integer4
+    b%mpitype = MPI_INTEGER4
+    b%ndims = ndims
+    b%stagger = stagger
+
+    IF (PRESENT(mult)) THEN
+      b%mult = REAL(mult,r8)
+    ELSE
+      b%mult = 1.d0
+    END IF
+
+    nelements = 1
+    DO i = 1,ndims
+      b%dims(i) = INT(dims(i),i4)
+      nelements = nelements * b%dims(i)
+    END DO
+
+    IF (PRESENT(rank_write)) h%rank_master = rank_write
+
+    ! Write header
+
+    CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
+
+    ! Write the actual data
+
+    IF (h%rank == h%rank_master) THEN
+      h%current_location = b%data_location
+
+      CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
+          errcode)
+
+      IF (PRESENT(subarray)) THEN
+        mpitype = subarray
+        nitems = 1
+      ELSE
+        mpitype = b%mpitype
+        nitems = nelements
+      END IF
+
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nitems, mpitype, &
+          MPI_STATUS_IGNORE, errcode)
+    END IF
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_srl_1d_integer_i4_r8
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a 2D cartesian integer variable in serial from the node
+  ! with rank {rank_write}
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_srl_2d_integer_i4_r8(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    INTEGER, PARAMETER :: ndims = 2
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER(i4), DIMENSION(:,:), INTENT(IN) :: variable
+    INTEGER, OPTIONAL, INTENT(IN) :: subarray
+    REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+    INTEGER :: i, errcode, mpitype, nitems, nelements
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = 4
+    b%datatype = c_datatype_integer4
+    b%mpitype = MPI_INTEGER4
+    b%ndims = ndims
+    b%stagger = stagger
+
+    IF (PRESENT(mult)) THEN
+      b%mult = REAL(mult,r8)
+    ELSE
+      b%mult = 1.d0
+    END IF
+
+    nelements = 1
+    DO i = 1,ndims
+      b%dims(i) = INT(dims(i),i4)
+      nelements = nelements * b%dims(i)
+    END DO
+
+    IF (PRESENT(rank_write)) h%rank_master = rank_write
+
+    ! Write header
+
+    CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
+
+    ! Write the actual data
+
+    IF (h%rank == h%rank_master) THEN
+      h%current_location = b%data_location
+
+      CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
+          errcode)
+
+      IF (PRESENT(subarray)) THEN
+        mpitype = subarray
+        nitems = 1
+      ELSE
+        mpitype = b%mpitype
+        nitems = nelements
+      END IF
+
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nitems, mpitype, &
+          MPI_STATUS_IGNORE, errcode)
+    END IF
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_srl_2d_integer_i4_r8
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a 3D cartesian integer variable in serial from the node
+  ! with rank {rank_write}
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_srl_3d_integer_i4_r8(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    INTEGER, PARAMETER :: ndims = 3
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER(i4), DIMENSION(:,:,:), INTENT(IN) :: variable
+    INTEGER, OPTIONAL, INTENT(IN) :: subarray
+    REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+    INTEGER :: i, errcode, mpitype, nitems, nelements
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = 4
+    b%datatype = c_datatype_integer4
+    b%mpitype = MPI_INTEGER4
+    b%ndims = ndims
+    b%stagger = stagger
+
+    IF (PRESENT(mult)) THEN
+      b%mult = REAL(mult,r8)
+    ELSE
+      b%mult = 1.d0
+    END IF
+
+    nelements = 1
+    DO i = 1,ndims
+      b%dims(i) = INT(dims(i),i4)
+      nelements = nelements * b%dims(i)
+    END DO
+
+    IF (PRESENT(rank_write)) h%rank_master = rank_write
+
+    ! Write header
+
+    CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
+
+    ! Write the actual data
+
+    IF (h%rank == h%rank_master) THEN
+      h%current_location = b%data_location
+
+      CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
+          errcode)
+
+      IF (PRESENT(subarray)) THEN
+        mpitype = subarray
+        nitems = 1
+      ELSE
+        mpitype = b%mpitype
+        nitems = nelements
+      END IF
+
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nitems, mpitype, &
+          MPI_STATUS_IGNORE, errcode)
+    END IF
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_srl_3d_integer_i4_r8
+
+
+
+  SUBROUTINE write_srl_1d_integer_i4_r4(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER(i4), DIMENSION(:), INTENT(IN) :: variable
+    INTEGER, INTENT(IN) :: subarray
+    REAL(r4), INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+
+    CALL write_srl_1d_integer_i4_r8(h, id, name, units, dims, stagger, &
+        mesh_id, variable, subarray, REAL(mult,r8), rank_write)
+
+  END SUBROUTINE write_srl_1d_integer_i4_r4
+
+
+
+  SUBROUTINE write_srl_2d_integer_i4_r4(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER(i4), DIMENSION(:,:), INTENT(IN) :: variable
+    INTEGER, INTENT(IN) :: subarray
+    REAL(r4), INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+
+    CALL write_srl_2d_integer_i4_r8(h, id, name, units, dims, stagger, &
+        mesh_id, variable, subarray, REAL(mult,r8), rank_write)
+
+  END SUBROUTINE write_srl_2d_integer_i4_r4
+
+
+
+  SUBROUTINE write_srl_3d_integer_i4_r4(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER(i4), DIMENSION(:,:,:), INTENT(IN) :: variable
+    INTEGER, INTENT(IN) :: subarray
+    REAL(r4), INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+
+    CALL write_srl_3d_integer_i4_r8(h, id, name, units, dims, stagger, &
+        mesh_id, variable, subarray, REAL(mult,r8), rank_write)
+
+  END SUBROUTINE write_srl_3d_integer_i4_r4
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a 1D cartesian integer variable in serial from the node
+  ! with rank {rank_write}
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_srl_1d_integer_i8_r8(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    INTEGER, PARAMETER :: ndims = 1
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER(i8), DIMENSION(:), INTENT(IN) :: variable
+    INTEGER, OPTIONAL, INTENT(IN) :: subarray
+    REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+    INTEGER :: i, errcode, mpitype, nitems, nelements
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = 8
+    b%datatype = c_datatype_integer8
+    b%mpitype = MPI_INTEGER8
+    b%ndims = ndims
+    b%stagger = stagger
+
+    IF (PRESENT(mult)) THEN
+      b%mult = REAL(mult,r8)
+    ELSE
+      b%mult = 1.d0
+    END IF
+
+    nelements = 1
+    DO i = 1,ndims
+      b%dims(i) = INT(dims(i),i4)
+      nelements = nelements * b%dims(i)
+    END DO
+
+    IF (PRESENT(rank_write)) h%rank_master = rank_write
+
+    ! Write header
+
+    CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
+
+    ! Write the actual data
+
+    IF (h%rank == h%rank_master) THEN
+      h%current_location = b%data_location
+
+      CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
+          errcode)
+
+      IF (PRESENT(subarray)) THEN
+        mpitype = subarray
+        nitems = 1
+      ELSE
+        mpitype = b%mpitype
+        nitems = nelements
+      END IF
+
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nitems, mpitype, &
+          MPI_STATUS_IGNORE, errcode)
+    END IF
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_srl_1d_integer_i8_r8
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a 2D cartesian integer variable in serial from the node
+  ! with rank {rank_write}
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_srl_2d_integer_i8_r8(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    INTEGER, PARAMETER :: ndims = 2
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER(i8), DIMENSION(:,:), INTENT(IN) :: variable
+    INTEGER, OPTIONAL, INTENT(IN) :: subarray
+    REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+    INTEGER :: i, errcode, mpitype, nitems, nelements
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = 8
+    b%datatype = c_datatype_integer8
+    b%mpitype = MPI_INTEGER8
+    b%ndims = ndims
+    b%stagger = stagger
+
+    IF (PRESENT(mult)) THEN
+      b%mult = REAL(mult,r8)
+    ELSE
+      b%mult = 1.d0
+    END IF
+
+    nelements = 1
+    DO i = 1,ndims
+      b%dims(i) = INT(dims(i),i4)
+      nelements = nelements * b%dims(i)
+    END DO
+
+    IF (PRESENT(rank_write)) h%rank_master = rank_write
+
+    ! Write header
+
+    CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
+
+    ! Write the actual data
+
+    IF (h%rank == h%rank_master) THEN
+      h%current_location = b%data_location
+
+      CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
+          errcode)
+
+      IF (PRESENT(subarray)) THEN
+        mpitype = subarray
+        nitems = 1
+      ELSE
+        mpitype = b%mpitype
+        nitems = nelements
+      END IF
+
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nitems, mpitype, &
+          MPI_STATUS_IGNORE, errcode)
+    END IF
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_srl_2d_integer_i8_r8
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a 3D cartesian integer variable in serial from the node
+  ! with rank {rank_write}
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_srl_3d_integer_i8_r8(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    INTEGER, PARAMETER :: ndims = 3
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER(i8), DIMENSION(:,:,:), INTENT(IN) :: variable
+    INTEGER, OPTIONAL, INTENT(IN) :: subarray
+    REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+    INTEGER :: i, errcode, mpitype, nitems, nelements
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = 8
+    b%datatype = c_datatype_integer8
+    b%mpitype = MPI_INTEGER8
+    b%ndims = ndims
+    b%stagger = stagger
+
+    IF (PRESENT(mult)) THEN
+      b%mult = REAL(mult,r8)
+    ELSE
+      b%mult = 1.d0
+    END IF
+
+    nelements = 1
+    DO i = 1,ndims
+      b%dims(i) = INT(dims(i),i4)
+      nelements = nelements * b%dims(i)
+    END DO
+
+    IF (PRESENT(rank_write)) h%rank_master = rank_write
+
+    ! Write header
+
+    CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
+
+    ! Write the actual data
+
+    IF (h%rank == h%rank_master) THEN
+      h%current_location = b%data_location
+
+      CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
+          errcode)
+
+      IF (PRESENT(subarray)) THEN
+        mpitype = subarray
+        nitems = 1
+      ELSE
+        mpitype = b%mpitype
+        nitems = nelements
+      END IF
+
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nitems, mpitype, &
+          MPI_STATUS_IGNORE, errcode)
+    END IF
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_srl_3d_integer_i8_r8
+
+
+
+  SUBROUTINE write_srl_1d_integer_i8_r4(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER(i8), DIMENSION(:), INTENT(IN) :: variable
+    INTEGER, INTENT(IN) :: subarray
+    REAL(r4), INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+
+    CALL write_srl_1d_integer_i8_r8(h, id, name, units, dims, stagger, &
+        mesh_id, variable, subarray, REAL(mult,r8), rank_write)
+
+  END SUBROUTINE write_srl_1d_integer_i8_r4
+
+
+
+  SUBROUTINE write_srl_2d_integer_i8_r4(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER(i8), DIMENSION(:,:), INTENT(IN) :: variable
+    INTEGER, INTENT(IN) :: subarray
+    REAL(r4), INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+
+    CALL write_srl_2d_integer_i8_r8(h, id, name, units, dims, stagger, &
+        mesh_id, variable, subarray, REAL(mult,r8), rank_write)
+
+  END SUBROUTINE write_srl_2d_integer_i8_r4
+
+
+
+  SUBROUTINE write_srl_3d_integer_i8_r4(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    INTEGER(i8), DIMENSION(:,:,:), INTENT(IN) :: variable
+    INTEGER, INTENT(IN) :: subarray
+    REAL(r4), INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+
+    CALL write_srl_3d_integer_i8_r8(h, id, name, units, dims, stagger, &
+        mesh_id, variable, subarray, REAL(mult,r8), rank_write)
+
+  END SUBROUTINE write_srl_3d_integer_i8_r4
+
+
+
+  !----------------------------------------------------------------------------
   ! Code to write a 1D cartesian integer variable in parallel
   ! using the mpitype {distribution} for distribution of data
   ! It's up to the coder to design the distribution parallel operation, so
@@ -1037,5 +1607,290 @@ CONTAINS
         variable, distribution, subarray, REAL(mult,r8))
 
   END SUBROUTINE write_3d_character_r4
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a 1D cartesian character variable in serial from the node
+  ! with rank {rank_write}
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_srl_1d_character_r8(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    INTEGER, PARAMETER :: ndims = 1
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    CHARACTER(LEN=1), DIMENSION(:), INTENT(IN) :: variable
+    INTEGER, OPTIONAL, INTENT(IN) :: subarray
+    REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+    INTEGER :: i, errcode, mpitype, nitems, nelements
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = 1
+    b%datatype = c_datatype_character
+    b%mpitype = MPI_CHARACTER
+    b%ndims = ndims
+    b%stagger = stagger
+
+    IF (PRESENT(mult)) THEN
+      b%mult = REAL(mult,r8)
+    ELSE
+      b%mult = 1.d0
+    END IF
+
+    nelements = 1
+    DO i = 1,ndims
+      b%dims(i) = INT(dims(i),i4)
+      nelements = nelements * b%dims(i)
+    END DO
+
+    IF (PRESENT(rank_write)) h%rank_master = rank_write
+
+    ! Write header
+
+    CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
+
+    ! Write the actual data
+
+    IF (h%rank == h%rank_master) THEN
+      h%current_location = b%data_location
+
+      CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
+          errcode)
+
+      IF (PRESENT(subarray)) THEN
+        mpitype = subarray
+        nitems = 1
+      ELSE
+        mpitype = b%mpitype
+        nitems = nelements
+      END IF
+
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nitems, mpitype, &
+          MPI_STATUS_IGNORE, errcode)
+    END IF
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_srl_1d_character_r8
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a 2D cartesian character variable in serial from the node
+  ! with rank {rank_write}
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_srl_2d_character_r8(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    INTEGER, PARAMETER :: ndims = 2
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    CHARACTER(LEN=1), DIMENSION(:,:), INTENT(IN) :: variable
+    INTEGER, OPTIONAL, INTENT(IN) :: subarray
+    REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+    INTEGER :: i, errcode, mpitype, nitems, nelements
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = 1
+    b%datatype = c_datatype_character
+    b%mpitype = MPI_CHARACTER
+    b%ndims = ndims
+    b%stagger = stagger
+
+    IF (PRESENT(mult)) THEN
+      b%mult = REAL(mult,r8)
+    ELSE
+      b%mult = 1.d0
+    END IF
+
+    nelements = 1
+    DO i = 1,ndims
+      b%dims(i) = INT(dims(i),i4)
+      nelements = nelements * b%dims(i)
+    END DO
+
+    IF (PRESENT(rank_write)) h%rank_master = rank_write
+
+    ! Write header
+
+    CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
+
+    ! Write the actual data
+
+    IF (h%rank == h%rank_master) THEN
+      h%current_location = b%data_location
+
+      CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
+          errcode)
+
+      IF (PRESENT(subarray)) THEN
+        mpitype = subarray
+        nitems = 1
+      ELSE
+        mpitype = b%mpitype
+        nitems = nelements
+      END IF
+
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nitems, mpitype, &
+          MPI_STATUS_IGNORE, errcode)
+    END IF
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_srl_2d_character_r8
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a 3D cartesian character variable in serial from the node
+  ! with rank {rank_write}
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_srl_3d_character_r8(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    INTEGER, PARAMETER :: ndims = 3
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    CHARACTER(LEN=1), DIMENSION(:,:,:), INTENT(IN) :: variable
+    INTEGER, OPTIONAL, INTENT(IN) :: subarray
+    REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+    INTEGER :: i, errcode, mpitype, nitems, nelements
+    TYPE(sdf_block_type), POINTER :: b
+
+    CALL sdf_get_next_block(h)
+    b => h%current_block
+
+    b%type_size = 1
+    b%datatype = c_datatype_character
+    b%mpitype = MPI_CHARACTER
+    b%ndims = ndims
+    b%stagger = stagger
+
+    IF (PRESENT(mult)) THEN
+      b%mult = REAL(mult,r8)
+    ELSE
+      b%mult = 1.d0
+    END IF
+
+    nelements = 1
+    DO i = 1,ndims
+      b%dims(i) = INT(dims(i),i4)
+      nelements = nelements * b%dims(i)
+    END DO
+
+    IF (PRESENT(rank_write)) h%rank_master = rank_write
+
+    ! Write header
+
+    CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
+
+    ! Write the actual data
+
+    IF (h%rank == h%rank_master) THEN
+      h%current_location = b%data_location
+
+      CALL MPI_FILE_SEEK(h%filehandle, h%current_location, MPI_SEEK_SET, &
+          errcode)
+
+      IF (PRESENT(subarray)) THEN
+        mpitype = subarray
+        nitems = 1
+      ELSE
+        mpitype = b%mpitype
+        nitems = nelements
+      END IF
+
+      CALL MPI_FILE_WRITE(h%filehandle, variable, nitems, mpitype, &
+          MPI_STATUS_IGNORE, errcode)
+    END IF
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE write_srl_3d_character_r8
+
+
+
+  SUBROUTINE write_srl_1d_character_r4(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    CHARACTER(LEN=1), DIMENSION(:), INTENT(IN) :: variable
+    INTEGER, INTENT(IN) :: subarray
+    REAL(r4), INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+
+    CALL write_srl_1d_character_r8(h, id, name, units, dims, stagger, &
+        mesh_id, variable, subarray, REAL(mult,r8), rank_write)
+
+  END SUBROUTINE write_srl_1d_character_r4
+
+
+
+  SUBROUTINE write_srl_2d_character_r4(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    CHARACTER(LEN=1), DIMENSION(:,:), INTENT(IN) :: variable
+    INTEGER, INTENT(IN) :: subarray
+    REAL(r4), INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+
+    CALL write_srl_2d_character_r8(h, id, name, units, dims, stagger, &
+        mesh_id, variable, subarray, REAL(mult,r8), rank_write)
+
+  END SUBROUTINE write_srl_2d_character_r4
+
+
+
+  SUBROUTINE write_srl_3d_character_r4(h, id, name, units, dims, stagger, &
+      mesh_id, variable, subarray, mult, rank_write)
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    CHARACTER(LEN=1), DIMENSION(:,:,:), INTENT(IN) :: variable
+    INTEGER, INTENT(IN) :: subarray
+    REAL(r4), INTENT(IN) :: mult
+    INTEGER, OPTIONAL, INTENT(IN) :: rank_write
+
+    CALL write_srl_3d_character_r8(h, id, name, units, dims, stagger, &
+        mesh_id, variable, subarray, REAL(mult,r8), rank_write)
+
+  END SUBROUTINE write_srl_3d_character_r4
 
 END MODULE sdf_output_cartesian_ru
