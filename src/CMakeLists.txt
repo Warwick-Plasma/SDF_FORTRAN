@@ -72,13 +72,43 @@ if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
       ${INFO_FLAGS})
 endif()
 
-if(NOT TARGET sdf)
-   add_library(sdf ${SOURCES})
-   set_target_properties(
-       sdf
-       PROPERTIES
-       COMPILE_FLAGS ${MCMODEL}
-       Fortran_MODULE_DIRECTORY include)
-   install(TARGETS sdf DESTINATION lib COMPONENT develop)
-   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include  DESTINATION . COMPONENT develop)
-endif()
+add_library(sdf ${SOURCES})
+set_target_properties(
+    sdf
+    PROPERTIES
+    COMPILE_FLAGS ${MCMODEL}
+    Fortran_MODULE_DIRECTORY include
+)
+target_include_directories(
+    sdf
+    INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+)
+
+install(
+    TARGETS sdf
+    EXPORT SDFConfig
+    COMPONENT develop
+    LIBRARY DESTINATION lib
+    INCLUDES DESTINATION include
+)
+install(
+    DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/
+    TYPE INCLUDE
+    COMPONENT develop
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/SDFConfigVersion.cmake
+    VERSION ${SDF_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/SDFConfigVersion.cmake
+    DESTINATION lib/SDF
+    COMPONENT develop
+)
+
+export(TARGETS sdf FILE ${CMAKE_CURRENT_BINARY_DIR}/SDFConfig.cmake)
+install(EXPORT SDFConfig DESTINATION lib/SDF COMPONENT develop)

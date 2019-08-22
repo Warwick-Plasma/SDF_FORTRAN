@@ -1,5 +1,5 @@
-project(SDF Fortran)
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.14)
+project(SDF VERSION 1.5.16 LANGUAGES Fortran)
 find_package(MPI REQUIRED)
 find_package(PackSDF REQUIRED PATHS CMake)
 include(CMake/CheckMPIVersion.cmake)
@@ -56,3 +56,13 @@ set(F77_OUTPUT 0)
 
 include_directories(${MPI_Fortran_INCLUDE_PATH})
 add_subdirectory(src lib)
+
+install(
+    FILES
+        CMake/PackSDFConfig.cmake
+        CMake/pack.cmake.in
+        CMake/ConfigurePackTarget.cmake
+        src/pack.py
+    DESTINATION lib/PackSDF
+    COMPONENT develop
+)
