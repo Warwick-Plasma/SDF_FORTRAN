@@ -1,6 +1,6 @@
 find_package(PythonInterp)
 find_file(PACK_PY pack.py
-   PATHS ${CMAKE_CURRENT_LIST_DIR}/../src
+   PATHS ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_LIST_DIR}/../src
    DOC "Path to pack.py")
 find_file(PACK_CMAKE_IN pack.cmake.in build_scripts
    PATHS ${CMAKE_CURRENT_LIST_DIR}
