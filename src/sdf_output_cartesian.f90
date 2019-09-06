@@ -37,6 +37,42 @@ MODULE sdf_output_cartesian
         write_srl_3d_path_mesh_r8
   END INTERFACE sdf_write_srl_path_mesh
 
+  INTERFACE sdf_write_srl_plain_variable
+    MODULE PROCEDURE &
+        write_srl_1d_float_r4, &
+        write_srl_2d_float_r4, &
+        write_srl_3d_float_r4, &
+        write_srl_1d_float_r8, &
+        write_srl_2d_float_r8, &
+        write_srl_3d_float_r8, &
+        write_srl_1d_float_num_r4, &
+        write_srl_2d_float_num_r4, &
+        write_srl_3d_float_num_r4, &
+        write_srl_4d_float_num_r4, &
+        write_srl_1d_float_num_r8, &
+        write_srl_2d_float_num_r8, &
+        write_srl_3d_float_num_r8, &
+        write_srl_4d_float_num_r8, &
+        write_srl_1d_character_r4, &
+        write_srl_2d_character_r4, &
+        write_srl_3d_character_r4, &
+        write_srl_1d_character_r8, &
+        write_srl_2d_character_r8, &
+        write_srl_3d_character_r8, &
+        write_srl_1d_integer_i4_r4, &
+        write_srl_2d_integer_i4_r4, &
+        write_srl_3d_integer_i4_r4, &
+        write_srl_1d_integer_i4_r8, &
+        write_srl_2d_integer_i4_r8, &
+        write_srl_3d_integer_i4_r8, &
+        write_srl_1d_integer_i8_r4, &
+        write_srl_2d_integer_i8_r4, &
+        write_srl_3d_integer_i8_r4, &
+        write_srl_1d_integer_i8_r8, &
+        write_srl_2d_integer_i8_r8, &
+        write_srl_3d_integer_i8_r8
+  END INTERFACE sdf_write_srl_plain_variable
+
   INTERFACE sdf_write_plain_mesh
     MODULE PROCEDURE &
         write_1d_mesh_r4, &
