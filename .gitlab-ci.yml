@@ -1,19 +1,45 @@
+variables:
+  GIT_STRATEGY: clone
+
+
+.common: &common
+  only:
+    - branches@SDF/SDF_FORTRAN
+    - web
+    - hook
+  except:
+    - master
+    - wip/*
+    - tag
+
+
 test_ubuntu_gfortran:
+  <<: *common
+  variables:
+    COMPILER: gfortran
   script:
-    - COMPILER=gfortran sh -x src/test.sh
+    - sh -x src/test.sh
   tags:
     - ubuntu
     - gfortran
 
+
 test_ubuntu_intel:
+  <<: *common
+  variables:
+    COMPILER: intel
   script:
-    - COMPILER=intel sh -x src/test.sh
+    - sh -x src/test.sh
   tags:
     - ubuntu
     - intel
 
+
 test_osx:
+  <<: *common
+  variables:
+    COMPILER: gfortran
   script:
-    - COMPILER=gfortran sh -x src/test.sh
+    - sh -x src/test.sh
   tags:
     - osx
