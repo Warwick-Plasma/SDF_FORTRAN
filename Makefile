@@ -41,7 +41,7 @@ D = -D
 ifeq ($(strip $(COMPILER)),pgi)
   FFLAGS = -O2 -Mvect -Munroll
   ifeq ($(strip $(MODE)),debug)
-    FFLAGS = -O0 -g -C -Ktrap=denorm -Mbounds -Mchkfpstk -Mdepchk -Mstandard
+    FFLAGS = -O0 -g -C -Mbounds -Mchkfpstk -Mdepchk -Mstandard
   endif
   ifeq (prof,$(findstring prof,$(MODE)))
     FFLAGS += -Mprof=func,lines

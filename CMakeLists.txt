@@ -19,7 +19,7 @@ if(NOT INHERIT_FLAGS)
       set(CMAKE_Fortran_FLAGS_RELEASE "-O2 -g -Mvect -Munroll"
          CACHE STRING "Fortran flags for release build" FORCE)
       set(CMAKE_Fortran_FLAGS_DEBUG
-         "-O0 -g -Ktrap=denorm -Mbounds -Mchkfpstk -Mdepchk -Mstandard -C"
+         "-O0 -g -Mbounds -Mchkfpstk -Mdepchk -Mstandard -C"
          CACHE STRING "Fortran flags for debug build" FORCE)
 
    elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
