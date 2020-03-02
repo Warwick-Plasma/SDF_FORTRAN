@@ -71,8 +71,8 @@ CONTAINS
     b%dims(1) = INT(SIZE(x),i4)
 
     IF (h%rank == h%rank_master) THEN
-      b%extents(1) = REAL(x(1),r8)
-      b%extents(ndims+1) = REAL(x(b%dims(1)),r8)
+      b%extents(1) = REAL(MINVAL(x(1:intn)),r8)
+      b%extents(ndims+1) = REAL(MAXVAL(x(1:intn)),r8)
     END IF
 
     ! Write header
@@ -166,10 +166,10 @@ CONTAINS
     b%dims(2) = INT(SIZE(y),i4)
 
     IF (h%rank == h%rank_master) THEN
-      b%extents(1) = REAL(x(1),r8)
-      b%extents(2) = REAL(y(1),r8)
-      b%extents(ndims+1) = REAL(x(b%dims(1)),r8)
-      b%extents(ndims+2) = REAL(y(b%dims(2)),r8)
+      b%extents(1) = REAL(MINVAL(x(1:intn)),r8)
+      b%extents(2) = REAL(MINVAL(y(1:intn)),r8)
+      b%extents(ndims+1) = REAL(MAXVAL(x(1:intn)),r8)
+      b%extents(ndims+2) = REAL(MAXVAL(y(1:intn)),r8)
     END IF
 
     ! Write header
@@ -273,12 +273,12 @@ CONTAINS
     b%dims(3) = INT(SIZE(z),i4)
 
     IF (h%rank == h%rank_master) THEN
-      b%extents(1) = REAL(x(1),r8)
-      b%extents(2) = REAL(y(1),r8)
-      b%extents(3) = REAL(z(1),r8)
-      b%extents(ndims+1) = REAL(x(b%dims(1)),r8)
-      b%extents(ndims+2) = REAL(y(b%dims(2)),r8)
-      b%extents(ndims+3) = REAL(z(b%dims(3)),r8)
+      b%extents(1) = REAL(MINVAL(x(1:intn)),r8)
+      b%extents(2) = REAL(MINVAL(y(1:intn)),r8)
+      b%extents(3) = REAL(MINVAL(z(1:intn)),r8)
+      b%extents(ndims+1) = REAL(MAXVAL(x(1:intn)),r8)
+      b%extents(ndims+2) = REAL(MAXVAL(y(1:intn)),r8)
+      b%extents(ndims+3) = REAL(MAXVAL(z(1:intn)),r8)
     END IF
 
     ! Write header
@@ -741,10 +741,10 @@ CONTAINS
     b%ndims = ndims
 
     IF (h%rank == h%rank_master) THEN
-      b%extents(1) = REAL(x(1,1),r8)
-      b%extents(2) = REAL(y(1,1),r8)
-      b%extents(ndims+1) = REAL(x(b%dims(1),b%dims(2)),r8)
-      b%extents(ndims+2) = REAL(y(b%dims(1),b%dims(2)),r8)
+      b%extents(1) = REAL(MINVAL(x),r8)
+      b%extents(2) = REAL(MINVAL(y),r8)
+      b%extents(ndims+1) = REAL(MAXVAL(x),r8)
+      b%extents(ndims+2) = REAL(MAXVAL(y),r8)
     END IF
 
     ! Write header
@@ -844,12 +844,12 @@ CONTAINS
     b%ndims = ndims
 
     IF (h%rank == h%rank_master) THEN
-      b%extents(1) = REAL(x(1,1,1),r8)
-      b%extents(2) = REAL(y(1,1,1),r8)
-      b%extents(3) = REAL(z(1,1,1),r8)
-      b%extents(ndims+1) = REAL(x(b%dims(1),b%dims(2),b%dims(3)),r8)
-      b%extents(ndims+2) = REAL(y(b%dims(1),b%dims(2),b%dims(3)),r8)
-      b%extents(ndims+3) = REAL(z(b%dims(1),b%dims(2),b%dims(3)),r8)
+      b%extents(1) = REAL(MINVAL(x),r8)
+      b%extents(2) = REAL(MINVAL(y),r8)
+      b%extents(3) = REAL(MINVAL(z),r8)
+      b%extents(ndims+1) = REAL(MAXVAL(x),r8)
+      b%extents(ndims+2) = REAL(MAXVAL(y),r8)
+      b%extents(ndims+3) = REAL(MAXVAL(z),r8)
     END IF
 
     ! Write header
