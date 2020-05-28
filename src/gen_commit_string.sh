@@ -11,7 +11,9 @@
 # If any of these fields is unavailable then the tag 'unknown' will be
 # used. If none of the tags are known then the COMMIT file is left untouched
 
-COMMIT_FILE=src/COMMIT
+COMMIT_FILE_BASE=COMMIT
+OUTDIR=$1
+COMMIT_FILE=$OUTDIR/$COMMIT_FILE_BASE
 
 LF='
 '
@@ -33,11 +35,14 @@ if [ $? -eq 0 ]; then
   test -z "$(git diff-index --name-only HEAD --)" || state='dirty'
 
   commit_string=$gitdescribe-$state
+  commit_date=$(git log --pretty=format:%cd -1 HEAD)
 else
 # not in a git repo
-  grep "COMMIT=" $COMMIT_FILE > /dev/null 2>&1
+  [[ $COMMIT_FILE_BASE -nt $COMMIT_FILE ]] && cp $COMMIT_FILE_BASE $COMMIT_FILE
+  grep "COMMIT_ID" $COMMIT_FILE > /dev/null 2>&1
   [ $? -eq 0 ] && exit
   commit_string=unknown-unknown-unknown-unknown
+  commit_date=unknown
 fi
 
 [ -z $commit_string ] && exit
@@ -46,6 +51,7 @@ grep "$commit_string" $COMMIT_FILE > /dev/null 2>&1
 if [ $? -eq 0 ]; then
   exit
 else
-  echo "COMMIT=$commit_string" > $COMMIT_FILE
+  echo "COMMIT_ID=\"$commit_string\"" > $COMMIT_FILE
+  echo "COMMIT_DATE=\"$commit_date\"" >> $COMMIT_FILE
   exit
 fi

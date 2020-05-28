@@ -292,7 +292,7 @@ try:
             f = open(commitfile, "r")
             string = f.readline().rstrip('\n')
             f.close()
-            git_version = string.split('=')[1]
+            git_version = string.split('=')[1].replace('"', '')
         except:
             pass
     elif cmd.returncode != 0 and str(output[1]).find('ot a git repo') != -1:
@@ -303,7 +303,7 @@ try:
             f = open(commitfile, "r")
             string = f.readline().rstrip('\n')
             f.close()
-            git_version = string.split('=')[1]
+            git_version = string.split('=')[1].replace('"', '')
         except:
             pass
     elif cmd.returncode != 0:

@@ -62,7 +62,7 @@ if [ $? -ne 0 ]; then
   git_version=' '
   if [ -f $commitfile ]; then
     . $commitfile
-    git_version=$COMMIT
+    git_version=$COMMIT_ID
   fi
   pack_git_diff=0
 fi
