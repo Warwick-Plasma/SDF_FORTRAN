@@ -88,7 +88,7 @@ CONTAINS
     IF (errcode /= 0) h%error_code = map_error_code(errcode)
     CALL MPI_INFO_FREE(info, errcode)
 
-    IF (h%rank == h%rank_master .AND. h%filehandle /= 0) THEN
+    IF (h%filehandle /= 0) THEN
       IF (h%errhandler /= MPI_ERRHANDLER_NULL) THEN
         ! Restore default error handler if changed
         CALL MPI_FILE_GET_ERRHANDLER(MPI_FILE_NULL, errcode, ierr)
