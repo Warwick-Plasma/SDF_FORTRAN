@@ -23,6 +23,15 @@ CONTAINS
     LOGICAL, INTENT(IN), OPTIONAL :: handle_errors
     INTEGER :: errcode, ierr, i, info, file_mode
     LOGICAL :: exists
+    LOGICAL :: first_call = .TRUE.
+
+    IF (first_call) THEN
+      DO i = 1, max_handles
+        sdf_handles(i)%filehandle = 0
+        NULLIFY(sdf_handles(i)%handle)
+      END DO
+      first_call = .FALSE.
+    END IF
 
     CALL initialise_file_handle(h, handle_errors)
     CALL sdf_set_default_rank(h, 0)
