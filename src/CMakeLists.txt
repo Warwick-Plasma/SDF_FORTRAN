@@ -89,12 +89,12 @@ install(
     TARGETS sdf
     EXPORT SDFConfig
     COMPONENT develop
-    LIBRARY DESTINATION lib
-    INCLUDES DESTINATION include
+    ARCHIVE DESTINATION lib/SDF_${SDF_VERSION}
+    INCLUDES DESTINATION include/SDF_${SDF_VERSION}
 )
 install(
     DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/
-    TYPE INCLUDE
+    DESTINATION include/SDF_${SDF_VERSION}
     COMPONENT develop
 )
 
@@ -106,9 +106,9 @@ write_basic_package_version_file(
 )
 install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/SDFConfigVersion.cmake
-    DESTINATION lib/SDF
+    DESTINATION lib/SDF_${SDF_VERSION}
     COMPONENT develop
 )
 
 export(TARGETS sdf FILE ${CMAKE_CURRENT_BINARY_DIR}/SDFConfig.cmake)
-install(EXPORT SDFConfig DESTINATION lib/SDF COMPONENT develop)
+install(EXPORT SDFConfig DESTINATION lib/SDF_${SDF_VERSION} COMPONENT develop)

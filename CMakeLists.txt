@@ -63,6 +63,6 @@ install(
         CMake/pack.cmake.in
         CMake/ConfigurePackTarget.cmake
         src/pack.py
-    DESTINATION lib/PackSDF
+    DESTINATION lib/PackSDF_${SDF_VERSION}
     COMPONENT develop
 )
