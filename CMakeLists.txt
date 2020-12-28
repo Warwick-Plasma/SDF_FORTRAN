@@ -12,7 +12,7 @@ if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "PGI")
 
   set(CMAKE_Fortran_FLAGS "-g -Mnodefaultunit -Ktrap=fp -mcmodel=medium -Mdclchk -Mnofma ${CPU} ${MPI_Fortran_COMPILE_FLAGS}")
   set(CMAKE_Fortran_FLAGS_RELEASE "-O2 -g -Mvect -Munroll")
-  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -Mbounds -Mchkfpstk -Mdepchk -Mstandard -C")
+  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -Mbounds -Mdepchk -Mstandard -C")
 
 elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
   set(CMAKE_Fortran_FLAGS "-fpe0 -g")
