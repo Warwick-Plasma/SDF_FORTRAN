@@ -102,6 +102,29 @@ CONTAINS
 
 
 
+  SUBROUTINE write_station_array2d_r8_r8(h, time, step, array)
+
+    TYPE(sdf_file_handle) :: h
+    REAL(r8), INTENT(IN) :: time
+    INTEGER, INTENT(IN) :: step
+    REAL(r8), DIMENSION(:,:), INTENT(IN) :: array
+    TYPE(sdf_block_type), POINTER :: b
+    INTEGER :: errcode
+
+    CALL station_pre(h, time, step)
+
+    IF (h%rank == h%rank_master) THEN
+      b => h%current_block
+      CALL MPI_FILE_WRITE(h%filehandle, array, b%nvariables-1, mpitype_real, &
+          MPI_STATUS_IGNORE, errcode)
+    END IF
+
+    CALL station_post(h)
+
+  END SUBROUTINE write_station_array2d_r8_r8
+
+
+
   SUBROUTINE write_station_array_r4_r8(h, time, step, array)
 
     TYPE(sdf_file_handle) :: h
@@ -112,5 +135,18 @@ CONTAINS
     CALL write_station_array_r8_r8(h, REAL(time,r8), step, array)
 
   END SUBROUTINE write_station_array_r4_r8
+
+
+
+  SUBROUTINE write_station_array2d_r4_r8(h, time, step, array)
+
+    TYPE(sdf_file_handle) :: h
+    REAL(r4), INTENT(IN) :: time
+    INTEGER, INTENT(IN) :: step
+    REAL(r8), DIMENSION(:,:), INTENT(IN) :: array
+
+    CALL write_station_array2d_r8_r8(h, REAL(time,r8), step, array)
+
+  END SUBROUTINE write_station_array2d_r4_r8
 
 END MODULE sdf_output_station_r8
