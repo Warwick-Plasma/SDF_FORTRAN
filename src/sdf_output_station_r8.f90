@@ -56,6 +56,7 @@ CONTAINS
       CALL MPI_FILE_WRITE(h%filehandle, real8, 1, mpitype_real, &
           MPI_STATUS_IGNORE, errcode)
     END IF
+    h%current_location = b%data_location + b%data_length + sof
 
   END SUBROUTINE station_pre
 
@@ -79,22 +80,27 @@ CONTAINS
 
 
 
-  SUBROUTINE write_station_array_r8_r8(h, time, step, array)
+  SUBROUTINE write_station_array_r8_r8(h, time, step, array, &
+                                       distribution, subarray)
 
     TYPE(sdf_file_handle) :: h
     REAL(r8), INTENT(IN) :: time
     INTEGER, INTENT(IN) :: step
     REAL(r8), DIMENSION(:), INTENT(IN) :: array
+    INTEGER, INTENT(IN) :: distribution, subarray
     TYPE(sdf_block_type), POINTER :: b
     INTEGER :: errcode
 
     CALL station_pre(h, time, step)
 
-    IF (h%rank == h%rank_master) THEN
-      b => h%current_block
-      CALL MPI_FILE_WRITE(h%filehandle, array, b%nvariables-1, mpitype_real, &
-          MPI_STATUS_IGNORE, errcode)
-    END IF
+    CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
+        distribution, 'native', MPI_INFO_NULL, errcode)
+
+    CALL MPI_FILE_WRITE_ALL(h%filehandle, array, 1, subarray, &
+        MPI_STATUS_IGNORE, errcode)
+
+    CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, &
+        'native', MPI_INFO_NULL, errcode)
 
     CALL station_post(h)
 
@@ -102,7 +108,90 @@ CONTAINS
 
 
 
-  SUBROUTINE write_station_array2d_r8_r8(h, time, step, array)
+  SUBROUTINE write_station_array2d_r8_r8(h, time, step, array, &
+                                         distribution, subarray)
+
+    TYPE(sdf_file_handle) :: h
+    REAL(r8), INTENT(IN) :: time
+    INTEGER, INTENT(IN) :: step
+    REAL(r8), DIMENSION(:,:), INTENT(IN) :: array
+    INTEGER, INTENT(IN) :: distribution, subarray
+    TYPE(sdf_block_type), POINTER :: b
+    INTEGER :: errcode
+
+    CALL station_pre(h, time, step)
+
+    CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
+        distribution, 'native', MPI_INFO_NULL, errcode)
+
+    CALL MPI_FILE_WRITE_ALL(h%filehandle, array, 1, subarray, &
+        MPI_STATUS_IGNORE, errcode)
+
+    CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, &
+        'native', MPI_INFO_NULL, errcode)
+
+    CALL station_post(h)
+
+  END SUBROUTINE write_station_array2d_r8_r8
+
+
+
+  SUBROUTINE write_station_array_r4_r8(h, time, step, array, &
+                                       distribution, subarray)
+
+    TYPE(sdf_file_handle) :: h
+    REAL(r4), INTENT(IN) :: time
+    INTEGER, INTENT(IN) :: step
+    REAL(r8), DIMENSION(:), INTENT(IN) :: array
+    INTEGER, INTENT(IN) :: distribution, subarray
+
+    CALL write_station_array_r8_r8(h, REAL(time,r8), step, array, &
+                                   distribution, subarray)
+
+  END SUBROUTINE write_station_array_r4_r8
+
+
+
+  SUBROUTINE write_station_array2d_r4_r8(h, time, step, array, &
+                                         distribution, subarray)
+
+    TYPE(sdf_file_handle) :: h
+    REAL(r4), INTENT(IN) :: time
+    INTEGER, INTENT(IN) :: step
+    REAL(r8), DIMENSION(:,:), INTENT(IN) :: array
+    INTEGER, INTENT(IN) :: distribution, subarray
+
+    CALL write_station_array2d_r8_r8(h, REAL(time,r8), step, array, &
+                                     distribution, subarray)
+
+  END SUBROUTINE write_station_array2d_r4_r8
+
+
+
+  SUBROUTINE write_srl_station_array_r8_r8(h, time, step, array)
+
+    TYPE(sdf_file_handle) :: h
+    REAL(r8), INTENT(IN) :: time
+    INTEGER, INTENT(IN) :: step
+    REAL(r8), DIMENSION(:), INTENT(IN) :: array
+    TYPE(sdf_block_type), POINTER :: b
+    INTEGER :: errcode
+
+    CALL station_pre(h, time, step)
+
+    IF (h%rank == h%rank_master) THEN
+      b => h%current_block
+      CALL MPI_FILE_WRITE(h%filehandle, array, b%nvariables-1, mpitype_real, &
+          MPI_STATUS_IGNORE, errcode)
+    END IF
+
+    CALL station_post(h)
+
+  END SUBROUTINE write_srl_station_array_r8_r8
+
+
+
+  SUBROUTINE write_srl_station_array2d_r8_r8(h, time, step, array)
 
     TYPE(sdf_file_handle) :: h
     REAL(r8), INTENT(IN) :: time
@@ -121,32 +210,32 @@ CONTAINS
 
     CALL station_post(h)
 
-  END SUBROUTINE write_station_array2d_r8_r8
+  END SUBROUTINE write_srl_station_array2d_r8_r8
 
 
 
-  SUBROUTINE write_station_array_r4_r8(h, time, step, array)
+  SUBROUTINE write_srl_station_array_r4_r8(h, time, step, array)
 
     TYPE(sdf_file_handle) :: h
     REAL(r4), INTENT(IN) :: time
     INTEGER, INTENT(IN) :: step
     REAL(r8), DIMENSION(:), INTENT(IN) :: array
 
-    CALL write_station_array_r8_r8(h, REAL(time,r8), step, array)
+    CALL write_srl_station_array_r8_r8(h, REAL(time,r8), step, array)
 
-  END SUBROUTINE write_station_array_r4_r8
+  END SUBROUTINE write_srl_station_array_r4_r8
 
 
 
-  SUBROUTINE write_station_array2d_r4_r8(h, time, step, array)
+  SUBROUTINE write_srl_station_array2d_r4_r8(h, time, step, array)
 
     TYPE(sdf_file_handle) :: h
     REAL(r4), INTENT(IN) :: time
     INTEGER, INTENT(IN) :: step
     REAL(r8), DIMENSION(:,:), INTENT(IN) :: array
 
-    CALL write_station_array2d_r8_r8(h, REAL(time,r8), step, array)
+    CALL write_srl_station_array2d_r8_r8(h, REAL(time,r8), step, array)
 
-  END SUBROUTINE write_station_array2d_r4_r8
+  END SUBROUTINE write_srl_station_array2d_r4_r8
 
 END MODULE sdf_output_station_r8

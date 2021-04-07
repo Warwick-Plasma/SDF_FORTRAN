@@ -32,7 +32,15 @@ MODULE sdf_output_station
         write_station_array2d_r4_r4, &
         write_station_array2d_r8_r4, &
         write_station_array2d_r4_r8, &
-        write_station_array2d_r8_r8
+        write_station_array2d_r8_r8, &
+        write_srl_station_array_r4_r4, &
+        write_srl_station_array_r8_r4, &
+        write_srl_station_array_r4_r8, &
+        write_srl_station_array_r8_r8, &
+        write_srl_station_array2d_r4_r4, &
+        write_srl_station_array2d_r8_r4, &
+        write_srl_station_array2d_r4_r8, &
+        write_srl_station_array2d_r8_r8
   END INTERFACE sdf_write_station_array
 
 END MODULE sdf_output_station
