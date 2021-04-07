@@ -18,12 +18,11 @@ MODULE sdf_output_station_r8
 
 CONTAINS
 
-  SUBROUTINE write_station_array_r8_r8(h, time, step, array)
+  SUBROUTINE station_pre(h, time, step)
 
     TYPE(sdf_file_handle) :: h
     REAL(r8), INTENT(IN) :: time
     INTEGER, INTENT(IN) :: step
-    REAL(r8), DIMENSION(:), INTENT(IN) :: array
     TYPE(sdf_block_type), POINTER :: b
     REAL(r8) :: real8
     INTEGER :: errcode
@@ -56,9 +55,18 @@ CONTAINS
       real8 = REAL(time,r8)
       CALL MPI_FILE_WRITE(h%filehandle, real8, 1, mpitype_real, &
           MPI_STATUS_IGNORE, errcode)
-      CALL MPI_FILE_WRITE(h%filehandle, array, b%nvariables-1, mpitype_real, &
-          MPI_STATUS_IGNORE, errcode)
     END IF
+
+  END SUBROUTINE station_pre
+
+
+
+  SUBROUTINE station_post(h)
+
+    TYPE(sdf_file_handle) :: h
+    TYPE(sdf_block_type), POINTER :: b
+
+    b => h%current_block
     b%nelements = b%nelements + 1
     b%data_length = b%data_length + b%type_size
 
@@ -66,6 +74,29 @@ CONTAINS
 
     h%current_location = b%data_location + b%data_length
     b%done_data = .TRUE.
+
+  END SUBROUTINE station_post
+
+
+
+  SUBROUTINE write_station_array_r8_r8(h, time, step, array)
+
+    TYPE(sdf_file_handle) :: h
+    REAL(r8), INTENT(IN) :: time
+    INTEGER, INTENT(IN) :: step
+    REAL(r8), DIMENSION(:), INTENT(IN) :: array
+    TYPE(sdf_block_type), POINTER :: b
+    INTEGER :: errcode
+
+    CALL station_pre(h, time, step)
+
+    IF (h%rank == h%rank_master) THEN
+      b => h%current_block
+      CALL MPI_FILE_WRITE(h%filehandle, array, b%nvariables-1, mpitype_real, &
+          MPI_STATUS_IGNORE, errcode)
+    END IF
+
+    CALL station_post(h)
 
   END SUBROUTINE write_station_array_r8_r8
 
