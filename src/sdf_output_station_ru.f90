@@ -131,13 +131,13 @@ CONTAINS
         + (b%nstations + b%nvariables) * h%string_length + 4
     b%data_length = b%nelements * b%type_size
 
-    IF (h%rank == h%rank_master) THEN
-      IF (PRESENT(id)) THEN
-        CALL sdf_write_block_header(h, id, name)
-      ELSE
-        CALL write_block_header(h)
-      END IF
+    IF (PRESENT(id)) THEN
+      CALL sdf_write_block_header(h, id, name)
+    ELSE
+      CALL write_block_header(h)
+    END IF
 
+    IF (h%rank == h%rank_master) THEN
       CALL MPI_FILE_WRITE(h%filehandle, b%nelements, 1, MPI_INTEGER8, &
           MPI_STATUS_IGNORE, errcode)
       CALL MPI_FILE_WRITE(h%filehandle, b%type_size, 1, MPI_INTEGER, &
