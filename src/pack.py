@@ -51,6 +51,8 @@ if got_argparse:
     argp.add_argument("compiler_info", type=stripped, help="Compiler info")
     argp.add_argument("compiler_flags", type=stripped, help="Compiler flags")
     argp.add_argument("filelist", type=str, nargs='*', help="Source files")
+    argp.add_argument("--diff-branch", type=str, default="origin/main",
+                      help="Git branch to compare differences")
     args = argp.parse_args()
 else:
     args = type("", (), dict(dummy=1))()
@@ -64,6 +66,7 @@ else:
     (args.compiler_info,
      args.compiler_flags,) = map(stripped, sys.argv[9:11])
     args.filelist = sys.argv[11:]
+    args.diff_branch = "origin/main"
 
 prefix = args.prefix
 pack_source_code = args.pack_source_code
@@ -391,7 +394,7 @@ if not pack_git_diff:
     print_integer_array(0)
 else:
     if pack_git_diff_from_origin:
-        sp.call(["git diff origin/main > %s" % gitdiff], shell=True)
+        sp.call(["git diff %s > %s" % (args.diff_branch, gitdiff)], shell=True)
     else:
         sp.call(["git diff > %s" % gitdiff], shell=True)
     if os.path.getsize(gitdiff) != 0:
