@@ -23,14 +23,21 @@ if(${MPI_VERSION_RAN} STREQUAL FAILED_TO_RUN)
 endif()
 string(STRIP "${MPI_VERSION}" MPI_VERSION)
 
-
-if("${MPI_VERSION}" STREQUAL "OMPI_1.10.1" OR ${MPI_VERSION_RAN} EQUAL 1)
+if("${MPI_VERSION}" MATCHES "OMPI_1\.10\.1")
     message(FATAL_ERROR
         "OpenMPI 1.10.1 detected. This contains a serious bug and should not be used.")
-elseif("${MPI_VERSION}" STREQUAL "OMPI_2.1.1")
+elseif("${MPI_VERSION}" MATCHES "OMPI_2\.1\.1")
     message(FATAL_ERROR
         "OpenMPI 2.1.1 detected. This contains a serious bug and should not be used.")
-elseif("${MPI_VERSION}" STREQUAL "OMPI_2.1.2")
+elseif("${MPI_VERSION}" MATCHES "OMPI_2\.1\.2")
     message(FATAL_ERROR
         "OpenMPI 2.1.2 detected. This contains a serious bug and should not be used.")
+elseif("${MPI_VERSION}" MATCHES "OMPI_4\.0\.0")
+    message(FATAL_ERROR
+        "OpenMPI 4.0.0 detected. This contains a serious bug and should not be used.")
+elseif("${MPI_VERSION}" MATCHES "OMPI_4\.0\.1")
+    message(FATAL_ERROR
+        "OpenMPI 4.0.1 detected. This contains a serious bug and should not be used.")
+elseif(${MPI_VERSION_RAN} EQUAL 1)
+    message(FATAL_ERROR "Failed to detect MPI version")
 endif()
