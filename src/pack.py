@@ -14,7 +14,7 @@ import codecs
 try:
     import argparse
     got_argparse = True
-except:
+except ImportError:
     got_argparse = False
 
 
@@ -296,7 +296,7 @@ try:
             string = f.readline().rstrip('\n')
             f.close()
             git_version = string.split('=')[1].replace('"', '')
-        except:
+        except FileNotFoundError:
             pass
     elif cmd.returncode != 0 and str(output[1]).find('ot a git repo') != -1:
         print('WARNING: Not a git repository')
@@ -307,14 +307,14 @@ try:
             string = f.readline().rstrip('\n')
             f.close()
             git_version = string.split('=')[1].replace('"', '')
-        except:
+        except FileNotFoundError:
             pass
     elif cmd.returncode != 0:
         raise Exception('ERROR: unable to generate git diff')
     else:
         git_version = output[0].decode('utf-8').rstrip()
         pack_git_diff = True
-except:
+except Exception:
     raise Exception('ERROR: unable to generate git diff')
 
 tsec = time.time()
