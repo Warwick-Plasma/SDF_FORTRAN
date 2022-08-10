@@ -314,7 +314,6 @@ try:
         raise Exception('ERROR: unable to generate git diff')
     else:
         git_version = output[0].decode('utf-8').rstrip()
-        pack_git_diff = True
 except Exception:
     raise Exception('ERROR: unable to generate git diff')
 
