@@ -393,10 +393,11 @@ if not pack_git_diff:
     print_integer('len', 0)
     print_integer_array(0)
 else:
-    if pack_git_diff_from_origin:
-        sp.call(["git diff %s > %s" % (args.diff_branch, gitdiff)], shell=True)
-    else:
-        sp.call(["git diff > %s" % gitdiff], shell=True)
+    with open(gitdiff, 'w') as fd:
+        if pack_git_diff_from_origin:
+            sp.call(["git", "diff", args.diff_branch], shell=True, stdout=fd)
+        else:
+            sp.call(["git", "diff"], shell=True, stdout=fd)
     if os.path.getsize(gitdiff) != 0:
         checksum = get_bytes_checksum([gitdiff])
 
