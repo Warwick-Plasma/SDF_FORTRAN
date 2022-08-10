@@ -33,6 +33,7 @@ def stripped(s):
         s = s.encode('ascii', 'ignore').decode()
     return s.strip()
 
+
 if got_argparse:
     argp = argparse.ArgumentParser(
         description="Pack source code for writing to SDF output")
