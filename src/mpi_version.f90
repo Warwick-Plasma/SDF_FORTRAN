@@ -32,6 +32,20 @@ PROGRAM check_mpi_version
     PRINT*, 'OpenMPI 2.1.2 detected. This contains a serious bug and ', &
         'should not be used.'
     STOP 1
+
+  ELSE IF (OMPI_MAJOR_VERSION == 4 .AND. OMPI_MINOR_VERSION == 0 &
+      .AND. OMPI_RELEASE_VERSION == 0) THEN
+    PRINT*, '*** ERROR ***'
+    PRINT*, 'OpenMPI 4.0.0 detected. This contains a serious bug and ', &
+        'should not be used.'
+    STOP 1
+
+  ELSE IF (OMPI_MAJOR_VERSION == 4 .AND. OMPI_MINOR_VERSION == 0 &
+      .AND. OMPI_RELEASE_VERSION == 1) THEN
+    PRINT*, '*** ERROR ***'
+    PRINT*, 'OpenMPI 4.0.1 detected. This contains a serious bug and ', &
+        'should not be used.'
+    STOP 1
   END IF
 
 END PROGRAM check_mpi_version
