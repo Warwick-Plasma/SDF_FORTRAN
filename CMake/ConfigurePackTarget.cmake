@@ -35,9 +35,21 @@ else()
 endif()
 
 configure_file(${PACK_CMAKE_IN} pack.cmake)
-add_custom_command(
-   OUTPUT ${INFO_FILE}
-   COMMAND ${CMAKE_COMMAND} -E remove -f ${FORT}
-   COMMAND ${CMAKE_COMMAND} -P pack.cmake
-   DEPENDS ${PACK_PY} ${CMAKE_CURRENT_BINARY_DIR}/pack.cmake ${SOURCE_ALL}
-   VERBATIM)
+if(TARGET)
+    add_custom_command(
+       TARGET ${TARGET} PRE_BUILD
+       BYPRODUCTS ${INFO_FILE}
+       COMMAND ${CMAKE_COMMAND} -E remove -f ${FORT}
+       COMMAND ${CMAKE_COMMAND} -P pack.cmake
+       DEPENDS ${PACK_PY} pack.cmake ${SOURCE_ALL}
+       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+       VERBATIM)
+else()
+    add_custom_command(
+       OUTPUT ${INFO_FILE}
+       COMMAND ${CMAKE_COMMAND} -E remove -f ${FORT}
+       COMMAND ${CMAKE_COMMAND} -P pack.cmake
+       DEPENDS ${PACK_PY} pack.cmake ${SOURCE_ALL}
+       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+       VERBATIM)
+endif()

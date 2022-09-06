@@ -14,7 +14,7 @@ import codecs
 try:
     import argparse
     got_argparse = True
-except:
+except ImportError:
     got_argparse = False
 
 
@@ -32,6 +32,7 @@ def stripped(s):
         # python 3
         s = s.encode('ascii', 'ignore').decode()
     return s.strip()
+
 
 if got_argparse:
     argp = argparse.ArgumentParser(
@@ -296,7 +297,7 @@ try:
             string = f.readline().rstrip('\n')
             f.close()
             git_version = string.split('=')[1].replace('"', '')
-        except:
+        except FileNotFoundError:
             pass
     elif cmd.returncode != 0 and str(output[1]).find('ot a git repo') != -1:
         print('WARNING: Not a git repository')
@@ -307,14 +308,13 @@ try:
             string = f.readline().rstrip('\n')
             f.close()
             git_version = string.split('=')[1].replace('"', '')
-        except:
+        except FileNotFoundError:
             pass
     elif cmd.returncode != 0:
         raise Exception('ERROR: unable to generate git diff')
     else:
         git_version = output[0].decode('utf-8').rstrip()
-        pack_git_diff = True
-except:
+except Exception:
     raise Exception('ERROR: unable to generate git diff')
 
 tsec = time.time()
@@ -393,10 +393,11 @@ if not pack_git_diff:
     print_integer('len', 0)
     print_integer_array(0)
 else:
-    if pack_git_diff_from_origin:
-        sp.call(["git diff %s > %s" % (args.diff_branch, gitdiff)], shell=True)
-    else:
-        sp.call(["git diff > %s" % gitdiff], shell=True)
+    with open(gitdiff, 'w') as fd:
+        if pack_git_diff_from_origin:
+            sp.call(["git", "diff", args.diff_branch], shell=True, stdout=fd)
+        else:
+            sp.call(["git", "diff"], shell=True, stdout=fd)
     if os.path.getsize(gitdiff) != 0:
         checksum = get_bytes_checksum([gitdiff])
 
