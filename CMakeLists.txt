@@ -49,3 +49,15 @@ install(
     DESTINATION lib/PackSDF_${SDF_VERSION}
     COMPONENT develop
 )
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/PackSDFConfigVersion.cmake
+    VERSION ${SDF_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/PackSDFConfigVersion.cmake
+    DESTINATION lib/PackSDF_${SDF_VERSION}
+    COMPONENT develop
+)
