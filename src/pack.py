@@ -208,10 +208,9 @@ def write_data_bytes(filename, varname):
     global mimetype, of
     global linestart, linecont, suffix, ncolumns, ncontinuation
 
-    f = open(filename, 'rb')
-    d = f.read()
-    dhex = codecs.encode(d, 'hex_codec').decode('utf-8')
-    f.close()
+    with open(filename, 'rb') as f:
+        d = f.read()
+        dhex = codecs.encode(d, 'hex_codec').decode('utf-8')
     os.remove(filename)
 
     nelements = (len(d)+nbytes-1) // nbytes
@@ -294,10 +293,9 @@ try:
         git_version = ''
         pack_git_diff = False
         try:
-            f = open(commitfile, "r")
-            string = f.readline().rstrip('\n')
-            f.close()
-            git_version = string.split('=')[1].replace('"', '')
+            with open(commitfile, 'r') as f:
+                string = f.readline().rstrip('\n')
+                git_version = string.split('=')[1].replace('"', '')
         except FileNotFoundError:
             pass
     elif cmd.returncode != 0 and str(output[1]).find('ot a git repo') != -1:
@@ -305,10 +303,9 @@ try:
         git_version = ''
         pack_git_diff = False
         try:
-            f = open(commitfile, "r")
-            string = f.readline().rstrip('\n')
-            f.close()
-            git_version = string.split('=')[1].replace('"', '')
+            with open(commitfile, 'r') as f:
+                string = f.readline().rstrip('\n')
+                git_version = string.split('=')[1].replace('"', '')
         except FileNotFoundError:
             pass
     elif cmd.returncode != 0:
@@ -373,10 +370,9 @@ if not pack_source_code:
     print_integer('len', 0)
     print_integer_array(0)
 else:
-    tar = tarfile.open(archive, "w:gz")
-    for name in filelist:
-        tar.add(name)
-    tar.close()
+    with tarfile.open(archive, "w:gz") as tar:
+        for name in filelist:
+            tar.add(name)
     mimetype = 'application/x-tar-gz'
 
     write_data_bytes(archive, vname)
@@ -403,11 +399,9 @@ else:
         checksum = get_bytes_checksum([gitdiff])
 
         zgitdiff = gitdiff + '.gz'
-        f_in = open(gitdiff, 'rb')
-        f_out = gzip.open(zgitdiff, 'wb')
-        f_out.writelines(f_in)
-        f_out.close()
-        f_in.close()
+        with open(gitdiff, 'rb') as f_in:
+            with gzip.open(zgitdiff, 'wb') as f_out:
+                f_out.writelines(f_in)
         os.remove(gitdiff)
         os.rename(zgitdiff, gitdiff)
     mimetype = 'application/x-gzip'
