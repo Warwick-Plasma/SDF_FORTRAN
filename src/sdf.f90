@@ -127,6 +127,7 @@ MODULE sdf
   PUBLIC :: sdf_get_all_stations
   PUBLIC :: sdf_station_seek_time
   PUBLIC :: sdf_flush
+  PUBLIC :: sdf_get_source_output
   PUBLIC :: sdf_read_header
   PUBLIC :: sdf_read_blocklist
   PUBLIC :: sdf_read_nblocks

@@ -16,6 +16,32 @@ MODULE sdf_output_source
 
 CONTAINS
 
+  SUBROUTINE sdf_get_source_output(is_written, only_diff)
+
+    LOGICAL, INTENT(OUT) :: is_written
+    LOGICAL, INTENT(IN), OPTIONAL :: only_diff
+    LOGICAL :: write_diff = .FALSE.
+
+    is_written = .FALSE.
+
+    IF (PRESENT(only_diff)) write_diff = only_diff
+
+    IF (.NOT.write_diff) THEN
+      IF (SIZE(sdf_bytes) > 1 .OR. &
+            (TRIM(sdf_bytes_checksum_type) /= '' .AND. &
+            ICHAR(sdf_bytes_checksum_type(1:1)) /= 0)) THEN
+        is_written = .TRUE.
+      END IF
+    END IF
+
+    IF (write_diff .AND. SIZE(sdf_diff_bytes) > 1) THEN
+      is_written = .TRUE.
+    END IF
+
+  END SUBROUTINE sdf_get_source_output
+
+
+
   SUBROUTINE sdf_write_source_info(h, only_diff)
 
     TYPE(sdf_file_handle) :: h
