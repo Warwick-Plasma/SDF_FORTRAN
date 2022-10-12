@@ -16,28 +16,36 @@ MODULE sdf_output_source
 
 CONTAINS
 
-  SUBROUTINE sdf_write_source_info(h)
+  SUBROUTINE sdf_write_source_info(h, only_diff)
 
     TYPE(sdf_file_handle) :: h
+    LOGICAL, INTENT(IN), OPTIONAL :: only_diff
     CHARACTER(LEN=c_id_length) :: stitched_ids(3)
     CHARACTER(LEN=c_id_length) :: time_string
     CHARACTER(LEN=512) :: string_array(6)
+    LOGICAL :: write_diff = .FALSE.
     INTEGER :: n, i
 
     n = 0
 
-    IF (SIZE(sdf_bytes) > 1 .OR. &
-          (TRIM(sdf_bytes_checksum_type) /= '' .AND. &
-          ICHAR(sdf_bytes_checksum_type(1:1)) /= 0)) THEN
-      n = n + 1
-      CALL sdf_safe_copy_id(h, 'sdf_source/source', stitched_ids(n))
-      CALL sdf_write_datablock(h, stitched_ids(n), &
-          'SDF source code', sdf_bytes, &
-          sdf_bytes_padding, sdf_bytes_mimetype, &
-          sdf_bytes_checksum_type, sdf_bytes_checksum)
+    IF (PRESENT(only_diff)) write_diff = only_diff
+
+    IF (.NOT.write_diff) THEN
+      IF (SIZE(sdf_bytes) > 1 .OR. &
+            (TRIM(sdf_bytes_checksum_type) /= '' .AND. &
+            ICHAR(sdf_bytes_checksum_type(1:1)) /= 0)) THEN
+        n = n + 1
+        CALL sdf_safe_copy_id(h, 'sdf_source/source', stitched_ids(n))
+        CALL sdf_write_datablock(h, stitched_ids(n), &
+            'SDF source code', sdf_bytes, &
+            sdf_bytes_padding, sdf_bytes_mimetype, &
+            sdf_bytes_checksum_type, sdf_bytes_checksum)
+      ELSE
+        write_diff = .TRUE.
+      END IF
     END IF
 
-    IF (SIZE(sdf_bytes) == 1 .AND. SIZE(sdf_diff_bytes) > 1) THEN
+    IF (write_diff .AND. SIZE(sdf_diff_bytes) > 1) THEN
       n = n + 1
       CALL sdf_safe_copy_id(h, 'sdf_source/diff', stitched_ids(n))
       CALL sdf_write_datablock(h, stitched_ids(n), &

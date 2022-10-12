@@ -285,8 +285,8 @@ def print_integer_array(value):
 
 
 try:
-    cmd = sp.Popen("git describe --always --long --dirty", shell=True,
-                   stderr=sp.PIPE, stdout=sp.PIPE)
+    cmd = sp.Popen(["git", "describe", "--always", "--long", "--dirty"],
+                   shell=False, stderr=sp.PIPE, stdout=sp.PIPE)
     output = cmd.communicate()
     if cmd.returncode == 127:
         print('WARNING: Git command not found')
@@ -326,7 +326,7 @@ compiler_flags = args.compiler_flags
 
 # fnull=open(os.devnull,'w')
 # filelist = sp.check_output("git ls-files --cached --no-empty-directory "
-#                            + "--full-name", shell=True,
+#                            + "--full-name", shell=False,
 #                            stderr=fnull).rstrip()
 
 filelist = args.filelist
@@ -395,9 +395,9 @@ if not pack_git_diff:
 else:
     with open(gitdiff, 'w') as fd:
         if pack_git_diff_from_origin:
-            sp.call(["git", "diff", args.diff_branch], shell=True, stdout=fd)
+            sp.call(["git", "diff", args.diff_branch], shell=False, stdout=fd)
         else:
-            sp.call(["git", "diff"], shell=True, stdout=fd)
+            sp.call(["git", "diff"], shell=False, stdout=fd)
     if os.path.getsize(gitdiff) != 0:
         checksum = get_bytes_checksum([gitdiff])
 
