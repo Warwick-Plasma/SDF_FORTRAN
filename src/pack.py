@@ -424,14 +424,17 @@ else:
         name = name.decode('ascii').rstrip()
 
         remote = None
-        bname = sp.check_output(["git", "name-rev", branch], shell=False)
-        for n in bname.decode('ascii').rstrip().split(' '):
-            if n.startswith('remotes/'):
-                remote = n.split('/')[1]
-            elif n != 'HEAD':
-                bname = n
+        sremote = "local"
+        bname = sp.check_output(["git", "rev-parse", "--symbolic-full-name",
+                                branch], shell=False)
+        bname =  bname.decode('ascii').rstrip()
+        bnames = bname.split('/', 2)
+        bname = bnames[-1]
+        if bnames[1] == 'remotes':
+            remote = bname.split('/')[0]
+            sremote = "remote"
 
-        fd.write(f"with remote branch {name} ({bname})\n\n")
+        fd.write(f"with {sremote} branch {name} ({bname})\n\n")
 
         if remote:
             url = sp.check_output(["git", "remote", "get-url", remote],
