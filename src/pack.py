@@ -378,6 +378,17 @@ else:
     write_data_bytes(archive, vname)
 
 
+if pack_git_diff:
+    branch = 'HEAD'
+    if pack_git_diff_from_origin:
+        branch = args.diff_branch
+
+    stat = sp.check_output(["git", "diff", "--stat", branch], shell=False)
+
+    if len(stat) == 0:
+        pack_git_diff = False
+
+
 vname = diffname
 checksum_type = ''
 checksum = ''
@@ -391,10 +402,52 @@ if not pack_git_diff:
     print_integer_array(0)
 else:
     with open(gitdiff, 'w') as fd:
+        branch = 'HEAD'
+
+        name = sp.check_output(["git", "describe", "--match", "v[0-9]*",
+                                "--always", "--long", branch], shell=False)
+        name = name.decode('ascii').rstrip()
+
+        bname = sp.check_output(["git", "name-rev", branch], shell=False)
+        for n in bname.decode('ascii').rstrip().split(' '):
+            if n != 'HEAD':
+                bname = n
+                break
+
+        fd.write(f"git-diff of current index on branch {name} ({bname})\n")
+
         if pack_git_diff_from_origin:
-            sp.call(["git", "diff", args.diff_branch], shell=False, stdout=fd)
-        else:
-            sp.call(["git", "diff"], shell=False, stdout=fd)
+            branch = args.diff_branch
+
+        name = sp.check_output(["git", "describe", "--match", "v[0-9]*",
+                                "--always", "--long", branch], shell=False)
+        name = name.decode('ascii').rstrip()
+
+        remote = None
+        bname = sp.check_output(["git", "name-rev", branch], shell=False)
+        for n in bname.decode('ascii').rstrip().split(' '):
+            if n.startswith('remotes/'):
+                remote = n.split('/')[1]
+            elif n != 'HEAD':
+                bname = n
+
+        fd.write(f"with remote branch {name} ({bname})\n\n")
+
+        if remote:
+            url = sp.check_output(["git", "remote", "get-url", remote],
+                                  shell=False)
+            url = url.decode('ascii').rstrip()
+            fd.write(f"Remote {remote} {url}\n\n")
+
+        fd.flush()
+        sp.call(["git", "diff", "--stat", branch], shell=False, stdout=fd)
+
+        fd.flush()
+        fd.write("---\n\n")
+        fd.flush()
+
+        sp.call(["git", "diff", branch], shell=False, stdout=fd)
+
     if os.path.getsize(gitdiff) != 0:
         checksum = get_bytes_checksum([gitdiff])
 
