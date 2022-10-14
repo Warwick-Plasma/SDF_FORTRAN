@@ -744,6 +744,7 @@ CONTAINS
     var%error_code = 0
     var%errhandler = MPI_ERRHANDLER_NULL
     var%old_errhandler = MPI_ERRHANDLER_NULL
+    var%datatype = 0
     var%comm = 0
 
     var%summary_location = 0
