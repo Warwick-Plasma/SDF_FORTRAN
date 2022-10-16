@@ -1,4 +1,5 @@
-find_package(PythonInterp)
+# pack.py now uses f-strings which were introduced in Python 3.6
+find_package(Python3 3.6 REQUIRED)
 find_file(PACK_PY pack.py
    PATHS ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_LIST_DIR}/../src
    DOC "Path to pack.py")
