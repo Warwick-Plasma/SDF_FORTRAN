@@ -427,7 +427,7 @@ else:
         sremote = "local"
         bname = sp.check_output(["git", "rev-parse", "--symbolic-full-name",
                                 branch], shell=False)
-        bname =  bname.decode('ascii').rstrip()
+        bname = bname.decode('ascii').rstrip()
         bnames = bname.split('/', 2)
         bname = bnames[-1]
         if bnames[1] == 'remotes':
