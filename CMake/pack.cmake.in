@@ -12,7 +12,7 @@ set(ENV{GIT_DIR} @GIT_DIR@)
 # are interpreted correctly.
 # The trailing whitespace to "-O3 ", is stripped within pack.py.
 execute_process(
-   COMMAND "@Python3_EXECUTABLE@" "@PACK_PY@" @PACK_OPTS@
+   COMMAND "@Python3_EXECUTABLE@" "@PACK_PY@" --git "@GIT_EXECUTABLE@" @PACK_OPTS@
       @CMAKE_CURRENT_BINARY_DIR@/@INFO_FILE@ "@FC_INFO@ "
       "@FFLAGS@ " @SOURCE_ALL@
       RESULT_VARIABLE RET)

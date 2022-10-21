@@ -1,13 +1,13 @@
-find_program(GIT git)
-if(GIT)
+find_package(Git 2.7)   # Version >=2.7 is needed for 'git remote get-url ...'
+if(GIT_FOUND)
     execute_process(
-        COMMAND git rev-parse --show-toplevel
+        COMMAND ${GIT_EXECUTABLE} rev-parse --show-toplevel
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         OUTPUT_VARIABLE GIT_WORK_TREE
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(NOT "${GIT_WORK_TREE}" STREQUAL "")
         execute_process(
-            COMMAND git rev-parse --git-dir
+            COMMAND ${GIT_EXECUTABLE} rev-parse --git-dir
             WORKING_DIRECTORY ${GIT_WORK_TREE}
             OUTPUT_VARIABLE GIT_DIR
             OUTPUT_STRIP_TRAILING_WHITESPACE)

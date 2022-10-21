@@ -54,6 +54,8 @@ if got_argparse:
     argp.add_argument("filelist", type=str, nargs='*', help="Source files")
     argp.add_argument("--diff-branch", type=str, default="origin/main",
                       help="Git branch to compare differences")
+    argp.add_argument("--git", type=str, default="git",
+                      help="Path to git executable")
     args = argp.parse_args()
 else:
     args = type("", (), dict(dummy=1))()
@@ -68,6 +70,7 @@ else:
      args.compiler_flags,) = map(stripped, sys.argv[9:11])
     args.filelist = sys.argv[11:]
     args.diff_branch = "origin/main"
+    args.git = "git"
 
 prefix = args.prefix
 pack_source_code = args.pack_source_code
@@ -285,7 +288,7 @@ def print_integer_array(value):
 
 
 try:
-    cmd = sp.Popen(["git", "describe", "--always", "--long", "--dirty"],
+    cmd = sp.Popen([args.git, "describe", "--always", "--long", "--dirty"],
                    shell=False, stderr=sp.PIPE, stdout=sp.PIPE)
     output = cmd.communicate()
     if cmd.returncode == 127:
@@ -383,7 +386,7 @@ if pack_git_diff:
     if pack_git_diff_from_origin:
         branch = args.diff_branch
 
-    stat = sp.check_output(["git", "diff", "--stat", branch], shell=False)
+    stat = sp.check_output([args.git, "diff", "--stat", branch], shell=False)
 
     if len(stat) == 0:
         pack_git_diff = False
@@ -404,11 +407,11 @@ else:
     with open(gitdiff, 'w') as fd:
         branch = 'HEAD'
 
-        name = sp.check_output(["git", "describe", "--match", "v[0-9]*",
+        name = sp.check_output([args.git, "describe", "--match", "v[0-9]*",
                                 "--always", "--long", branch], shell=False)
         name = name.decode('ascii').rstrip()
 
-        bname = sp.check_output(["git", "name-rev", branch], shell=False)
+        bname = sp.check_output([args.git, "name-rev", branch], shell=False)
         for n in bname.decode('ascii').rstrip().split(' '):
             if n != 'HEAD':
                 bname = n
@@ -419,13 +422,13 @@ else:
         if pack_git_diff_from_origin:
             branch = args.diff_branch
 
-        name = sp.check_output(["git", "describe", "--match", "v[0-9]*",
+        name = sp.check_output([args.git, "describe", "--match", "v[0-9]*",
                                 "--always", "--long", branch], shell=False)
         name = name.decode('ascii').rstrip()
 
         remote = None
         sremote = "local"
-        bname = sp.check_output(["git", "rev-parse", "--symbolic-full-name",
+        bname = sp.check_output([args.git, "rev-parse", "--symbolic-full-name",
                                 branch], shell=False)
         bname = bname.decode('ascii').rstrip()
         bnames = bname.split('/', 2)
@@ -437,19 +440,19 @@ else:
         fd.write(f"with {sremote} branch {name} ({bname})\n\n")
 
         if remote:
-            url = sp.check_output(["git", "remote", "get-url", remote],
+            url = sp.check_output([args.git, "remote", "get-url", remote],
                                   shell=False)
             url = url.decode('ascii').rstrip()
             fd.write(f"Remote {remote} {url}\n\n")
 
         fd.flush()
-        sp.call(["git", "diff", "--stat", branch], shell=False, stdout=fd)
+        sp.call([args.git, "diff", "--stat", branch], shell=False, stdout=fd)
 
         fd.flush()
         fd.write("---\n\n")
         fd.flush()
 
-        sp.call(["git", "diff", branch], shell=False, stdout=fd)
+        sp.call([args.git, "diff", branch], shell=False, stdout=fd)
 
     if os.path.getsize(gitdiff) != 0:
         checksum = get_bytes_checksum([gitdiff])
