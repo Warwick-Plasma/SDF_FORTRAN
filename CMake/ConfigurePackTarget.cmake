@@ -34,6 +34,9 @@ else()
     set(GIT_DIR ${PROJECT_SOURCE_DIR})
 endif()
 
+# The following assumes that the spaces in SOURCE_ALL haven't been escaped already
+list(TRANSFORM SOURCE_ALL REPLACE " " "\\\\ ")
+
 configure_file(${PACK_CMAKE_IN} pack.cmake)
 if(TARGET)
     add_custom_command(
