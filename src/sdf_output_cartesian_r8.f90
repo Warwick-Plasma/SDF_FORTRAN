@@ -550,6 +550,30 @@ CONTAINS
 
 
 
+  SUBROUTINE write_2d_mesh_r8_f08(h, id, name, x, y, dims, xmin, xmax, &
+      ymin, ymax, distribution, subarray, convert_in, dim_labels, &
+      dim_units, dim_mults, geometry)
+
+    USE mpi_f08
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name
+    REAL(r8), DIMENSION(:), INTENT(IN) :: x, y
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    REAL(r8), INTENT(IN) :: xmin, xmax, ymin, ymax
+    TYPE(MPI_DATATYPE), DIMENSION(:), INTENT(IN) :: distribution, subarray
+    LOGICAL, INTENT(IN), OPTIONAL :: convert_in
+    CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
+    REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
+    INTEGER, INTENT(IN), OPTIONAL :: geometry
+
+    CALL write_2d_mesh_r8(h, id, name, x, y, dims, xmin, xmax, &
+      ymin, ymax, distribution%MPI_VAL, subarray%MPI_VAL, convert_in, dim_labels, &
+      dim_units, dim_mults, geometry)
+  END SUBROUTINE write_2d_mesh_r8_f08
+
+
+
   !----------------------------------------------------------------------------
   ! Code to write a 3D cartesian mesh in parallel using the
   ! mpitype {distribution} for distribution of data
@@ -681,6 +705,30 @@ CONTAINS
     b%done_data = .TRUE.
 
   END SUBROUTINE write_3d_mesh_r8
+
+
+
+  SUBROUTINE write_3d_mesh_r8_f08(h, id, name, x, y, z, dims, xmin, xmax, &
+      ymin, ymax, zmin, zmax, distribution, subarray, convert_in, dim_labels, &
+      dim_units, dim_mults, geometry)
+
+    USE mpi_f08_types
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name
+    REAL(r8), DIMENSION(:), INTENT(IN) :: x, y, z
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    REAL(r8), INTENT(IN) :: xmin, xmax, ymin, ymax, zmin, zmax
+    TYPE(MPI_DATATYPE), DIMENSION(:), INTENT(IN) :: distribution, subarray
+    LOGICAL, INTENT(IN), OPTIONAL :: convert_in
+    CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
+    REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
+    INTEGER, INTENT(IN), OPTIONAL :: geometry
+
+    CALL write_3d_mesh_r8(h, id, name, x, y, z, dims, xmin, xmax, &
+      ymin, ymax, zmin, zmax, distribution%MPI_VAL, subarray%MPI_VAL, &
+      convert_in, dim_labels, dim_units, dim_mults, geometry)
+  END SUBROUTINE write_3d_mesh_r8_f08
 
 
 
@@ -2470,6 +2518,27 @@ CONTAINS
 
 
 
+  SUBROUTINE write_2d_float_r8_f08(h, id, name, units, dims, stagger, mesh_id, &
+      variable, distribution, subarray, convert, mult)
+
+    USE mpi_f08_types
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    REAL(r8), DIMENSION(:,:), INTENT(IN) :: variable
+    TYPE(MPI_DATATYPE), INTENT(IN) :: distribution, subarray
+    LOGICAL, OPTIONAL, INTENT(IN) :: convert
+    REAL(r8), OPTIONAL, INTENT(IN) :: mult
+  
+    CALL write_2d_float_r8(h, id, name, units, dims, stagger, mesh_id, &
+      variable, distribution%MPI_VAL, subarray%MPI_VAL, convert, mult)
+   END SUBROUTINE write_2d_float_r8_f08
+
+
+
   !----------------------------------------------------------------------------
   ! Code to write a 3D cartesian variable in parallel
   ! using the mpitype {distribution} for distribution of data
@@ -2500,6 +2569,27 @@ CONTAINS
         stagger, mesh_id, variable, distribution, subarray, convert, mult)
 
   END SUBROUTINE write_3d_float_r8
+
+
+
+  SUBROUTINE write_3d_float_r8_f08(h, id, name, units, dims, stagger, mesh_id, &
+      variable, distribution, subarray, convert, mult)
+
+    USE mpi_f08_types
+
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    REAL(r8), DIMENSION(:,:,:), INTENT(IN) :: variable
+    TYPE(MPI_DATATYPE), INTENT(IN) :: distribution, subarray
+    LOGICAL, OPTIONAL, INTENT(IN) :: convert
+    REAL(r8), OPTIONAL, INTENT(IN) :: mult
+
+    CALL write_3d_float_r8(h, id, name, units, dims, stagger, mesh_id, &
+      variable, distribution%MPI_VAL, subarray%MPI_VAL, convert, mult)
+  END SUBROUTINE write_3d_float_r8_f08
 
 
 

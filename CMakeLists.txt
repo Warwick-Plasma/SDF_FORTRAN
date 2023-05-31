@@ -25,7 +25,7 @@ elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
   endif()
   set(CMAKE_Fortran_FLAGS "-g -Wall -frecord-marker=4 ${MCMODEL}")
   set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -g")
-  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -fimplicit-none -fbounds-check -fbacktrace -Wextra -ffpe-trap=invalid,zero,overflow -pedantic")
+  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -fimplicit-none -fbounds-check -fbacktrace -Wextra -ffpe-trap=invalid,zero,overflow")
 
 endif()
 

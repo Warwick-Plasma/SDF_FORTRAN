@@ -12,9 +12,14 @@ MODULE sdf_control
 
   IMPLICIT NONE
 
+  INTERFACE sdf_open
+     MODULE PROCEDURE sdf_open_f90
+     MODULE PROCEDURE sdf_open_f08
+  END INTERFACE sdf_open
+
 CONTAINS
 
-  SUBROUTINE sdf_open(h, filename, sdf_comm_in, mode, handle_errors)
+  SUBROUTINE sdf_open_f90(h, filename, sdf_comm_in, mode, handle_errors)
 
     TYPE(sdf_file_handle), TARGET :: h
     CHARACTER(LEN=*), INTENT(IN) :: filename
@@ -110,7 +115,22 @@ CONTAINS
       END DO
     END IF
 
-  END SUBROUTINE sdf_open
+  END SUBROUTINE sdf_open_f90
+
+
+
+  SUBROUTINE sdf_open_f08(h, filename, sdf_comm_in, mode, handle_errors)
+
+    USE mpi_f08_types
+
+    TYPE(sdf_file_handle), TARGET :: h
+    CHARACTER(LEN=*), INTENT(IN) :: filename
+    TYPE(MPI_COMM), INTENT(IN) :: sdf_comm_in
+    INTEGER, INTENT(IN), OPTIONAL :: mode
+    LOGICAL, INTENT(IN), OPTIONAL :: handle_errors
+
+    CALL sdf_open_f90(h, filename, sdf_comm_in%mpi_val, mode, handle_errors)
+  END SUBROUTINE sdf_open_f08
 
 
 
