@@ -1,5 +1,5 @@
-set(ENV{GIT_WORK_TREE} @GIT_WORK_TREE@)
-set(ENV{GIT_DIR} @GIT_DIR@)
+set(ENV{GIT_WORK_TREE} "@GIT_WORK_TREE@")
+set(ENV{GIT_DIR} "@GIT_DIR@")
 
 # The string arguments, "@FC_INFO@ " and "@FFLAGS@ ", are given
 # a trailing whitespace to work around a problem in Python's
@@ -12,8 +12,8 @@ set(ENV{GIT_DIR} @GIT_DIR@)
 # are interpreted correctly.
 # The trailing whitespace to "-O3 ", is stripped within pack.py.
 execute_process(
-   COMMAND "@Python3_EXECUTABLE@" "@PACK_PY@" @PACK_OPTS@
-      @CMAKE_CURRENT_BINARY_DIR@/@INFO_FILE@ "@FC_INFO@ "
+   COMMAND "@Python3_EXECUTABLE@" "@PACK_PY@" --git "@GIT_EXECUTABLE@" @PACK_OPTS@
+      "@CMAKE_CURRENT_BINARY_DIR@/@INFO_FILE@" "@FC_INFO@ "
       "@FFLAGS@ " @SOURCE_ALL@
       RESULT_VARIABLE RET)
 if(RET)
