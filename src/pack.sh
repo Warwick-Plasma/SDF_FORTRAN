@@ -39,9 +39,9 @@ f77_output=$6
 # Use python script by default and then fall back to shell script if that
 # fails
 BASEDIR=$(dirname $0)
-PYTHONCMD=$(which python)
+PYTHONCMD=$(which python3)
 if [ "$PYTHONCMD"x = x ]; then
-  PYTHONCMD=$(which python3)
+  PYTHONCMD=$(which python)
 fi
 $PYTHONCMD $BASEDIR/pack.py -- "$@"
 if [ $? -eq 0 ]; then
