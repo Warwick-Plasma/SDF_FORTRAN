@@ -550,6 +550,7 @@ CONTAINS
 
 
 
+#ifdef MPI_F08
   SUBROUTINE write_2d_mesh_r8_f08(h, id, name, x, y, dims, xmin, xmax, &
       ymin, ymax, distribution, subarray, convert_in, dim_labels, &
       dim_units, dim_mults, geometry)
@@ -571,6 +572,7 @@ CONTAINS
       ymin, ymax, distribution%MPI_VAL, subarray%MPI_VAL, convert_in, dim_labels, &
       dim_units, dim_mults, geometry)
   END SUBROUTINE write_2d_mesh_r8_f08
+#endif
 
 
 
@@ -708,6 +710,7 @@ CONTAINS
 
 
 
+#ifdef MPI_F08
   SUBROUTINE write_3d_mesh_r8_f08(h, id, name, x, y, z, dims, xmin, xmax, &
       ymin, ymax, zmin, zmax, distribution, subarray, convert_in, dim_labels, &
       dim_units, dim_mults, geometry)
@@ -729,6 +732,7 @@ CONTAINS
       ymin, ymax, zmin, zmax, distribution%MPI_VAL, subarray%MPI_VAL, &
       convert_in, dim_labels, dim_units, dim_mults, geometry)
   END SUBROUTINE write_3d_mesh_r8_f08
+#endif
 
 
 
@@ -2518,6 +2522,7 @@ CONTAINS
 
 
 
+#ifdef MPI_F08
   SUBROUTINE write_2d_float_r8_f08(h, id, name, units, dims, stagger, mesh_id, &
       variable, distribution, subarray, convert, mult)
 
@@ -2536,6 +2541,7 @@ CONTAINS
     CALL write_2d_float_r8(h, id, name, units, dims, stagger, mesh_id, &
       variable, distribution%MPI_VAL, subarray%MPI_VAL, convert, mult)
    END SUBROUTINE write_2d_float_r8_f08
+#endif
 
 
 
@@ -2572,6 +2578,7 @@ CONTAINS
 
 
 
+#ifdef MPI_F08
   SUBROUTINE write_3d_float_r8_f08(h, id, name, units, dims, stagger, mesh_id, &
       variable, distribution, subarray, convert, mult)
 
@@ -2590,6 +2597,7 @@ CONTAINS
     CALL write_3d_float_r8(h, id, name, units, dims, stagger, mesh_id, &
       variable, distribution%MPI_VAL, subarray%MPI_VAL, convert, mult)
   END SUBROUTINE write_3d_float_r8_f08
+#endif
 
 
 

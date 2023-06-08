@@ -86,9 +86,12 @@ MODULE sdf_output_cartesian
         write_3d_lag_mesh_r4, &
         write_1d_lag_mesh_r8, &
         write_2d_lag_mesh_r8, &
-        write_3d_lag_mesh_r8, &
+        write_3d_lag_mesh_r8
+#ifdef MPI_F08
+    MODULE PROCEDURE &
         write_2d_mesh_r8_f08, &
         write_3d_mesh_r8_f08
+#endif
   END INTERFACE sdf_write_plain_mesh
 
   INTERFACE sdf_write_plain_variable
@@ -124,9 +127,12 @@ MODULE sdf_output_cartesian
         write_3d_integer_i8_r4, &
         write_1d_integer_i8_r8, &
         write_2d_integer_i8_r8, &
-        write_3d_integer_i8_r8, &
+        write_3d_integer_i8_r8
+#ifdef MPI_F08
+    MODULE PROCEDURE &
         write_2d_float_r8_f08, &
         write_3d_float_r8_f08
+#endif
   END INTERFACE sdf_write_plain_variable
 
   INTERFACE sdf_write_material

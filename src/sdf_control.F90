@@ -14,7 +14,9 @@ MODULE sdf_control
 
   INTERFACE sdf_open
      MODULE PROCEDURE sdf_open_f90
+#ifdef MPI_F08
      MODULE PROCEDURE sdf_open_f08
+#endif
   END INTERFACE sdf_open
 
 CONTAINS
@@ -119,6 +121,7 @@ CONTAINS
 
 
 
+#ifdef MPI_F08
   SUBROUTINE sdf_open_f08(h, filename, sdf_comm_in, mode, handle_errors)
 
     USE mpi_f08_types
@@ -131,6 +134,7 @@ CONTAINS
 
     CALL sdf_open_f90(h, filename, sdf_comm_in%mpi_val, mode, handle_errors)
   END SUBROUTINE sdf_open_f08
+#endif
 
 
 

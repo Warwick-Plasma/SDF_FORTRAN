@@ -220,6 +220,9 @@ MPI_CHECK: mpi_version.f90
 %.o: %.f90
 	$(FC) -c $(FFLAGS) $(MODULEFLAG) -o $(OBJDIR)/$@ $<
 
+%.o: %.F90
+	$(FC) -c $(FFLAGS) $(MODULEFLAG) -o $(OBJDIR)/$@ $<
+
 $(SRCDIR)/sdf_source_info.f90: $(SOURCE_ALL)
 	sh $(PACK_SDF) $(PACK_OPTS) $@ "$(FC_INFO)" "$(FFLAGS)" $^
 sdf_source_info.o: sdf_source_info.f90 $(SOURCE_ALL)
