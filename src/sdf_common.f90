@@ -13,39 +13,68 @@ MODULE sdf_common
 
   IMPLICIT NONE
 
-  INTEGER, PARAMETER :: i4  = SELECTED_INT_KIND(9)  ! 4-byte 2^31 ~ 10^9
-  INTEGER, PARAMETER :: i8  = SELECTED_INT_KIND(18) ! 8-byte 2^63 ~ 10^18
+  PRIVATE
 
-  INTEGER, PARAMETER :: r4  = SELECTED_REAL_KIND(r=30)
-  INTEGER, PARAMETER :: r8  = SELECTED_REAL_KIND(r=300)
-  INTEGER, PARAMETER :: r16 = SELECTED_REAL_KIND(r=3000)
+  PUBLIC :: sdf_set_point_array_size
+  PUBLIC :: sdf_get_next_block
+  PUBLIC :: sdf_seek_start
+  PUBLIC :: sdf_find_block
+  PUBLIC :: sdf_find_block_by_id
+  PUBLIC :: sdf_get_block_id
+  PUBLIC :: sdf_seek_block
+  PUBLIC :: sdf_get_data_location
+  PUBLIC :: sdf_set_data_location
+  PUBLIC :: sdf_string_equal
+  PUBLIC :: sdf_safe_copy_string
+  PUBLIC :: sdf_safe_copy_id
+  PUBLIC :: sdf_safe_copy_unique_id
+  PUBLIC :: initialise_block_type
+  PUBLIC :: deallocate_block_type
+  PUBLIC :: initialise_file_handle
+  PUBLIC :: deallocate_file_handle
+  PUBLIC :: map_error_code
+  PUBLIC :: error_handler
+  PUBLIC :: set_point_array_size_i8
+  PUBLIC :: set_point_array_size_i4
+  PUBLIC :: sdf_get_point_array_size
+  PUBLIC :: sdf_set_exit_on_error
+  PUBLIC :: sdf_get_exit_on_error
+  PUBLIC :: sdf_hash_function
+  PUBLIC :: add_to_hash_table
 
-  INTEGER(i8), PARAMETER :: hash_size = 2039_i8
-  INTEGER, PARAMETER :: c_maxdims = 4
-  INTEGER(i4), PARAMETER :: c_id_length = 32
-  INTEGER(i4), PARAMETER :: c_long_id_length = 256
-  INTEGER(i4), PARAMETER :: c_max_string_length = 128
-  INTEGER(i8) :: npoint_per_iteration = 10000
-  CHARACTER(LEN=4), PARAMETER :: c_sdf_magic = 'SDF1'
-  REAL(r8), PARAMETER :: c_tiny = TINY(1.0_r8)
+  INTEGER, PARAMETER, PUBLIC :: i4  = SELECTED_INT_KIND(9)  ! 4-byte 2^31 ~ 10^9
+  INTEGER, PARAMETER, PUBLIC :: i8  = SELECTED_INT_KIND(18) ! 8-byte 2^63 ~ 10^18
 
-  LOGICAL :: print_errors   = .TRUE.
-  LOGICAL :: print_warnings = .TRUE.
-  LOGICAL :: exit_on_error  = .TRUE.
+  INTEGER, PARAMETER, PUBLIC :: r4  = SELECTED_REAL_KIND(r=30)
+  INTEGER, PARAMETER, PUBLIC :: r8  = SELECTED_REAL_KIND(r=300)
+  INTEGER, PARAMETER, PUBLIC :: r16 = SELECTED_REAL_KIND(r=3000)
 
-  TYPE sdf_run_type
+  INTEGER(i8), PARAMETER, PUBLIC :: hash_size = 2039_i8
+  INTEGER, PARAMETER, PUBLIC :: c_maxdims = 4
+  INTEGER(i4), PARAMETER, PUBLIC :: c_id_length = 32
+  INTEGER(i4), PARAMETER, PUBLIC :: c_long_id_length = 256
+  INTEGER(i4), PARAMETER, PUBLIC :: c_max_string_length = 128
+  INTEGER(i8), PUBLIC :: npoint_per_iteration = 10000
+  CHARACTER(LEN=4), PARAMETER, PUBLIC :: c_sdf_magic = 'SDF1'
+  REAL(r8), PARAMETER, PUBLIC :: c_tiny = TINY(1.0_r8)
+
+  LOGICAL, PUBLIC :: print_errors   = .TRUE.
+  LOGICAL, PUBLIC :: print_warnings = .TRUE.
+  LOGICAL, PUBLIC :: exit_on_error  = .TRUE.
+
+  TYPE, PUBLIC :: sdf_run_type
     INTEGER(i4) :: version, revision, minor_rev, compile_date, run_date, io_date
     INTEGER(i8) :: defines
     CHARACTER(LEN=c_max_string_length) :: commit_id, sha1sum
     CHARACTER(LEN=c_max_string_length) :: compile_machine, compile_flags
   END TYPE sdf_run_type
 
-  TYPE sdf_hash_list
+  TYPE, PUBLIC :: sdf_hash_list
     TYPE(sdf_block_type), POINTER :: block
     TYPE(sdf_hash_list), POINTER :: next
   END TYPE sdf_hash_list
 
-  TYPE sdf_block_type
+  TYPE, PUBLIC :: sdf_block_type
     REAL(r4), POINTER :: r4_array(:)
     REAL(r8), DIMENSION(2*c_maxdims) :: extents
     REAL(r8) :: mult, time, time_increment
@@ -82,7 +111,7 @@ MODULE sdf_common
     TYPE(sdf_block_type), POINTER :: next_block
   END TYPE sdf_block_type
 
-  TYPE sdf_file_handle
+  TYPE, PUBLIC :: sdf_file_handle
     INTEGER(KIND=MPI_OFFSET_KIND) :: current_location
     REAL(r8) :: time, time_wrote
     INTEGER(i8) :: first_block_location, summary_location, start_location
@@ -108,119 +137,119 @@ MODULE sdf_common
     TYPE(sdf_hash_list) :: hash_table(hash_size)
   END TYPE sdf_file_handle
 
-  TYPE sdf_handle_type
+  TYPE, PUBLIC :: sdf_handle_type
     INTEGER :: filehandle
     TYPE(sdf_file_handle), POINTER :: handle
   END TYPE sdf_handle_type
-  INTEGER, PARAMETER :: max_handles = 64
-  TYPE(sdf_handle_type) :: sdf_handles(max_handles)
+  INTEGER, PARAMETER, PUBLIC :: max_handles = 64
+  TYPE(sdf_handle_type), PUBLIC :: sdf_handles(max_handles)
 
-  INTEGER, SAVE :: errhandler_handle = MPI_ERRHANDLER_NULL
-  INTEGER, SAVE :: open_handles = 0
+  INTEGER, SAVE, PUBLIC :: errhandler_handle = MPI_ERRHANDLER_NULL
+  INTEGER, SAVE, PUBLIC :: open_handles = 0
 
-  INTEGER, PARAMETER :: c_sdf_read = 0
-  INTEGER, PARAMETER :: c_sdf_write = 1
-  INTEGER, PARAMETER :: c_sdf_append = 3
+  INTEGER, PARAMETER, PUBLIC :: c_sdf_read = 0
+  INTEGER, PARAMETER, PUBLIC :: c_sdf_write = 1
+  INTEGER, PARAMETER, PUBLIC :: c_sdf_append = 3
 
-  INTEGER(i4), PARAMETER :: c_blocktype_scrubbed = -1
-  INTEGER(i4), PARAMETER :: c_blocktype_null = 0
-  INTEGER(i4), PARAMETER :: c_blocktype_plain_mesh = 1
-  INTEGER(i4), PARAMETER :: c_blocktype_point_mesh = 2
-  INTEGER(i4), PARAMETER :: c_blocktype_plain_variable = 3
-  INTEGER(i4), PARAMETER :: c_blocktype_point_variable = 4
-  INTEGER(i4), PARAMETER :: c_blocktype_constant = 5
-  INTEGER(i4), PARAMETER :: c_blocktype_array = 6
-  INTEGER(i4), PARAMETER :: c_blocktype_run_info = 7
-  INTEGER(i4), PARAMETER :: c_blocktype_source = 8
-  INTEGER(i4), PARAMETER :: c_blocktype_stitched_tensor = 9
-  INTEGER(i4), PARAMETER :: c_blocktype_stitched_material = 10
-  INTEGER(i4), PARAMETER :: c_blocktype_stitched_matvar = 11
-  INTEGER(i4), PARAMETER :: c_blocktype_stitched_species = 12
-  INTEGER(i4), PARAMETER :: c_blocktype_species = 13
-  INTEGER(i4), PARAMETER :: c_blocktype_plain_derived = 14
-  INTEGER(i4), PARAMETER :: c_blocktype_point_derived = 15
-  INTEGER(i4), PARAMETER :: c_blocktype_contiguous_tensor = 16
-  INTEGER(i4), PARAMETER :: c_blocktype_contiguous_material = 17
-  INTEGER(i4), PARAMETER :: c_blocktype_contiguous_matvar = 18
-  INTEGER(i4), PARAMETER :: c_blocktype_contiguous_species = 19
-  INTEGER(i4), PARAMETER :: c_blocktype_cpu_split = 20
-  INTEGER(i4), PARAMETER :: c_blocktype_stitched_obstacle_group = 21
-  INTEGER(i4), PARAMETER :: c_blocktype_unstructured_mesh = 22
-  INTEGER(i4), PARAMETER :: c_blocktype_stitched = 23
-  INTEGER(i4), PARAMETER :: c_blocktype_contiguous = 24
-  INTEGER(i4), PARAMETER :: c_blocktype_lagrangian_mesh = 25
-  INTEGER(i4), PARAMETER :: c_blocktype_station = 26
-  INTEGER(i4), PARAMETER :: c_blocktype_station_derived = 27
-  INTEGER(i4), PARAMETER :: c_blocktype_datablock = 28
-  INTEGER(i4), PARAMETER :: c_blocktype_namevalue = 29
-  INTEGER(i4), PARAMETER :: c_blocktype_max = 29
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_scrubbed = -1
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_null = 0
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_plain_mesh = 1
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_point_mesh = 2
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_plain_variable = 3
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_point_variable = 4
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_constant = 5
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_array = 6
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_run_info = 7
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_source = 8
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_stitched_tensor = 9
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_stitched_material = 10
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_stitched_matvar = 11
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_stitched_species = 12
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_species = 13
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_plain_derived = 14
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_point_derived = 15
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_contiguous_tensor = 16
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_contiguous_material = 17
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_contiguous_matvar = 18
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_contiguous_species = 19
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_cpu_split = 20
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_stitched_obstacle_group = 21
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_unstructured_mesh = 22
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_stitched = 23
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_contiguous = 24
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_lagrangian_mesh = 25
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_station = 26
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_station_derived = 27
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_datablock = 28
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_namevalue = 29
+  INTEGER(i4), PARAMETER, PUBLIC :: c_blocktype_max = 29
 
-  INTEGER(i4), PARAMETER :: c_datatype_null = 0
-  INTEGER(i4), PARAMETER :: c_datatype_integer4 = 1
-  INTEGER(i4), PARAMETER :: c_datatype_integer8 = 2
-  INTEGER(i4), PARAMETER :: c_datatype_real4 = 3
-  INTEGER(i4), PARAMETER :: c_datatype_real8 = 4
-  INTEGER(i4), PARAMETER :: c_datatype_real16 = 5
-  INTEGER(i4), PARAMETER :: c_datatype_character = 6
-  INTEGER(i4), PARAMETER :: c_datatype_logical = 7
-  INTEGER(i4), PARAMETER :: c_datatype_other = 8
-  INTEGER(i4), PARAMETER :: c_datatype_max = 8
-  INTEGER, PARAMETER :: c_type_sizes(0:c_datatype_max) = &
+  INTEGER(i4), PARAMETER, PUBLIC :: c_datatype_null = 0
+  INTEGER(i4), PARAMETER, PUBLIC :: c_datatype_integer4 = 1
+  INTEGER(i4), PARAMETER, PUBLIC :: c_datatype_integer8 = 2
+  INTEGER(i4), PARAMETER, PUBLIC :: c_datatype_real4 = 3
+  INTEGER(i4), PARAMETER, PUBLIC :: c_datatype_real8 = 4
+  INTEGER(i4), PARAMETER, PUBLIC :: c_datatype_real16 = 5
+  INTEGER(i4), PARAMETER, PUBLIC :: c_datatype_character = 6
+  INTEGER(i4), PARAMETER, PUBLIC :: c_datatype_logical = 7
+  INTEGER(i4), PARAMETER, PUBLIC :: c_datatype_other = 8
+  INTEGER(i4), PARAMETER, PUBLIC :: c_datatype_max = 8
+  INTEGER, PARAMETER, PUBLIC :: c_type_sizes(0:c_datatype_max) = &
       (/ 0, 4, 8, 4, 8, 16, 1, 1, 0 /)
 
-  INTEGER(i4), PARAMETER :: c_geometry_null = 0
-  INTEGER(i4), PARAMETER :: c_geometry_cartesian = 1
-  INTEGER(i4), PARAMETER :: c_geometry_cylindrical = 2
-  INTEGER(i4), PARAMETER :: c_geometry_spherical = 3
+  INTEGER(i4), PARAMETER, PUBLIC :: c_geometry_null = 0
+  INTEGER(i4), PARAMETER, PUBLIC :: c_geometry_cartesian = 1
+  INTEGER(i4), PARAMETER, PUBLIC :: c_geometry_cylindrical = 2
+  INTEGER(i4), PARAMETER, PUBLIC :: c_geometry_spherical = 3
 
   ! c_dimension_irrelevant is used where the dimensionality isn't needed, as
   ! with point variables still keep dimensionality as a common quantity
   ! because other than this, they really are very alike
-  INTEGER(i4), PARAMETER :: c_dimension_irrelevant = 0
-  INTEGER(i4), PARAMETER :: c_dimension_1d = 1
-  INTEGER(i4), PARAMETER :: c_dimension_2d = 2
-  INTEGER(i4), PARAMETER :: c_dimension_3d = 3
+  INTEGER(i4), PARAMETER, PUBLIC :: c_dimension_irrelevant = 0
+  INTEGER(i4), PARAMETER, PUBLIC :: c_dimension_1d = 1
+  INTEGER(i4), PARAMETER, PUBLIC :: c_dimension_2d = 2
+  INTEGER(i4), PARAMETER, PUBLIC :: c_dimension_3d = 3
 
-  INTEGER(i4), PARAMETER :: c_stagger_cell_centre = 0
-  INTEGER(i4), PARAMETER :: c_stagger_face_x = 1
-  INTEGER(i4), PARAMETER :: c_stagger_face_y = 2
-  INTEGER(i4), PARAMETER :: c_stagger_face_z = 4
-  INTEGER(i4), PARAMETER :: c_stagger_edge_x = &
+  INTEGER(i4), PARAMETER, PUBLIC :: c_stagger_cell_centre = 0
+  INTEGER(i4), PARAMETER, PUBLIC :: c_stagger_face_x = 1
+  INTEGER(i4), PARAMETER, PUBLIC :: c_stagger_face_y = 2
+  INTEGER(i4), PARAMETER, PUBLIC :: c_stagger_face_z = 4
+  INTEGER(i4), PARAMETER, PUBLIC :: c_stagger_edge_x = &
       c_stagger_face_y + c_stagger_face_z
-  INTEGER(i4), PARAMETER :: c_stagger_edge_y = &
+  INTEGER(i4), PARAMETER, PUBLIC :: c_stagger_edge_y = &
       c_stagger_face_x + c_stagger_face_z
-  INTEGER(i4), PARAMETER :: c_stagger_edge_z = &
+  INTEGER(i4), PARAMETER, PUBLIC :: c_stagger_edge_z = &
       c_stagger_face_x + c_stagger_face_y
-  INTEGER(i4), PARAMETER :: c_stagger_vertex = &
+  INTEGER(i4), PARAMETER, PUBLIC :: c_stagger_vertex = &
       c_stagger_face_x + c_stagger_face_y + c_stagger_face_z
 
-  CHARACTER(LEN=*), PARAMETER :: c_checksum_null = ''
-  CHARACTER(LEN=*), PARAMETER :: c_checksum_md5 = 'md5'
-  CHARACTER(LEN=*), PARAMETER :: c_checksum_sha1 = 'sha1'
-  CHARACTER(LEN=*), PARAMETER :: c_checksum_sha256 = 'sha256'
+  CHARACTER(LEN=*), PARAMETER, PUBLIC :: c_checksum_null = ''
+  CHARACTER(LEN=*), PARAMETER, PUBLIC :: c_checksum_md5 = 'md5'
+  CHARACTER(LEN=*), PARAMETER, PUBLIC :: c_checksum_sha1 = 'sha1'
+  CHARACTER(LEN=*), PARAMETER, PUBLIC :: c_checksum_sha256 = 'sha256'
 
-  INTEGER(i4), PARAMETER :: sdf_version = 1, sdf_revision = 4
-  INTEGER(i4), PARAMETER :: sdf_minor_rev = 0
+  INTEGER(i4), PARAMETER, PUBLIC :: sdf_version = 1, sdf_revision = 4
+  INTEGER(i4), PARAMETER, PUBLIC :: sdf_minor_rev = 0
 
-  INTEGER(i4), PARAMETER :: soi4 = 4 ! Size of 4-byte integer
-  INTEGER(i4), PARAMETER :: soi8 = 8 ! Size of 8-byte integer
-  INTEGER(i4), PARAMETER :: sof4 = 4 ! Size of 4-byte real
-  INTEGER(i4), PARAMETER :: sof8 = 8 ! Size of 8-byte real
-  INTEGER(i4), PARAMETER :: sol  = 4 ! Size of logical
+  INTEGER(i4), PARAMETER, PUBLIC :: soi4 = 4 ! Size of 4-byte integer
+  INTEGER(i4), PARAMETER, PUBLIC :: soi8 = 8 ! Size of 8-byte integer
+  INTEGER(i4), PARAMETER, PUBLIC :: sof4 = 4 ! Size of 4-byte real
+  INTEGER(i4), PARAMETER, PUBLIC :: sof8 = 8 ! Size of 8-byte real
+  INTEGER(i4), PARAMETER, PUBLIC :: sol  = 4 ! Size of logical
 
   ! header length (including padding) - must be updated if sdf_write_header
   ! changes
-  INTEGER, PARAMETER :: c_header_length = 11 * soi4 + 2 * soi8 + sof8 + 12 &
+  INTEGER, PARAMETER, PUBLIC :: c_header_length = 11 * soi4 + 2 * soi8 + sof8 + 12 &
       + c_id_length
 
   ! summary offset - must be updated if sdf_write_header changes
-  INTEGER(i4), PARAMETER :: c_summary_offset = 4 + 3 * soi4 + c_id_length + soi8
+  INTEGER(i4), PARAMETER, PUBLIC :: c_summary_offset = 4 + 3 * soi4 + c_id_length + soi8
 
-  INTEGER(i4), PARAMETER :: c_endianness = 16911887
+  INTEGER(i4), PARAMETER, PUBLIC :: c_endianness = 16911887
 
-  INTEGER(KIND=MPI_OFFSET_KIND), PARAMETER :: c_off0 = 0
-  INTEGER, PARAMETER :: max_mpi_error_codes = 21
-  INTEGER, PARAMETER :: mpi_error_codes(max_mpi_error_codes) = (/ &
+  INTEGER(KIND=MPI_OFFSET_KIND), PARAMETER, PUBLIC :: c_off0 = 0
+  INTEGER, PARAMETER, PUBLIC :: max_mpi_error_codes = 21
+  INTEGER, PARAMETER, PUBLIC :: mpi_error_codes(max_mpi_error_codes) = (/ &
       MPI_ERR_ACCESS, MPI_ERR_AMODE, MPI_ERR_BAD_FILE, MPI_ERR_CONVERSION, &
       MPI_ERR_DUP_DATAREP, MPI_ERR_FILE, MPI_ERR_FILE_EXISTS, &
       MPI_ERR_FILE_IN_USE, MPI_ERR_INFO, MPI_ERR_INFO_KEY, MPI_ERR_INFO_NOKEY, &
@@ -230,37 +259,37 @@ MODULE sdf_common
       MPI_ERR_TYPE /)
 
   ! SDF errors
-  INTEGER, PARAMETER :: c_err_success = 0
-  INTEGER, PARAMETER :: c_err_unknown = 1
-  INTEGER, PARAMETER :: c_err_unsupported_file = 2
-  INTEGER, PARAMETER :: c_err_sdf = 3
+  INTEGER, PARAMETER, PUBLIC :: c_err_success = 0
+  INTEGER, PARAMETER, PUBLIC :: c_err_unknown = 1
+  INTEGER, PARAMETER, PUBLIC :: c_err_unsupported_file = 2
+  INTEGER, PARAMETER, PUBLIC :: c_err_sdf = 3
 
   ! MPI errors
-  INTEGER, PARAMETER :: c_mpi_error_start = 31
-  INTEGER, PARAMETER :: c_err_access = 31
-  INTEGER, PARAMETER :: c_err_amode = 32
-  INTEGER, PARAMETER :: c_err_bad_file = 33
-  INTEGER, PARAMETER :: c_err_conversion = 34
-  INTEGER, PARAMETER :: c_err_dup_datarep = 35
-  INTEGER, PARAMETER :: c_err_file = 36
-  INTEGER, PARAMETER :: c_err_file_exists = 37
-  INTEGER, PARAMETER :: c_err_file_in_use = 38
-  INTEGER, PARAMETER :: c_err_info = 39
-  INTEGER, PARAMETER :: c_err_info_key = 40
-  INTEGER, PARAMETER :: c_err_info_nokey = 41
-  INTEGER, PARAMETER :: c_err_info_value = 42
-  INTEGER, PARAMETER :: c_err_io = 43
-  INTEGER, PARAMETER :: c_err_not_same = 44
-  INTEGER, PARAMETER :: c_err_no_space = 45
-  INTEGER, PARAMETER :: c_err_no_such_file = 46
-  INTEGER, PARAMETER :: c_err_quota = 47
-  INTEGER, PARAMETER :: c_err_read_only = 48
-  INTEGER, PARAMETER :: c_err_unsupported_datarep = 49
-  INTEGER, PARAMETER :: c_err_unsupported_operation = 50
-  INTEGER, PARAMETER :: c_err_type = 51
-  INTEGER, PARAMETER :: c_err_max = 51
+  INTEGER, PARAMETER, PUBLIC :: c_mpi_error_start = 31
+  INTEGER, PARAMETER, PUBLIC :: c_err_access = 31
+  INTEGER, PARAMETER, PUBLIC :: c_err_amode = 32
+  INTEGER, PARAMETER, PUBLIC :: c_err_bad_file = 33
+  INTEGER, PARAMETER, PUBLIC :: c_err_conversion = 34
+  INTEGER, PARAMETER, PUBLIC :: c_err_dup_datarep = 35
+  INTEGER, PARAMETER, PUBLIC :: c_err_file = 36
+  INTEGER, PARAMETER, PUBLIC :: c_err_file_exists = 37
+  INTEGER, PARAMETER, PUBLIC :: c_err_file_in_use = 38
+  INTEGER, PARAMETER, PUBLIC :: c_err_info = 39
+  INTEGER, PARAMETER, PUBLIC :: c_err_info_key = 40
+  INTEGER, PARAMETER, PUBLIC :: c_err_info_nokey = 41
+  INTEGER, PARAMETER, PUBLIC :: c_err_info_value = 42
+  INTEGER, PARAMETER, PUBLIC :: c_err_io = 43
+  INTEGER, PARAMETER, PUBLIC :: c_err_not_same = 44
+  INTEGER, PARAMETER, PUBLIC :: c_err_no_space = 45
+  INTEGER, PARAMETER, PUBLIC :: c_err_no_such_file = 46
+  INTEGER, PARAMETER, PUBLIC :: c_err_quota = 47
+  INTEGER, PARAMETER, PUBLIC :: c_err_read_only = 48
+  INTEGER, PARAMETER, PUBLIC :: c_err_unsupported_datarep = 49
+  INTEGER, PARAMETER, PUBLIC :: c_err_unsupported_operation = 50
+  INTEGER, PARAMETER, PUBLIC :: c_err_type = 51
+  INTEGER, PARAMETER, PUBLIC :: c_err_max = 51
 
-  CHARACTER(LEN=*), PARAMETER :: c_blocktypes_char(-1:c_blocktype_max) = (/ &
+  CHARACTER(LEN=*), PARAMETER, PUBLIC :: c_blocktypes_char(-1:c_blocktype_max) = (/ &
       'SDF_BLOCKTYPE_SCRUBBED               ', &
       'SDF_BLOCKTYPE_NULL                   ', &
       'SDF_BLOCKTYPE_PLAIN_MESH             ', &
@@ -293,7 +322,7 @@ MODULE sdf_common
       'SDF_BLOCKTYPE_DATABLOCK              ', &
       'SDF_BLOCKTYPE_NAMEVALUE              ' /)
 
-  CHARACTER(LEN=*), PARAMETER :: c_datatypes_char(0:c_datatype_max) = (/ &
+  CHARACTER(LEN=*), PARAMETER, PUBLIC :: c_datatypes_char(0:c_datatype_max) = (/ &
       'SDF_DATATYPE_NULL     ', &
       'SDF_DATATYPE_INTEGER4 ', &
       'SDF_DATATYPE_INTEGER8 ', &
@@ -304,7 +333,7 @@ MODULE sdf_common
       'SDF_DATATYPE_LOGICAL  ', &
       'SDF_DATATYPE_OTHER    ' /)
 
-  CHARACTER(LEN=*), PARAMETER :: c_errcodes_char(0:c_err_max) = (/ &
+  CHARACTER(LEN=*), PARAMETER, PUBLIC :: c_errcodes_char(0:c_err_max) = (/ &
       'SDF_ERR_SUCCESS              ', 'SDF_ERR_UNKNOWN              ', &
       'SDF_ERR_UNSUPPORTED_FILE     ', 'SDF_ERR_SDF                  ', &
       '                             ', '                             ', &

@@ -41,6 +41,11 @@ set(SOURCES
    sdf_md5.f90
    )
 
+if(MPI_Fortran_HAVE_F08_MODULE)
+    list(APPEND SOURCES sdf_f08.f90)
+    add_definitions(-DMPI_F08)
+endif()
+
 execute_process(COMMAND ${CMAKE_Fortran_COMPILER} --version
   COMMAND grep [a-zA-Z] COMMAND head -n 1
   OUTPUT_VARIABLE FC_INFO OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -70,10 +75,6 @@ if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
    set(INFO_FLAGS "-Wno-conversion -fno-range-check")
    set_source_files_properties(${INFO_FILE} PROPERTIES COMPILE_FLAGS
       ${INFO_FLAGS})
-endif()
-
-if(MPI_Fortran_HAVE_F08_MODULE)
-    add_definitions(-DMPI_F08)
 endif()
 
 add_library(sdf ${SOURCES})

@@ -8,20 +8,28 @@
 
 MODULE sdf_control
 
+  USE sdf_job_info
   USE sdf_output_util
 
   IMPLICIT NONE
 
-  INTERFACE sdf_open
-     MODULE PROCEDURE sdf_open_f90
-#ifdef MPI_F08
-     MODULE PROCEDURE sdf_open_f08
-#endif
-  END INTERFACE sdf_open
+  PRIVATE
+
+  PUBLIC :: sdf_open
+  PUBLIC :: sdf_close
+  PUBLIC :: sdf_destroy_block
+  PUBLIC :: sdf_destroy_blocklist
+  PUBLIC :: sdf_set_string_length
+  PUBLIC :: sdf_get_string_length
+  PUBLIC :: sdf_get_max_string_length
+  PUBLIC :: sdf_set_default_rank
+  PUBLIC :: sdf_read_nblocks
+  PUBLIC :: sdf_read_jobid
+  PUBLIC :: sdf_errorcode
 
 CONTAINS
 
-  SUBROUTINE sdf_open_f90(h, filename, sdf_comm_in, mode, handle_errors)
+  SUBROUTINE sdf_open(h, filename, sdf_comm_in, mode, handle_errors)
 
     TYPE(sdf_file_handle), TARGET :: h
     CHARACTER(LEN=*), INTENT(IN) :: filename
@@ -117,25 +125,7 @@ CONTAINS
       END DO
     END IF
 
-  END SUBROUTINE sdf_open_f90
-
-
-
-#ifdef MPI_F08
-  SUBROUTINE sdf_open_f08(h, filename, sdf_comm_in, mode, handle_errors)
-
-    USE mpi_f08_types
-
-    TYPE(sdf_file_handle), TARGET :: h
-    CHARACTER(LEN=*), INTENT(IN) :: filename
-    TYPE(MPI_COMM), INTENT(IN) :: sdf_comm_in
-    INTEGER, INTENT(IN), OPTIONAL :: mode
-    LOGICAL, INTENT(IN), OPTIONAL :: handle_errors
-
-    CALL sdf_open_f90(h, filename, sdf_comm_in%mpi_val, mode, handle_errors)
-  END SUBROUTINE sdf_open_f08
-#endif
-
+  END SUBROUTINE sdf_open
 
 
   SUBROUTINE sdf_close(h)

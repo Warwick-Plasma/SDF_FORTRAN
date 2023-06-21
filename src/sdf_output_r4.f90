@@ -8,6 +8,8 @@
 
 MODULE sdf_output_r4
 
+  USE mpi
+  USE sdf_common
   USE sdf_output_ru
 
   IMPLICIT NONE
