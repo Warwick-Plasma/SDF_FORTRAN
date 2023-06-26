@@ -1,7 +1,7 @@
 set(SOURCES
    sdf.f90
    sdf_common.f90
-   sdf_control.F90
+   sdf_control.f90
    sdf_input.f90
    sdf_input_cartesian.f90
    sdf_input_cartesian_r4.f90
@@ -21,9 +21,9 @@ set(SOURCES
    sdf_input_util.f90
    sdf_job_info.f90
    sdf_output.f90
-   sdf_output_cartesian.F90
+   sdf_output_cartesian.f90
    sdf_output_cartesian_r4.f90
-   sdf_output_cartesian_r8.F90
+   sdf_output_cartesian_r8.f90
    sdf_output_cartesian_ru.f90
    sdf_output_point.f90
    sdf_output_point_r4.f90
@@ -43,7 +43,6 @@ set(SOURCES
 
 if(MPI_Fortran_HAVE_F08_MODULE)
     list(APPEND SOURCES sdf_f08.f90)
-    add_definitions(-DMPI_F08)
 endif()
 
 execute_process(COMMAND ${CMAKE_Fortran_COMPILER} --version
