@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 project(SDF VERSION 1.5.16 LANGUAGES Fortran)
 include(CTest)
 find_package(MPI REQUIRED)
-find_package(PackSDF REQUIRED PATHS CMake)
+find_package(PackSDF REQUIRED PATHS CMake NO_DEFAULT_PATH)
 include(CMake/CheckMPIVersion.cmake)
 
 if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "PGI")
