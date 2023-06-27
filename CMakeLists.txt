@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(SDF VERSION 1.5.16 LANGUAGES Fortran)
+include(CTest)
 find_package(MPI REQUIRED)
 find_package(PackSDF REQUIRED PATHS CMake)
 include(CMake/CheckMPIVersion.cmake)
@@ -61,3 +62,5 @@ install(
     DESTINATION lib/PackSDF_${SDF_VERSION}
     COMPONENT develop
 )
+
+add_subdirectory(tests)
