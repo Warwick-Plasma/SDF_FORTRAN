@@ -18,7 +18,7 @@ if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "PGI")
 elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
   set(CMAKE_Fortran_FLAGS "-fpe0 -g")
   set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -g -ip")
-  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -u -traceback -nothreads -fltconsistency -C -warn -save-temps -fpic -Wl,-no_pie")
+  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -u -traceback -nothreads -fltconsistency -C -warn -save-temps -fpic")
 
 elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
   if(NOT APPLE)
