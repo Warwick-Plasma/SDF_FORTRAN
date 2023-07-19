@@ -88,7 +88,6 @@ CONTAINS
     INTEGER, INTENT(IN) :: step
     REAL(r8), DIMENSION(:), INTENT(IN) :: array
     INTEGER, INTENT(IN) :: distribution, subarray
-    TYPE(sdf_block_type), POINTER :: b
     INTEGER :: errcode
 
     CALL station_pre(h, time, step)
@@ -116,7 +115,6 @@ CONTAINS
     INTEGER, INTENT(IN) :: step
     REAL(r8), DIMENSION(:,:), INTENT(IN) :: array
     INTEGER, INTENT(IN) :: distribution, subarray
-    TYPE(sdf_block_type), POINTER :: b
     INTEGER :: errcode
 
     CALL station_pre(h, time, step)
