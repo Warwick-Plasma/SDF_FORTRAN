@@ -42,8 +42,8 @@ MODULE sdf_common
   PUBLIC :: sdf_hash_function
   PUBLIC :: add_to_hash_table
 
-  INTEGER, PARAMETER, PUBLIC :: i4  = SELECTED_INT_KIND(9)  ! 4-byte 2^31 ~ 10^9
-  INTEGER, PARAMETER, PUBLIC :: i8  = SELECTED_INT_KIND(18) ! 8-byte 2^63 ~ 10^18
+  INTEGER, PARAMETER, PUBLIC :: i4 = SELECTED_INT_KIND(9)  ! 4-byte 2^31 ~ 10^9
+  INTEGER, PARAMETER, PUBLIC :: i8 = SELECTED_INT_KIND(18) ! 8-byte 2^63 ~ 10^18
 
   INTEGER, PARAMETER, PUBLIC :: r4  = SELECTED_REAL_KIND(r=30)
   INTEGER, PARAMETER, PUBLIC :: r8  = SELECTED_REAL_KIND(r=300)
@@ -239,11 +239,12 @@ MODULE sdf_common
 
   ! header length (including padding) - must be updated if sdf_write_header
   ! changes
-  INTEGER, PARAMETER, PUBLIC :: c_header_length = 11 * soi4 + 2 * soi8 + sof8 + 12 &
-      + c_id_length
+  INTEGER, PARAMETER, PUBLIC :: c_header_length = 11 * soi4 + 2 * soi8 + sof8 &
+                                                  + 12 + c_id_length
 
   ! summary offset - must be updated if sdf_write_header changes
-  INTEGER(i4), PARAMETER, PUBLIC :: c_summary_offset = 4 + 3 * soi4 + c_id_length + soi8
+  INTEGER(i4), PARAMETER, PUBLIC :: c_summary_offset = 4 + 3 * soi4 &
+                                                       + c_id_length + soi8
 
   INTEGER(i4), PARAMETER, PUBLIC :: c_endianness = 16911887
 
@@ -289,7 +290,8 @@ MODULE sdf_common
   INTEGER, PARAMETER, PUBLIC :: c_err_type = 51
   INTEGER, PARAMETER, PUBLIC :: c_err_max = 51
 
-  CHARACTER(LEN=*), PARAMETER, PUBLIC :: c_blocktypes_char(-1:c_blocktype_max) = (/ &
+  CHARACTER(LEN=*), PARAMETER, PUBLIC :: &
+      c_blocktypes_char(-1:c_blocktype_max) = (/ &
       'SDF_BLOCKTYPE_SCRUBBED               ', &
       'SDF_BLOCKTYPE_NULL                   ', &
       'SDF_BLOCKTYPE_PLAIN_MESH             ', &
@@ -322,7 +324,8 @@ MODULE sdf_common
       'SDF_BLOCKTYPE_DATABLOCK              ', &
       'SDF_BLOCKTYPE_NAMEVALUE              ' /)
 
-  CHARACTER(LEN=*), PARAMETER, PUBLIC :: c_datatypes_char(0:c_datatype_max) = (/ &
+  CHARACTER(LEN=*), PARAMETER, PUBLIC :: &
+      c_datatypes_char(0:c_datatype_max) = (/ &
       'SDF_DATATYPE_NULL     ', &
       'SDF_DATATYPE_INTEGER4 ', &
       'SDF_DATATYPE_INTEGER8 ', &
