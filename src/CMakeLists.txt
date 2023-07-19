@@ -39,7 +39,11 @@ set(SOURCES
    sdf_output_station_ru.f90
    sdf_output_util.f90
    sdf_md5.f90
-   )
+)
+
+if(MPI_Fortran_HAVE_F08_MODULE)
+    list(APPEND SOURCES sdf_f08.f90)
+endif()
 
 execute_process(COMMAND ${CMAKE_Fortran_COMPILER} --version
   COMMAND grep [a-zA-Z] COMMAND head -n 1
@@ -87,7 +91,7 @@ target_include_directories(
 
 install(
     TARGETS sdf
-    EXPORT SDFConfig
+    EXPORT SDFTargets
     COMPONENT develop
     ARCHIVE DESTINATION lib/SDF_${SDF_VERSION}
     INCLUDES DESTINATION include/SDF_${SDF_VERSION}
@@ -104,11 +108,19 @@ write_basic_package_version_file(
     VERSION ${SDF_VERSION}
     COMPATIBILITY SameMajorVersion
 )
+
+export(EXPORT SDFTargets)
+install(EXPORT SDFTargets DESTINATION lib/SDF_${SDF_VERSION} COMPONENT develop)
+
+configure_package_config_file(
+    SDFConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/SDFConfig.cmake
+    INSTALL_DESTINATION lib/SDF_${SDF_VERSION}
+)
+
 install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/SDFConfigVersion.cmake
+    FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/SDFConfigVersion.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/SDFConfig.cmake
     DESTINATION lib/SDF_${SDF_VERSION}
     COMPONENT develop
 )
-
-export(TARGETS sdf FILE ${CMAKE_CURRENT_BINARY_DIR}/SDFConfig.cmake)
-install(EXPORT SDFConfig DESTINATION lib/SDF_${SDF_VERSION} COMPONENT develop)

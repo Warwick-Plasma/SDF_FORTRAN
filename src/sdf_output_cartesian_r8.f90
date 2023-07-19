@@ -12,6 +12,62 @@ MODULE sdf_output_cartesian_r8
 
   IMPLICIT NONE
 
+  PRIVATE
+
+  PUBLIC :: write_srl_1d_mesh_r8
+  PUBLIC :: write_srl_2d_mesh_r8
+  PUBLIC :: write_srl_3d_mesh_r8
+  PUBLIC :: write_1d_mesh_r8
+  PUBLIC :: write_2d_mesh_r8
+  PUBLIC :: write_3d_mesh_r8
+  PUBLIC :: write_srl_2d_lag_mesh_r8
+  PUBLIC :: write_srl_3d_lag_mesh_r8
+  PUBLIC :: write_srl_2d_path_mesh_r8
+  PUBLIC :: write_srl_3d_path_mesh_r8
+  PUBLIC :: write_1d_lag_mesh_r8
+  PUBLIC :: write_2d_lag_mesh_r8
+  PUBLIC :: write_3d_lag_mesh_r8
+  PUBLIC :: write_srl_1d_float_gen_r8
+  PUBLIC :: write_srl_2d_float_gen_r8
+  PUBLIC :: write_srl_3d_float_gen_r8
+  PUBLIC :: write_srl_4d_float_gen_r8
+  PUBLIC :: write_srl_1d_float_r8
+  PUBLIC :: write_srl_2d_float_r8
+  PUBLIC :: write_srl_3d_float_r8
+  PUBLIC :: write_srl_1d_float_num_r8
+  PUBLIC :: write_srl_2d_float_num_r8
+  PUBLIC :: write_srl_3d_float_num_r8
+  PUBLIC :: write_srl_4d_float_num_r8
+  PUBLIC :: write_1d_float_gen_r8
+  PUBLIC :: write_2d_float_gen_r8
+  PUBLIC :: write_3d_float_gen_r8
+  PUBLIC :: write_4d_float_gen_r8
+  PUBLIC :: write_1d_float_r8
+  PUBLIC :: write_2d_float_r8
+  PUBLIC :: write_3d_float_r8
+  PUBLIC :: write_1d_float_num_r8
+  PUBLIC :: write_2d_float_num_r8
+  PUBLIC :: write_3d_float_num_r8
+  PUBLIC :: write_4d_float_num_r8
+  PUBLIC :: write_1d_var_first_r8
+  PUBLIC :: write_2d_var_first_r8
+  PUBLIC :: write_3d_var_first_r8
+  PUBLIC :: write_1d_var_last_r8
+  PUBLIC :: write_2d_var_last_r8
+  PUBLIC :: write_3d_var_last_r8
+  PUBLIC :: write_1d_material_r8
+  PUBLIC :: write_2d_material_r8
+  PUBLIC :: write_3d_material_r8
+  PUBLIC :: write_1d_matvar_r8
+  PUBLIC :: write_2d_matvar_r8
+  PUBLIC :: write_3d_matvar_r8
+  PUBLIC :: write_1d_species_r8
+  PUBLIC :: write_2d_species_r8
+  PUBLIC :: write_3d_species_r8
+  PUBLIC :: write_1d_stitched_var_r8
+  PUBLIC :: write_2d_stitched_var_r8
+  PUBLIC :: write_3d_stitched_var_r8
+
   INTEGER, PARAMETER, PRIVATE :: sof = 8
   INTEGER, PARAMETER, PRIVATE :: datatype_real = c_datatype_real8
   INTEGER, PARAMETER, PRIVATE :: mpitype_real = MPI_REAL8
@@ -2500,7 +2556,6 @@ CONTAINS
         stagger, mesh_id, variable, distribution, subarray, convert, mult)
 
   END SUBROUTINE write_3d_float_r8
-
 
 
   !----------------------------------------------------------------------------

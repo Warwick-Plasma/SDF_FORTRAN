@@ -8,6 +8,7 @@
 
 MODULE sdf_input_ru
 
+  USE mpi
   USE sdf_common
 
   IMPLICIT NONE

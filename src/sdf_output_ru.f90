@@ -8,9 +8,66 @@
 
 MODULE sdf_output_ru
 
+  USE mpi
+  USE sdf_job_info
   USE sdf_common
 
   IMPLICIT NONE
+
+  PRIVATE
+
+  PUBLIC :: write_header_r8
+  PUBLIC :: write_header_r4
+  PUBLIC :: write_block_header
+  PUBLIC :: sdf_write_block_header
+  PUBLIC :: sdf_safe_write_string_len
+  PUBLIC :: sdf_safe_write_string
+  PUBLIC :: sdf_safe_write_id
+  PUBLIC :: sdf_string_lowercase
+  PUBLIC :: sdf_safe_string_composite
+  PUBLIC :: write_run_info_meta
+  PUBLIC :: write_run_info_minor
+  PUBLIC :: write_run_info_old
+  PUBLIC :: write_stitched
+  PUBLIC :: sdf_write_stitched
+  PUBLIC :: sdf_write_stitched_tensor
+  PUBLIC :: sdf_write_stitched_tensor_mat
+  PUBLIC :: sdf_write_stitched_material
+  PUBLIC :: sdf_write_stitched_matvar
+  PUBLIC :: sdf_write_stitched_species
+  PUBLIC :: sdf_write_stitched_obstacle_group
+  PUBLIC :: write_constant_meta
+  PUBLIC :: write_constant_integer
+  PUBLIC :: write_constant_logical
+  PUBLIC :: sdf_write_source_code
+  PUBLIC :: write_datablock_meta
+  PUBLIC :: write_datablock_bytearray
+  PUBLIC :: write_datablock_chararray
+  PUBLIC :: write_namevalue_meta
+  PUBLIC :: write_namevalue_i4
+  PUBLIC :: write_namevalue_i8
+  PUBLIC :: write_namevalue_r4
+  PUBLIC :: write_namevalue_r8
+  PUBLIC :: write_namevalue_logical
+  PUBLIC :: write_namevalue_string
+  PUBLIC :: write_cpu_split_meta
+  PUBLIC :: write_cpu_split_part
+  PUBLIC :: write_cpu_split_1d_spec
+  PUBLIC :: write_cpu_split_1d
+  PUBLIC :: write_cpu_split_mix
+  PUBLIC :: write_cpu_split_3d
+  PUBLIC :: write_array_meta
+  PUBLIC :: write_1d_array_integer_spec
+  PUBLIC :: write_1d_array_integer
+  PUBLIC :: write_2d_array_integer_spec
+  PUBLIC :: write_2d_array_integer
+  PUBLIC :: write_1d_array_integer8_spec
+  PUBLIC :: write_1d_array_integer8
+  PUBLIC :: write_1d_array_logical_spec
+  PUBLIC :: write_1d_array_logical
+  PUBLIC :: write_2d_array_character
+  PUBLIC :: sdf_update
+  PUBLIC :: sdf_flush
 
 CONTAINS
 

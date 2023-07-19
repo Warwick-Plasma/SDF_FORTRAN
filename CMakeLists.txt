@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 project(SDF VERSION 1.5.16 LANGUAGES Fortran)
+include(CTest)
 find_package(MPI REQUIRED)
-find_package(PackSDF REQUIRED PATHS CMake)
+find_package(PackSDF REQUIRED PATHS CMake NO_DEFAULT_PATH)
 include(CMake/CheckMPIVersion.cmake)
 
 if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "PGI")
@@ -17,15 +18,18 @@ if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "PGI")
 elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
   set(CMAKE_Fortran_FLAGS "-fpe0 -g")
   set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -g -ip")
-  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -u -traceback -nothreads -fltconsistency -C -warn -save-temps -fpic -Wl,-no_pie")
+  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -u -traceback -nothreads -fltconsistency -C -warn -save-temps -fpic")
 
 elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
   if(NOT APPLE)
      set(MCMODEL "-mcmodel=medium")
   endif()
   set(CMAKE_Fortran_FLAGS "-g -Wall -frecord-marker=4 ${MCMODEL}")
+  if(CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER_EQUAL 10)
+      set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fallow-argument-mismatch")
+  endif()
   set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -g")
-  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -fimplicit-none -fbounds-check -fbacktrace -Wextra -ffpe-trap=invalid,zero,overflow -pedantic")
+  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -fimplicit-none -fbounds-check -fbacktrace -Wextra -ffpe-trap=invalid,zero,overflow")
 
 endif()
 
@@ -61,3 +65,5 @@ install(
     DESTINATION lib/PackSDF_${SDF_VERSION}
     COMPONENT develop
 )
+
+add_subdirectory(tests)

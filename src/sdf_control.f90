@@ -8,9 +8,24 @@
 
 MODULE sdf_control
 
+  USE sdf_job_info
   USE sdf_output_util
 
   IMPLICIT NONE
+
+  PRIVATE
+
+  PUBLIC :: sdf_open
+  PUBLIC :: sdf_close
+  PUBLIC :: sdf_destroy_block
+  PUBLIC :: sdf_destroy_blocklist
+  PUBLIC :: sdf_set_string_length
+  PUBLIC :: sdf_get_string_length
+  PUBLIC :: sdf_get_max_string_length
+  PUBLIC :: sdf_set_default_rank
+  PUBLIC :: sdf_read_nblocks
+  PUBLIC :: sdf_read_jobid
+  PUBLIC :: sdf_errorcode
 
 CONTAINS
 
