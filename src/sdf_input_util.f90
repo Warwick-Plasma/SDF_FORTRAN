@@ -172,11 +172,16 @@ CONTAINS
     found = .TRUE.
 
     b => station_block
-    ns = INT((time - b%time) * b%nelements / (h%time - b%time))
-    IF (ns >= b%nelements) THEN
-      ns = INT(b%nelements-1)
-    ELSE IF (ns < 0) THEN
+    time8 = h%time - b%time
+    IF (ABS(time8) < 1.0d-30) THEN
       ns = 0
+    ELSE
+      ns = INT((time - b%time) * b%nelements / time8)
+      IF (ns >= b%nelements) THEN
+        ns = INT(b%nelements-1)
+      ELSE IF (ns < 0) THEN
+        ns = 0
+      END IF
     END IF
     nstep = ns
 

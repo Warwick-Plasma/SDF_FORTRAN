@@ -2137,9 +2137,10 @@ CONTAINS
     LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
-    INTEGER :: i, errcode, nd
+    INTEGER :: i, errcode, nd, nitems
     TYPE(sdf_block_type), POINTER :: b
     LOGICAL :: convert
+    INTEGER, PARAMETER :: nsz = 1
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -2172,6 +2173,11 @@ CONTAINS
       b%dims(i) = INT(dims(i),i4)
     END DO
 
+    nitems = nm
+    DO i = 1, nsz
+      IF (sz(i) == 0) nitems = 0
+    END DO
+
     ! Write header
 
     CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
@@ -2184,11 +2190,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(r4array(sz(1)))
       r4array = REAL(variable,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
     END IF
 
@@ -2223,9 +2229,10 @@ CONTAINS
     LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
     REAL(r4), DIMENSION(:,:), ALLOCATABLE :: r4array
-    INTEGER :: i, errcode, nd
+    INTEGER :: i, errcode, nd, nitems
     TYPE(sdf_block_type), POINTER :: b
     LOGICAL :: convert
+    INTEGER, PARAMETER :: nsz = 2
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -2258,6 +2265,11 @@ CONTAINS
       b%dims(i) = INT(dims(i),i4)
     END DO
 
+    nitems = nm
+    DO i = 1, nsz
+      IF (sz(i) == 0) nitems = 0
+    END DO
+
     ! Write header
 
     CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
@@ -2270,11 +2282,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(r4array(sz(1),sz(2)))
       r4array = REAL(variable,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
     END IF
 
@@ -2309,9 +2321,10 @@ CONTAINS
     LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
     REAL(r4), DIMENSION(:,:,:), ALLOCATABLE :: r4array
-    INTEGER :: i, errcode, nd
+    INTEGER :: i, errcode, nd, nitems
     TYPE(sdf_block_type), POINTER :: b
     LOGICAL :: convert
+    INTEGER, PARAMETER :: nsz = 3
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -2344,6 +2357,11 @@ CONTAINS
       b%dims(i) = INT(dims(i),i4)
     END DO
 
+    nitems = nm
+    DO i = 1, nsz
+      IF (sz(i) == 0) nitems = 0
+    END DO
+
     ! Write header
 
     CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
@@ -2356,11 +2374,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(r4array(sz(1),sz(2),sz(3)))
       r4array = REAL(variable,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
     END IF
 
@@ -2395,9 +2413,10 @@ CONTAINS
     LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
     REAL(r4), DIMENSION(:,:,:,:), ALLOCATABLE :: r4array
-    INTEGER :: i, errcode, nd
+    INTEGER :: i, errcode, nd, nitems
     TYPE(sdf_block_type), POINTER :: b
     LOGICAL :: convert
+    INTEGER, PARAMETER :: nsz = 4
 
     CALL sdf_get_next_block(h)
     b => h%current_block
@@ -2430,6 +2449,11 @@ CONTAINS
       b%dims(i) = INT(dims(i),i4)
     END DO
 
+    nitems = nm
+    DO i = 1, nsz
+      IF (sz(i) == 0) nitems = 0
+    END DO
+
     ! Write header
 
     CALL write_mesh_variable_meta_r8(h, id, name, units, mesh_id, mult)
@@ -2442,11 +2466,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(r4array(sz(1),sz(2),sz(3),sz(4)))
       r4array = REAL(variable,r4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, r4array, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(r4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nm, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
     END IF
 

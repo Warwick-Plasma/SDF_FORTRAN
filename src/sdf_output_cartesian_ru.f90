@@ -825,7 +825,7 @@ CONTAINS
     INTEGER, INTENT(IN) :: distribution, subarray
     LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
-    INTEGER :: i, errcode
+    INTEGER :: i, errcode, nitems
     TYPE(sdf_block_type), POINTER :: b
 
     CALL sdf_get_next_block(h)
@@ -843,8 +843,10 @@ CONTAINS
       b%mult = 1.d0
     END IF
 
+    nitems = 1
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
+      IF (SIZE(variable,i) == 0) nitems = 0
     END DO
 
     ! Write header
@@ -855,7 +857,7 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -888,7 +890,7 @@ CONTAINS
     INTEGER, INTENT(IN) :: distribution, subarray
     LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
-    INTEGER :: i, errcode
+    INTEGER :: i, errcode, nitems
     TYPE(sdf_block_type), POINTER :: b
 
     CALL sdf_get_next_block(h)
@@ -906,8 +908,10 @@ CONTAINS
       b%mult = 1.d0
     END IF
 
+    nitems = 1
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
+      IF (SIZE(variable,i) == 0) nitems = 0
     END DO
 
     ! Write header
@@ -918,7 +922,7 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -951,7 +955,7 @@ CONTAINS
     INTEGER, INTENT(IN) :: distribution, subarray
     LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
-    INTEGER :: i, errcode
+    INTEGER :: i, errcode, nitems
     TYPE(sdf_block_type), POINTER :: b
 
     CALL sdf_get_next_block(h)
@@ -969,8 +973,10 @@ CONTAINS
       b%mult = 1.d0
     END IF
 
+    nitems = 1
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
+      IF (SIZE(variable,i) == 0) nitems = 0
     END DO
 
     ! Write header
@@ -981,7 +987,7 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -1075,7 +1081,7 @@ CONTAINS
     LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
     INTEGER(i4), DIMENSION(:), ALLOCATABLE :: i4array
-    INTEGER :: i, errcode
+    INTEGER :: i, errcode, nitems
     TYPE(sdf_block_type), POINTER :: b
     LOGICAL :: convert
 
@@ -1106,8 +1112,10 @@ CONTAINS
       b%mult = 1.d0
     END IF
 
+    nitems = 1
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
+      IF (SIZE(variable,i) == 0) nitems = 0
     END DO
 
     ! Write header
@@ -1121,11 +1129,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(i4array(b%dims(1)))
       i4array = INT(variable,i4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(i4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
     END IF
 
@@ -1160,7 +1168,7 @@ CONTAINS
     LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
     INTEGER(i4), DIMENSION(:,:), ALLOCATABLE :: i4array
-    INTEGER :: i, errcode
+    INTEGER :: i, errcode, nitems
     TYPE(sdf_block_type), POINTER :: b
     LOGICAL :: convert
 
@@ -1191,8 +1199,10 @@ CONTAINS
       b%mult = 1.d0
     END IF
 
+    nitems = 1
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
+      IF (SIZE(variable,i) == 0) nitems = 0
     END DO
 
     ! Write header
@@ -1206,11 +1216,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(i4array(b%dims(1),b%dims(2)))
       i4array = INT(variable,i4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(i4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
     END IF
 
@@ -1245,7 +1255,7 @@ CONTAINS
     LOGICAL, OPTIONAL, INTENT(IN) :: convert_in
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
     INTEGER(i4), DIMENSION(:,:,:), ALLOCATABLE :: i4array
-    INTEGER :: i, errcode
+    INTEGER :: i, errcode, nitems
     TYPE(sdf_block_type), POINTER :: b
     LOGICAL :: convert
 
@@ -1276,8 +1286,10 @@ CONTAINS
       b%mult = 1.d0
     END IF
 
+    nitems = 1
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
+      IF (SIZE(variable,i) == 0) nitems = 0
     END DO
 
     ! Write header
@@ -1291,11 +1303,11 @@ CONTAINS
     IF (convert) THEN
       ALLOCATE(i4array(b%dims(1),b%dims(2),b%dims(3)))
       i4array = INT(variable,i4)
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, i4array, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
       DEALLOCATE(i4array)
     ELSE
-      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+      CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
           MPI_STATUS_IGNORE, errcode)
     END IF
 
@@ -1388,7 +1400,7 @@ CONTAINS
     CHARACTER(LEN=1), DIMENSION(:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
-    INTEGER :: i, errcode
+    INTEGER :: i, errcode, nitems
     TYPE(sdf_block_type), POINTER :: b
 
     CALL sdf_get_next_block(h)
@@ -1406,8 +1418,10 @@ CONTAINS
       b%mult = 1.d0
     END IF
 
+    nitems = 1
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
+      IF (SIZE(variable,i) == 0) nitems = 0
     END DO
 
     ! Write header
@@ -1418,7 +1432,7 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -1450,7 +1464,7 @@ CONTAINS
     CHARACTER(LEN=1), DIMENSION(:,:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
-    INTEGER :: i, errcode
+    INTEGER :: i, errcode, nitems
     TYPE(sdf_block_type), POINTER :: b
 
     CALL sdf_get_next_block(h)
@@ -1468,8 +1482,10 @@ CONTAINS
       b%mult = 1.d0
     END IF
 
+    nitems = 1
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
+      IF (SIZE(variable,i) == 0) nitems = 0
     END DO
 
     ! Write header
@@ -1480,7 +1496,7 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
@@ -1512,7 +1528,7 @@ CONTAINS
     CHARACTER(LEN=1), DIMENSION(:,:,:), INTENT(IN) :: variable
     INTEGER, INTENT(IN) :: distribution, subarray
     REAL(r8), OPTIONAL, INTENT(IN) :: mult
-    INTEGER :: i, errcode
+    INTEGER :: i, errcode, nitems
     TYPE(sdf_block_type), POINTER :: b
 
     CALL sdf_get_next_block(h)
@@ -1530,8 +1546,10 @@ CONTAINS
       b%mult = 1.d0
     END IF
 
+    nitems = 1
     DO i = 1,ndims
       b%dims(i) = INT(dims(i),i4)
+      IF (SIZE(variable,i) == 0) nitems = 0
     END DO
 
     ! Write header
@@ -1542,7 +1560,7 @@ CONTAINS
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
         distribution, 'native', MPI_INFO_NULL, errcode)
-    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, 1, subarray, &
+    CALL MPI_FILE_WRITE_ALL(h%filehandle, variable, nitems, subarray, &
         MPI_STATUS_IGNORE, errcode)
 
     CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
