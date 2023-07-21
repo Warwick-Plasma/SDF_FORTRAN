@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(SDF VERSION 1.5.16 LANGUAGES Fortran)
+project(SDF VERSION 1.5.17 LANGUAGES Fortran)
 include(CTest)
 find_package(MPI REQUIRED)
 find_package(PackSDF REQUIRED PATHS CMake NO_DEFAULT_PATH)
