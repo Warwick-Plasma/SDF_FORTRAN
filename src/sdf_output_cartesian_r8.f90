@@ -45,6 +45,7 @@ MODULE sdf_output_cartesian_r8
   PUBLIC :: write_1d_float_r8
   PUBLIC :: write_2d_float_r8
   PUBLIC :: write_3d_float_r8
+  PUBLIC :: write_4d_float_r8
   PUBLIC :: write_1d_float_num_r8
   PUBLIC :: write_2d_float_num_r8
   PUBLIC :: write_3d_float_num_r8
@@ -2580,6 +2581,39 @@ CONTAINS
         stagger, mesh_id, variable, distribution, subarray, convert, mult)
 
   END SUBROUTINE write_3d_float_r8
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to write a 4D cartesian variable in parallel
+  ! using the mpitype {distribution} for distribution of data
+  ! It's up to the coder to design the distribution parallel operation, so
+  ! need global dims
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE write_4d_float_r8(h, id, name, units, dims, stagger, mesh_id, &
+      variable, distribution, subarray, convert, mult)
+
+    INTEGER, PARAMETER :: ndims = 4
+    TYPE(sdf_file_handle) :: h
+    CHARACTER(LEN=*), INTENT(IN) :: id, name, units
+    INTEGER, DIMENSION(:), INTENT(IN) :: dims
+    INTEGER(i4), INTENT(IN) :: stagger
+    CHARACTER(LEN=*), INTENT(IN) :: mesh_id
+    REAL(r8), DIMENSION(:,:,:,:), INTENT(IN) :: variable
+    INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, OPTIONAL, INTENT(IN) :: convert
+    REAL(r8), OPTIONAL, INTENT(IN) :: mult
+    INTEGER :: i, sz(ndims)
+
+    DO i = 1,ndims
+      sz(i) = SIZE(variable,i)
+    END DO
+
+    CALL write_4d_float_gen_r8(h, id, name, units, ndims, 1, dims, sz, &
+        stagger, mesh_id, variable, distribution, subarray, convert, mult)
+
+  END SUBROUTINE write_4d_float_r8
 
 
   !----------------------------------------------------------------------------
