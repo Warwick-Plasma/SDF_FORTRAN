@@ -18,17 +18,17 @@ CONTAINS
   SUBROUTINE read_header(h)
 
     TYPE(sdf_file_handle) :: h
-    CHARACTER(LEN=4) :: sdf
+    CHARACTER(LEN=4) :: sdf_magic
     INTEGER :: errcode
 
     h%current_location = 0
     h%start_location = 0
 
     ! Read the header
-    CALL read_entry_stringlen(h, sdf, 4)
+    CALL read_entry_stringlen(h, sdf_magic, 4)
 
     ! If this isn't SDF_MAGIC then this isn't an SDF file
-    IF (sdf /= c_sdf_magic) THEN
+    IF (sdf_magic /= c_sdf_magic) THEN
       CALL MPI_FILE_CLOSE(h%filehandle, errcode)
       h%error_code = c_err_unsupported_file + 64 * h%nblocks
       h%handled_error = .TRUE.
