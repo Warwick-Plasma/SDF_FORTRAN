@@ -201,6 +201,44 @@ CONTAINS
   ! using the mpitype {distribution} for distribution of data
   !----------------------------------------------------------------------------
 
+  SUBROUTINE read_4d_integer_i4(h, variable, distribution, subarray)
+
+    TYPE(sdf_file_handle) :: h
+    INTEGER(i4), DIMENSION(:,:,:,:), INTENT(OUT) :: variable
+    INTEGER, INTENT(IN) :: distribution, subarray
+    INTEGER :: errcode
+    TYPE(sdf_block_type), POINTER :: b
+
+    IF (sdf_check_block_header(h)) RETURN
+
+    b => h%current_block
+    IF (.NOT. b%done_info) CALL read_plain_variable_info_ru(h)
+
+    ! Read the actual data
+
+    h%current_location = b%data_location
+
+    CALL MPI_FILE_SET_VIEW(h%filehandle, h%current_location, MPI_BYTE, &
+        distribution, 'native', MPI_INFO_NULL, errcode)
+
+    CALL MPI_FILE_READ_ALL(h%filehandle, variable, 1, subarray, &
+        MPI_STATUS_IGNORE, errcode)
+
+    CALL MPI_FILE_SET_VIEW(h%filehandle, c_off0, MPI_BYTE, MPI_BYTE, 'native', &
+        MPI_INFO_NULL, errcode)
+
+    h%current_location = b%data_location + b%data_length
+    b%done_data = .TRUE.
+
+  END SUBROUTINE read_4d_integer_i4
+
+
+
+  !----------------------------------------------------------------------------
+  ! Code to read a 3D cartesian integer variable in parallel
+  ! using the mpitype {distribution} for distribution of data
+  !----------------------------------------------------------------------------
+
   SUBROUTINE read_3d_integer_i4(h, variable, distribution, subarray)
 
     TYPE(sdf_file_handle) :: h

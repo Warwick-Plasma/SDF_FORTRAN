@@ -97,6 +97,7 @@ MODULE sdf_output_cartesian
         write_1d_float_r8, &
         write_2d_float_r8, &
         write_3d_float_r8, &
+        write_4d_float_r8, &
         write_1d_float_num_r4, &
         write_2d_float_num_r4, &
         write_3d_float_num_r4, &
@@ -117,6 +118,7 @@ MODULE sdf_output_cartesian
         write_1d_integer_i4_r8, &
         write_2d_integer_i4_r8, &
         write_3d_integer_i4_r8, &
+        write_4d_integer_i4_r8, &
         write_1d_integer_i8_r4, &
         write_2d_integer_i8_r4, &
         write_3d_integer_i8_r4, &

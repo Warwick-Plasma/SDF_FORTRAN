@@ -878,4 +878,28 @@ CONTAINS
 
   END SUBROUTINE read_3d_variable_r8
 
+
+
+  !----------------------------------------------------------------------------
+  ! Code to read either 4D cartesian variable or 3D cartesian multi-material
+  ! in parallel
+  !----------------------------------------------------------------------------
+
+  SUBROUTINE read_4d_variable_r8(h, variable, distribution, subarray, last_in)
+
+    TYPE(sdf_file_handle) :: h
+    REAL(r8), DIMENSION(:,:,:,:), INTENT(OUT) :: variable
+    INTEGER, INTENT(IN) :: distribution, subarray
+    LOGICAL, INTENT(IN), OPTIONAL :: last_in
+    TYPE(sdf_block_type), POINTER :: b
+
+    b => h%current_block
+    IF (b%blocktype == c_blocktype_plain_variable) THEN
+      CALL read_nd_float_r8(h, variable(1,1,1,1), distribution, subarray)
+    ELSE
+      CALL read_3d_material_r8(h, variable, distribution, subarray, last_in)
+    END IF
+
+  END SUBROUTINE read_4d_variable_r8
+
 END MODULE sdf_input_cartesian_r8
