@@ -580,7 +580,9 @@ CONTAINS
     len2 = LEN(s2)
     olen = MIN(len1,len2)
     IF (olen > 0) THEN
-      s2(1:olen) = s1(1:olen)
+      DO i = 1,olen
+        s2(i:i) = s1(i:i)
+      END DO
       DO i = olen+1,len2
         s2(i:i) = ' '
       END DO
