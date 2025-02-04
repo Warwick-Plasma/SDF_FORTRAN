@@ -82,7 +82,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_srl_1d_mesh_r8(h, id, name, x, convert_in, &
-      dim_labels, dim_units, dim_mults, geometry, rank_write)
+      dim_labels, dim_units, dim_mults, geometry, rank_write, dims)
 
     INTEGER, PARAMETER :: ndims = 1
     TYPE(sdf_file_handle) :: h
@@ -92,6 +92,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
     INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
+    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: dims
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
     INTEGER :: errcode, intn
     TYPE(sdf_block_type), POINTER :: b
@@ -125,7 +126,12 @@ CONTAINS
 
     IF (PRESENT(rank_write)) h%rank_master = rank_write
 
-    b%dims(1) = INT(SIZE(x),i4)
+    IF (PRESENT(dims)) THEN
+      b%dims(1) = dims(1)
+    ELSE
+      b%dims(1) = INT(SIZE(x),i4)
+      CALL MPI_BCAST(b%dims, 1, MPI_INTEGER, h%rank_master, h%comm, errcode)
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       b%extents(1) = REAL(MINVAL(x(1:b%dims(1))),r8)
@@ -176,7 +182,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_srl_2d_mesh_r8(h, id, name, x, y, convert_in, &
-      dim_labels, dim_units, dim_mults, geometry, rank_write)
+      dim_labels, dim_units, dim_mults, geometry, rank_write, dims)
 
     INTEGER, PARAMETER :: ndims = 2
     TYPE(sdf_file_handle) :: h
@@ -186,6 +192,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
     INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
+    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: dims
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
     INTEGER :: errcode, intn
     TYPE(sdf_block_type), POINTER :: b
@@ -219,8 +226,14 @@ CONTAINS
 
     IF (PRESENT(rank_write)) h%rank_master = rank_write
 
-    b%dims(1) = INT(SIZE(x),i4)
-    b%dims(2) = INT(SIZE(y),i4)
+    IF (PRESENT(dims)) THEN
+      b%dims(1) = dims(1)
+      b%dims(2) = dims(2)
+    ELSE
+      b%dims(1) = INT(SIZE(x),i4)
+      b%dims(2) = INT(SIZE(y),i4)
+      CALL MPI_BCAST(b%dims, 2, MPI_INTEGER, h%rank_master, h%comm, errcode)
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       b%extents(1) = REAL(MINVAL(x(1:b%dims(1))),r8)
@@ -282,7 +295,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_srl_3d_mesh_r8(h, id, name, x, y, z, convert_in, &
-      dim_labels, dim_units, dim_mults, geometry, rank_write)
+      dim_labels, dim_units, dim_mults, geometry, rank_write, dims)
 
     INTEGER, PARAMETER :: ndims = 3
     TYPE(sdf_file_handle) :: h
@@ -292,6 +305,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
     INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
+    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: dims
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
     INTEGER :: errcode, intn
     TYPE(sdf_block_type), POINTER :: b
@@ -325,9 +339,16 @@ CONTAINS
 
     IF (PRESENT(rank_write)) h%rank_master = rank_write
 
-    b%dims(1) = INT(SIZE(x),i4)
-    b%dims(2) = INT(SIZE(y),i4)
-    b%dims(3) = INT(SIZE(z),i4)
+    IF (PRESENT(dims)) THEN
+      b%dims(1) = dims(1)
+      b%dims(2) = dims(2)
+      b%dims(3) = dims(3)
+    ELSE
+      b%dims(1) = INT(SIZE(x),i4)
+      b%dims(2) = INT(SIZE(y),i4)
+      b%dims(3) = INT(SIZE(z),i4)
+      CALL MPI_BCAST(b%dims, 3, MPI_INTEGER, h%rank_master, h%comm, errcode)
+    END IF
 
     IF (h%rank == h%rank_master) THEN
       b%extents(1) = REAL(MINVAL(x(1:b%dims(1))),r8)
@@ -748,7 +769,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_srl_2d_lag_mesh_r8(h, id, name, x, y, convert_in, &
-      dim_labels, dim_units, dim_mults, geometry, rank_write)
+      dim_labels, dim_units, dim_mults, geometry, rank_write, dims)
 
     INTEGER, PARAMETER :: ndims = 2
     TYPE(sdf_file_handle) :: h
@@ -758,6 +779,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
     INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
+    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: dims
     REAL(r4), DIMENSION(:,:), ALLOCATABLE :: r4array
     INTEGER :: i, errcode, intn
     TYPE(sdf_block_type), POINTER :: b
@@ -766,9 +788,19 @@ CONTAINS
     CALL sdf_get_next_block(h)
     b => h%current_block
 
+    IF (PRESENT(dims)) THEN
+      DO i = 1,ndims
+        b%dims(i) = dims(i)
+      END DO
+    ELSE
+      DO i = 1,ndims
+        b%dims(i) = INT(SIZE(x,i),i4)
+      END DO
+    END IF
+    CALL MPI_BCAST(b%dims, ndims, MPI_INTEGER, h%rank_master, h%comm, errcode)
+
     intn = 1
     DO i = 1,ndims
-      b%dims(i) = INT(SIZE(x,i),i4)
       intn = intn * b%dims(i)
     END DO
 
@@ -851,7 +883,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_srl_3d_lag_mesh_r8(h, id, name, x, y, z, convert_in, &
-      dim_labels, dim_units, dim_mults, geometry, rank_write)
+      dim_labels, dim_units, dim_mults, geometry, rank_write, dims)
 
     INTEGER, PARAMETER :: ndims = 3
     TYPE(sdf_file_handle) :: h
@@ -861,6 +893,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
     INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
+    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: dims
     REAL(r4), DIMENSION(:,:,:), ALLOCATABLE :: r4array
     INTEGER :: i, errcode, intn
     TYPE(sdf_block_type), POINTER :: b
@@ -869,9 +902,19 @@ CONTAINS
     CALL sdf_get_next_block(h)
     b => h%current_block
 
+    IF (PRESENT(dims)) THEN
+      DO i = 1,ndims
+        b%dims(i) = dims(i)
+      END DO
+    ELSE
+      DO i = 1,ndims
+        b%dims(i) = INT(SIZE(x,i),i4)
+      END DO
+    END IF
+    CALL MPI_BCAST(b%dims, ndims, MPI_INTEGER, h%rank_master, h%comm, errcode)
+
     intn = 1
     DO i = 1,ndims
-      b%dims(i) = INT(SIZE(x,i),i4)
       intn = intn * b%dims(i)
     END DO
 
@@ -963,7 +1006,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_srl_2d_path_mesh_r8(h, id, name, x, y, convert_in, &
-      dim_labels, dim_units, dim_mults, geometry, rank_write)
+      dim_labels, dim_units, dim_mults, geometry, rank_write, dims)
 
     INTEGER, PARAMETER :: ndims = 2
     TYPE(sdf_file_handle) :: h
@@ -973,6 +1016,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
     INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
+    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: dims
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
     INTEGER :: errcode, intn
     TYPE(sdf_block_type), POINTER :: b
@@ -981,7 +1025,12 @@ CONTAINS
     CALL sdf_get_next_block(h)
     b => h%current_block
 
-    intn = INT(SIZE(x),i4)
+    IF (PRESENT(dims)) THEN
+      intn = dims(1)
+    ELSE
+      intn = INT(SIZE(x),i4)
+      CALL MPI_BCAST(intn, 1, MPI_INTEGER, h%rank_master, h%comm, errcode)
+    END IF
     b%dims(:) = 1
     b%dims(1) = intn
 
@@ -1064,7 +1113,7 @@ CONTAINS
   !----------------------------------------------------------------------------
 
   SUBROUTINE write_srl_3d_path_mesh_r8(h, id, name, x, y, z, convert_in, &
-      dim_labels, dim_units, dim_mults, geometry, rank_write)
+      dim_labels, dim_units, dim_mults, geometry, rank_write, dims)
 
     INTEGER, PARAMETER :: ndims = 3
     TYPE(sdf_file_handle) :: h
@@ -1074,6 +1123,7 @@ CONTAINS
     CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: dim_labels(:), dim_units(:)
     REAL(r8), DIMENSION(:), INTENT(IN), OPTIONAL :: dim_mults
     INTEGER, INTENT(IN), OPTIONAL :: geometry, rank_write
+    INTEGER, DIMENSION(:), INTENT(IN), OPTIONAL :: dims
     REAL(r4), DIMENSION(:), ALLOCATABLE :: r4array
     INTEGER :: errcode, intn
     TYPE(sdf_block_type), POINTER :: b
@@ -1082,7 +1132,12 @@ CONTAINS
     CALL sdf_get_next_block(h)
     b => h%current_block
 
-    intn = INT(SIZE(x),i4)
+    IF (PRESENT(dims)) THEN
+      intn = dims(1)
+    ELSE
+      intn = INT(SIZE(x),i4)
+      CALL MPI_BCAST(intn, 1, MPI_INTEGER, h%rank_master, h%comm, errcode)
+    END IF
     b%dims(:) = 1
     b%dims(1) = intn
 
