@@ -130,6 +130,7 @@ CONTAINS
       b%dims(1) = dims(1)
     ELSE
       b%dims(1) = INT(SIZE(x),i4)
+      CALL MPI_BCAST(b%dims, 1, MPI_INTEGER, h%rank_master, h%comm, errcode)
     END IF
 
     IF (h%rank == h%rank_master) THEN
@@ -231,6 +232,7 @@ CONTAINS
     ELSE
       b%dims(1) = INT(SIZE(x),i4)
       b%dims(2) = INT(SIZE(y),i4)
+      CALL MPI_BCAST(b%dims, 2, MPI_INTEGER, h%rank_master, h%comm, errcode)
     END IF
 
     IF (h%rank == h%rank_master) THEN
@@ -345,6 +347,7 @@ CONTAINS
       b%dims(1) = INT(SIZE(x),i4)
       b%dims(2) = INT(SIZE(y),i4)
       b%dims(3) = INT(SIZE(z),i4)
+      CALL MPI_BCAST(b%dims, 3, MPI_INTEGER, h%rank_master, h%comm, errcode)
     END IF
 
     IF (h%rank == h%rank_master) THEN
@@ -785,13 +788,19 @@ CONTAINS
     CALL sdf_get_next_block(h)
     b => h%current_block
 
+    IF (PRESENT(dims)) THEN
+      DO i = 1,ndims
+        b%dims(i) = dims(i)
+      END DO
+    ELSE
+      DO i = 1,ndims
+        b%dims(i) = INT(SIZE(x,i),i4)
+      END DO
+    END IF
+    CALL MPI_BCAST(b%dims, ndims, MPI_INTEGER, h%rank_master, h%comm, errcode)
+
     intn = 1
     DO i = 1,ndims
-      IF (PRESENT(dims)) THEN
-        b%dims(i) = dims(i)
-      ELSE
-        b%dims(i) = INT(SIZE(x,i),i4)
-      END IF
       intn = intn * b%dims(i)
     END DO
 
@@ -893,13 +902,19 @@ CONTAINS
     CALL sdf_get_next_block(h)
     b => h%current_block
 
+    IF (PRESENT(dims)) THEN
+      DO i = 1,ndims
+        b%dims(i) = dims(i)
+      END DO
+    ELSE
+      DO i = 1,ndims
+        b%dims(i) = INT(SIZE(x,i),i4)
+      END DO
+    END IF
+    CALL MPI_BCAST(b%dims, ndims, MPI_INTEGER, h%rank_master, h%comm, errcode)
+
     intn = 1
     DO i = 1,ndims
-      IF (PRESENT(dims)) THEN
-        b%dims(i) = dims(i)
-      ELSE
-        b%dims(i) = INT(SIZE(x,i),i4)
-      END IF
       intn = intn * b%dims(i)
     END DO
 
@@ -1014,6 +1029,7 @@ CONTAINS
       intn = dims(1)
     ELSE
       intn = INT(SIZE(x),i4)
+      CALL MPI_BCAST(intn, 1, MPI_INTEGER, h%rank_master, h%comm, errcode)
     END IF
     b%dims(:) = 1
     b%dims(1) = intn
@@ -1120,6 +1136,7 @@ CONTAINS
       intn = dims(1)
     ELSE
       intn = INT(SIZE(x),i4)
+      CALL MPI_BCAST(intn, 1, MPI_INTEGER, h%rank_master, h%comm, errcode)
     END IF
     b%dims(:) = 1
     b%dims(1) = intn
